@@ -1,0 +1,30 @@
+{"frames": [
+
+{
+	"filename": "gray.png",
+	"frame": {"x":0,"y":0,"w":128,"h":128},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
+	"sourceSize": {"w":128,"h":128},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "testimage.png",
+	"frame": {"x":128,"y":0,"w":512,"h":512},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":512,"h":512},
+	"sourceSize": {"w":512,"h":512},
+	"pivot": {"x":0.5,"y":0.5}
+}],
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "RocketBallSprites.png",
+	"format": "RGBA8888",
+	"size": {"w":640,"h":512},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:7a4672dd1b8d43fbeebf199eff5d508c:b93823909dd392caeea5fb4418614ed4:abc763de9f831949696569c25140e526$"
+}
+}

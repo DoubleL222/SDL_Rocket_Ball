@@ -36,15 +36,18 @@ private:
 	sre::SDLRenderer r;
 
 	const float physicsScale = 100;
+	const float floorHeight = 10;
+
 
 	void initGame();
 
-	//void initPhysics();
+	void initPhysics();
 	//void updatePhysics();
 	//void handleContact(b2Contact *contact, bool begin);
 	//void registerPhysicsComponent(PhysicsComponent *r);
 	//void deregisterPhysicsComponent(PhysicsComponent *r);
 
+	std::shared_ptr<sre::SpriteAtlas> mySpriteAtlas;
 	b2World * world = nullptr;
 	std::map<b2Fixture*, PhysicsComponent *> physicsComponentLookup;
 

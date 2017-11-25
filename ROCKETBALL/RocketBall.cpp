@@ -3,6 +3,7 @@
 #include "GameObject.hpp"
 #include "sre/RenderPass.hpp"
 #include "PhysicsComponent.hpp"
+#include "SpriteComponent.hpp"
 #include "sre/profiler.hpp"
 #include <iostream>
 
@@ -40,7 +41,11 @@ RocketBall::RocketBall()
 }
 
 void RocketBall::initGame() {
+	//MAKING THE SPRITE ATLAS
+	mySpriteAtlas = SpriteAtlas::create("RocketBallSprites.json", "RocketBallSprites.png");
 
+	//INITIALIZING PHYSICS
+	initPhysics();
 
 	if (world) {
 		world->SetContactListener(nullptr);
@@ -58,7 +63,29 @@ void RocketBall::initGame() {
 	if (!background_Layer_1.isInit) {
 		//(image, initial position X, initial position Y)
 		//
-		background_Layer_1.init("testimage.png", -windowSize.x*0.5f, -windowSize.y*0.5f, true);
+		//background_Layer_1.init("testimage.png", -windowSize.x*0.5f, -windowSize.y*0.5f, true);
+	}
+
+	//Spawning Floor
+	auto floorGameObj = createGameObject();
+	auto spriteComp = floorGameObj->addComponent<SpriteComponent>();
+	auto floorSprite = mySpriteAtlas->get("gray.png");
+	floorSprite.setScale(glm::vec2(windowSize.x/floorSprite.getSpriteSize().x, windowSize.y / ((floorHeight/2.0f )*(floorSprite.getSpriteSize().y))));
+	spriteComp->setSprite(floorSprite);
+	floorGameObj->setPosition({ 0, -windowSize.y/(2.0) + windowSize.y / floorHeight });
+	auto physComp = floorGameObj->addComponent<PhysicsComponent>();
+	physComp->initBox(b2BodyType::b2_staticBody,glm::vec2(windowSize.x/(physicsScale*2), windowSize.y/(physicsScale*floorHeight)),floorGameObj->getPosition()/physicsScale, 0.0f);
+}
+
+void RocketBall::initPhysics()
+{
+	float gravity = -9.8; // 9.8 m/s2
+	delete world;
+	world = new b2World(b2Vec2(0, gravity));
+	world->SetContactListener(this);
+
+	if (doDebugDraw) {
+		world->SetDebugDraw(&debugDraw);
 	}
 }
 
@@ -163,6 +190,7 @@ std::shared_ptr<GameObject> RocketBall::createGameObject() {
 
 #pragma region Physics
 ///Place phyiscs
+
 
 #pragma endregion
 

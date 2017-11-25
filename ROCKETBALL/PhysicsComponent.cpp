@@ -4,12 +4,13 @@
 
 #include <Box2D/Box2D.h>
 #include "PhysicsComponent.hpp"
+#include "RocketBall.h"
 //#include "BirdGame.hpp"
 
 PhysicsComponent::PhysicsComponent(GameObject *gameObject)
         : Component(gameObject)
 {
-  //  world = BirdGame::instance->world;
+    world = RocketBall::gameInstance->world;
 }
 
 PhysicsComponent::~PhysicsComponent()
