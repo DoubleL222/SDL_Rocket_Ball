@@ -21,8 +21,8 @@ add_executable(RocketBall ${RocketFiles})
 target_link_libraries(RocketBall ${all_libs})
 
 # copy files to dest
-#file(COPY background.png background2.png bird.json bird.png coin_collect.wav DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
-#file(COPY background.png background2.png bird.json bird.png coin_collect.wav DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release)
+file(COPY testimage.png DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
+file(COPY testimage.png DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release)
 
 IF (WIN32)
     # Copy dll files to ${CMAKE_CURRENT_BINARY_DIR}/Debug

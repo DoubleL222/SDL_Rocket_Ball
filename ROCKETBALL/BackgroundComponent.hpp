@@ -7,11 +7,11 @@
 
 class BackgroundComponent {
 public:
-    BackgroundComponent();
-    void init(std::string filename);
-    void renderBackground(sre::RenderPass& renderPass, float offset);
+	BackgroundComponent();
+	void init(std::string filename, float initPositionX, float initPositionY, bool stretchToFit);
+	void renderBackground(sre::RenderPass& renderPass, float offset);
 	bool isInit = false;
 private:
-    std::shared_ptr<sre::Texture> tex;
-    std::shared_ptr<sre::SpriteBatch> batch;
+	std::shared_ptr<sre::Texture> tex;
+	std::shared_ptr<sre::SpriteBatch> batch;
 };

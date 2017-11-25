@@ -4,11 +4,13 @@
 #include "sre/RenderPass.hpp"
 #include "PhysicsComponent.hpp"
 #include "sre/profiler.hpp"
+#include <iostream>
+
 
 using namespace std;
 using namespace sre;
 
-const glm::vec2 RocketBall::windowSize(400, 600); // some size
+const glm::vec2 RocketBall::windowSize(800, 600); // some size for the window
 
 RocketBall* RocketBall::gameInstance = nullptr;
 
@@ -39,6 +41,7 @@ RocketBall::RocketBall()
 
 void RocketBall::initGame() {
 
+
 	if (world) {
 		world->SetContactListener(nullptr);
 	}
@@ -50,8 +53,27 @@ void RocketBall::initGame() {
 	camGameObj->name = "Camera";
 	camera = camGameObj->addComponent<GameCamera>();
 	camGameObj->setPosition(windowSize*0.5f);
+
+	//Set background if it has not yet been set
+	if (!background_Layer_1.isInit) {
+		//(image, initial position X, initial position Y)
+		//
+		background_Layer_1.init("testimage.png", -windowSize.x*0.5f, -windowSize.y*0.5f, true);
+	}
 }
 
+/// Core Update
+void RocketBall::update(float time) {
+	if (gameState == GameState::Running) {
+		//updatePhysics();
+	}
+	for (int i = 0; i < sceneObjects.size(); i++) {
+		sceneObjects[i]->update(time);
+	}
+}
+
+/// Region for Render engine
+#pragma region Render
 void RocketBall::render() {
 	auto rp = RenderPass::create()
 		.withCamera(camera->getCamera())
@@ -62,6 +84,9 @@ void RocketBall::render() {
 	profiler.gui(/*usewindow=*/ true);
 
 	auto pos = camera->getGameObject()->getPosition();
+
+	//Render the background Layer_1
+	background_Layer_1.renderBackground(rp, +pos.x*0.8f);
 
 	auto spriteBatchBuilder = SpriteBatch::create();
 	for (auto & go : sceneObjects) {
@@ -77,15 +102,57 @@ void RocketBall::render() {
 		debugDraw.clear();
 	}
 
-	/*
 	ImGui::SetNextWindowPos(ImVec2(Renderer::instance->getWindowSize().x / 2 - 50, .0f), ImGuiSetCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(100, 50), ImGuiSetCond_Always);
 	ImGui::Begin("", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
 	ImGui::SetWindowFontScale(2.0f);
 	ImGui::PushFont;
 	ImGui::End();
-	*/
+
 }
+#pragma endregion
+
+
+#pragma region Handle_Inputs
+void RocketBall::onKey(SDL_Event &event) {
+	for (auto & gameObject : sceneObjects) {
+		for (auto & c : gameObject->getComponents()) {
+			bool consumed = c->onKey(event);
+			if (consumed) {
+				return;
+			}
+		}
+	}
+
+	if (event.type == SDL_KEYDOWN) {
+		switch (event.key.keysym.sym) {
+		case SDLK_d:
+			// press 'd' for physics debug
+			doDebugDraw = !doDebugDraw;
+			if (doDebugDraw) {
+				world->SetDebugDraw(&debugDraw);
+			}
+			else {
+				world->SetDebugDraw(nullptr);
+			}
+			break;
+		case SDLK_r:
+			initGame();
+			break;
+		case SDLK_SPACE:
+			if (gameState == GameState::GameOver) {
+				initGame();
+				gameState = GameState::Ready;
+			}
+			else if (gameState == GameState::Ready) {
+				gameState = GameState::Running;
+			}
+			break;
+		}
+	}
+}
+#pragma endregion
+
 
 std::shared_ptr<GameObject> RocketBall::createGameObject() {
 	auto obj = shared_ptr<GameObject>(new GameObject());
@@ -93,6 +160,14 @@ std::shared_ptr<GameObject> RocketBall::createGameObject() {
 	return obj;
 }
 
+
+#pragma region Physics
+///Place phyiscs
+
+#pragma endregion
+
+
+
 void RocketBall::setGameState(GameState newState) {
-	//this->gameState = newState;
+	this->gameState = newState;
 }
