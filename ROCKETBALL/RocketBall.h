@@ -32,8 +32,6 @@ public:
 private:
 	sre::SDLRenderer r;
 
-	Box2DDebugDraw debugDraw;
-
 	const float physicsScale = 100;
 
 	void initGame();

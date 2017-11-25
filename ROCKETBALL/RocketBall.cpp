@@ -37,7 +37,6 @@ RocketBall::RocketBall()
 	r.startEventLoop();
 }
 
-
 void RocketBall::initGame() {
 
 	if (world) {
@@ -49,10 +48,9 @@ void RocketBall::initGame() {
 	camera.reset();
 	auto camGameObj = createGameObject();
 	camGameObj->name = "Camera";
-	camera = camGameObj->addComponent<Camera>();
+	camera = camGameObj->addComponent<GameCamera>();
 	camGameObj->setPosition(windowSize*0.5f);
 }
-
 
 void RocketBall::render() {
 	auto rp = RenderPass::create()
@@ -79,22 +77,21 @@ void RocketBall::render() {
 		debugDraw.clear();
 	}
 
+	/*
 	ImGui::SetNextWindowPos(ImVec2(Renderer::instance->getWindowSize().x / 2 - 50, .0f), ImGuiSetCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(100, 50), ImGuiSetCond_Always);
 	ImGui::Begin("", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
 	ImGui::SetWindowFontScale(2.0f);
 	ImGui::PushFont;
 	ImGui::End();
+	*/
 }
-
-
 
 std::shared_ptr<GameObject> RocketBall::createGameObject() {
 	auto obj = shared_ptr<GameObject>(new GameObject());
 	sceneObjects.push_back(obj);
 	return obj;
 }
-
 
 void RocketBall::setGameState(GameState newState) {
 	//this->gameState = newState;

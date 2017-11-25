@@ -33,10 +33,11 @@ public:
     void setRotation(float rotation);
 
     const std::vector<std::shared_ptr<Component>>& getComponents();
+    
+	GameObject() = default;
 
     std::string name = "_";
 private:
-    GameObject() = default;
     std::vector<std::shared_ptr<Component>> components;
 
     glm::vec2 position;
