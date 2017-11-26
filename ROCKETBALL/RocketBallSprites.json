@@ -10,8 +10,17 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
+	"filename": "SoccerBall.png",
+	"frame": {"x":128,"y":0,"w":256,"h":256},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
+	"sourceSize": {"w":256,"h":256},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
 	"filename": "testimage.png",
-	"frame": {"x":128,"y":0,"w":512,"h":512},
+	"frame": {"x":0,"y":256,"w":512,"h":512},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":512,"h":512},
@@ -23,8 +32,8 @@
 	"version": "1.0",
 	"image": "RocketBallSprites.png",
 	"format": "RGBA8888",
-	"size": {"w":640,"h":512},
+	"size": {"w":512,"h":768},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:7a4672dd1b8d43fbeebf199eff5d508c:b93823909dd392caeea5fb4418614ed4:abc763de9f831949696569c25140e526$"
+	"smartupdate": "$TexturePacker:SmartUpdate:43dacc9665a24fef93961df7b1879647:9aec9f9e85dd1d2f47b49482d3d44811:abc763de9f831949696569c25140e526$"
 }
 }
