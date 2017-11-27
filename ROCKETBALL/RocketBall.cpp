@@ -44,12 +44,12 @@ void RocketBall::initGame() {
 	//MAKING THE SPRITE ATLAS
 	mySpriteAtlas = SpriteAtlas::create("RocketBallSprites.json", "RocketBallSprites.png");
 
-	//INITIALIZING PHYSICS
-	initPhysics();
-
 	if (world) {
 		world->SetContactListener(nullptr);
 	}
+
+	//INITIALIZING PHYSICS
+	initPhysics();
 
 	//Setup Camera
 	sceneObjects.clear();
@@ -75,7 +75,50 @@ void RocketBall::initGame() {
 	floorGameObj->setPosition({ 0, -windowSize.y/(2.0) + windowSize.y / floorHeight });
 	auto physComp = floorGameObj->addComponent<PhysicsComponent>();
 	physComp->initBox(b2BodyType::b2_staticBody,glm::vec2(windowSize.x/(physicsScale*2), windowSize.y/(physicsScale*floorHeight)),floorGameObj->getPosition()/physicsScale, 0.0f);
+
+	//Spawning Ceiling
+	auto ceilingGameObj = createGameObject();
+	spriteComp = ceilingGameObj->addComponent<SpriteComponent>();
+	floorSprite.setScale(glm::vec2(windowSize.x / floorSprite.getSpriteSize().x, windowSize.y / ((ceilingHeight / 2.0f)*(floorSprite.getSpriteSize().y))));
+	spriteComp->setSprite(floorSprite);
+	ceilingGameObj->setPosition({ 0, windowSize.y / (2.0) - windowSize.y / ceilingHeight });
+	physComp = ceilingGameObj->addComponent<PhysicsComponent>();
+	physComp->initBox(b2BodyType::b2_staticBody, glm::vec2(windowSize.x / (physicsScale * 2), windowSize.y / (physicsScale*ceilingHeight)), ceilingGameObj->getPosition() / physicsScale, 0.0f);
+
+	//Spawning LeftWall
+	auto leftWall = createGameObject();
+	spriteComp = leftWall->addComponent<SpriteComponent>();
+	floorSprite.setScale(glm::vec2(windowSize.x / ((wallWidth / 2.0f)*(floorSprite.getSpriteSize().x)), windowSize.y / floorSprite.getSpriteSize().y));
+	spriteComp->setSprite(floorSprite);
+	leftWall->setPosition({ windowSize.x / (2.0) - windowSize.x / wallWidth,0 });
+	physComp = leftWall->addComponent<PhysicsComponent>();
+	physComp->initBox(b2BodyType::b2_staticBody, glm::vec2(windowSize.x / (physicsScale*wallWidth), windowSize.y / (physicsScale * 2) ), leftWall->getPosition() / physicsScale, 0.0f);
+
+	//Spawning RightWall
+	auto rightWall = createGameObject();
+	spriteComp = rightWall->addComponent<SpriteComponent>();
+	floorSprite.setScale(glm::vec2(windowSize.x / ((wallWidth / 2.0f)*(floorSprite.getSpriteSize().x)), windowSize.y / floorSprite.getSpriteSize().y));
+	spriteComp->setSprite(floorSprite);
+	rightWall->setPosition({- windowSize.x / (2.0) + windowSize.x / wallWidth,0 });
+	physComp = rightWall->addComponent<PhysicsComponent>();
+	physComp->initBox(b2BodyType::b2_staticBody, glm::vec2(windowSize.x / (physicsScale*wallWidth), windowSize.y / (physicsScale * 2)), rightWall->getPosition() / physicsScale, 0.0f);
+
+	//Spawn Soccer Ball
+	auto soccerBall = createGameObject();
+	spriteComp = soccerBall->addComponent<SpriteComponent>();
+	auto soccerBallSprite = mySpriteAtlas->get("SoccerBall.png"); 
+	soccerBallSprite.setScale(glm::vec2(0.4f,0.4f));
+	spriteComp->setSprite(soccerBallSprite);
+	soccerBall->setPosition(glm::vec2(0, 0));
+	physComp = soccerBall->addComponent<PhysicsComponent>();
+	physComp->initCircle(b2BodyType::b2_dynamicBody, 50 / physicsScale, soccerBall->getPosition() / physicsScale, 0.1f);
+
+
+	//SET GAME STATE
+	gameState = GameState::Running;
 }
+
+
 
 void RocketBall::initPhysics()
 {
@@ -92,7 +135,7 @@ void RocketBall::initPhysics()
 /// Core Update
 void RocketBall::update(float time) {
 	if (gameState == GameState::Running) {
-		//updatePhysics();
+		updatePhysics();
 	}
 	for (int i = 0; i < sceneObjects.size(); i++) {
 		sceneObjects[i]->update(time);
@@ -190,8 +233,27 @@ std::shared_ptr<GameObject> RocketBall::createGameObject() {
 
 #pragma region Physics
 ///Place phyiscs
+void RocketBall::registerPhysicsComponent(PhysicsComponent *r)
+{
+	physicsComponentLookup[r->fixture] = r;
+}
 
+void RocketBall::updatePhysics()
+{
+	const float32 timeStep = 1.0f / 60.0f;
+	const int positionIterations = 2;
+	const int velocityIterations = 6;
+	world->Step(timeStep, velocityIterations, positionIterations);
 
+	for (auto phys : physicsComponentLookup) {
+		if (phys.second->rbType == b2_staticBody) continue;
+		auto position = phys.second->body->GetPosition();
+		float angle = phys.second->body->GetAngle();
+		auto gameObject = phys.second->getGameObject();
+		gameObject->setPosition(glm::vec2(position.x*physicsScale, position.y*physicsScale));
+		gameObject->setRotation(angle);
+	}
+}
 #pragma endregion
 
 

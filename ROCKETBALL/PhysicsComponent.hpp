@@ -24,6 +24,10 @@ public:
 
     glm::vec2 getLinearVelocity();
 
+	b2Fixture* fixture = nullptr;
+	b2BodyType rbType;
+	b2Body * body = nullptr;
+
     bool isSensor();
 
     void setSensor(bool enabled);
@@ -31,10 +35,10 @@ private:
     b2PolygonShape * polygon = nullptr;
     b2CircleShape * circle = nullptr;
 	b2EdgeShape * edge = nullptr;
-    b2Body * body = nullptr;
+    
     b2Shape::Type shapeType;
-    b2Fixture* fixture = nullptr;
-    b2BodyType rbType;
+    
+    
     std::vector<PhysicsComponent *> collidingBodies;
     b2World * world = nullptr;
     friend class BirdGame;

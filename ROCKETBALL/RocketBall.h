@@ -24,6 +24,10 @@ public:
 
 	std::shared_ptr<GameObject> createGameObject();
 
+	void registerPhysicsComponent(PhysicsComponent * r);
+
+	void updatePhysics();
+
 	static const glm::vec2 windowSize;
 
 	//void BeginContact(b2Contact *contact) override;
@@ -36,8 +40,9 @@ private:
 	sre::SDLRenderer r;
 
 	const float physicsScale = 100;
-	const float floorHeight = 10;
-
+	const float floorHeight = 25;
+	const float ceilingHeight = 40;
+	const float wallWidth = 80;
 
 	void initGame();
 

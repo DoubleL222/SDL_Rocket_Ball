@@ -60,14 +60,18 @@ void PhysicsComponent::initCircle(b2BodyType type, float radius, glm::vec2 cente
     rbType = type;
     bd.position = b2Vec2(center.x, center.y);
     body = world->CreateBody(&bd);
+	body->SetLinearDamping(0.01f);
+	body->SetAngularDamping(0.01f);
     circle = new b2CircleShape();
     circle->m_radius = radius;
     b2FixtureDef fxD;
     fxD.shape = circle;
-    fxD.density = density;
+    fxD.density = 0.5f;
+	fxD.friction = 0.4f;
+	fxD.restitution = 0.6f;
     fixture = body->CreateFixture(&fxD);
 
-	//BirdGame::instance->registerPhysicsComponent(this);
+	RocketBall::gameInstance->registerPhysicsComponent(this);
 }
 
 void PhysicsComponent::initBox(b2BodyType type, glm::vec2 size, glm::vec2 center, float density) {
@@ -84,9 +88,10 @@ void PhysicsComponent::initBox(b2BodyType type, glm::vec2 size, glm::vec2 center
     b2FixtureDef fxD;
     fxD.shape = polygon;
     fxD.density = density;
-    fixture = body->CreateFixture(&fxD);
 
-    //BirdGame::instance->registerPhysicsComponent(this);
+	fixture = body->CreateFixture(&fxD);
+
+	RocketBall::gameInstance->registerPhysicsComponent(this);
 }
 
 void PhysicsComponent::initEdge(b2BodyType type, glm::vec2 point_1, glm::vec2 point_2, float density)
@@ -97,18 +102,18 @@ void PhysicsComponent::initEdge(b2BodyType type, glm::vec2 point_1, glm::vec2 po
 	b2BodyDef bd;
 	bd.type = type;
 	rbType = type;
-	bd.position = b2Vec2(center.x, center.y);
+	//bd.position = b2Vec2(center.x, center.y);
 	body = world->CreateBody(&bd);
 	edge = new b2EdgeShape();
-	edge->Set();
+	edge->Set(b2Vec2(point_1.x, point_1.y), b2Vec2(point_2.x, point_2.y));
 	//polygon = new b2PolygonShape();
 	//polygon->SetAsBox(size.x, size.y, { 0,0 }, 0);
 	b2FixtureDef fxD;
-	fxD.shape = polygon;
+	fxD.shape = edge;
 	fxD.density = density;
 	fixture = body->CreateFixture(&fxD);
 
-	//BirdGame::instance->registerPhysicsComponent(this);
+	RocketBall::gameInstance->registerPhysicsComponent(this);
 }
 
 bool PhysicsComponent::isSensor() {
