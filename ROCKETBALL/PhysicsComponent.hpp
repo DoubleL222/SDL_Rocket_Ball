@@ -14,6 +14,7 @@ public:
 
     void initCircle(b2BodyType type, float radius,glm::vec2 center,float density);
     void initBox(b2BodyType type, glm::vec2 size,glm::vec2 center,float density);
+	void initEdge(b2BodyType type, glm::vec2 point_1, glm::vec2 point_2, float density);
 
     void addForce(glm::vec2 force);     // Force gradually affects the velocity over time
 
@@ -29,6 +30,7 @@ public:
 private:
     b2PolygonShape * polygon = nullptr;
     b2CircleShape * circle = nullptr;
+	b2EdgeShape * edge = nullptr;
     b2Body * body = nullptr;
     b2Shape::Type shapeType;
     b2Fixture* fixture = nullptr;

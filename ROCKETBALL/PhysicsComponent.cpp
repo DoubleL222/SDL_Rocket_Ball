@@ -89,6 +89,28 @@ void PhysicsComponent::initBox(b2BodyType type, glm::vec2 size, glm::vec2 center
     //BirdGame::instance->registerPhysicsComponent(this);
 }
 
+void PhysicsComponent::initEdge(b2BodyType type, glm::vec2 point_1, glm::vec2 point_2, float density)
+{
+	assert(body == nullptr);
+	// do init
+	shapeType = b2Shape::Type::e_edge;
+	b2BodyDef bd;
+	bd.type = type;
+	rbType = type;
+	bd.position = b2Vec2(center.x, center.y);
+	body = world->CreateBody(&bd);
+	edge = new b2EdgeShape();
+	edge->Set();
+	//polygon = new b2PolygonShape();
+	//polygon->SetAsBox(size.x, size.y, { 0,0 }, 0);
+	b2FixtureDef fxD;
+	fxD.shape = polygon;
+	fxD.density = density;
+	fixture = body->CreateFixture(&fxD);
+
+	//BirdGame::instance->registerPhysicsComponent(this);
+}
+
 bool PhysicsComponent::isSensor() {
     return fixture->IsSensor();
 }
