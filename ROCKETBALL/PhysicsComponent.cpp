@@ -51,7 +51,7 @@ void PhysicsComponent::setLinearVelocity(glm::vec2 velocity) {
     body->SetLinearVelocity(v);
 }
 
-void PhysicsComponent::initCircle(b2BodyType type, float radius, glm::vec2 center, float density, float friction, float restitution, float mass) {
+void PhysicsComponent::initCircle(b2BodyType type, float radius, glm::vec2 center, float density, float friction, float restitution) {
     assert(body == nullptr);
     // do init
     shapeType = b2Shape::Type::e_circle;
@@ -62,8 +62,6 @@ void PhysicsComponent::initCircle(b2BodyType type, float radius, glm::vec2 cente
     body = world->CreateBody(&bd);
 	body->SetLinearDamping(0.01f);
 	body->SetAngularDamping(0.01f);
-	myData.mass = mass;
-	body->SetMassData(&myData);
     circle = new b2CircleShape();
     circle->m_radius = radius;
     b2FixtureDef fxD;
@@ -89,6 +87,7 @@ void PhysicsComponent::initBox(b2BodyType type, glm::vec2 size, glm::vec2 center
     polygon = new b2PolygonShape();
     polygon->SetAsBox(size.x, size.y, {0,0}, 0);
     b2FixtureDef fxD;
+	fxD.friction = 1.0f;
     fxD.shape = polygon;
     fxD.density = density;
 
@@ -114,6 +113,7 @@ void PhysicsComponent::initEdge(b2BodyType type, glm::vec2 point_1, glm::vec2 po
 	b2FixtureDef fxD;
 	fxD.shape = edge;
 	fxD.density = density;
+	body->ResetMassData();
 	fixture = body->CreateFixture(&fxD);
 
 	RocketBall::gameInstance->registerPhysicsComponent(this);

@@ -47,15 +47,13 @@ private:
 	std::shared_ptr<GameObject> player1;
 	std::shared_ptr<GameObject> player2;
 
-	float ballMass = 1.0f;
 	float ballRestitution = 0.8f;
 	float ballFriction = 0.4f;
-	float ballDensity = 0.1f;
+	float ballDensity = 0.01f;
 
-	float playerMass = 100.0f;
 	float playerRestitution = 0.0f;
 	float playerFriction = 0.4f;
-	float playerDensity = 0.1f;
+	float playerDensity = 0.7f;
 
 	sre::SDLRenderer r;
 
