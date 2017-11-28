@@ -279,6 +279,11 @@ void RocketBall::updatePhysics(float deltaTime)
 
 void RocketBall::UpdateWithNewPhysics()
 {
+	auto soccerBallPhysics = soccerBall->getComponent<PhysicsComponent>();
+	soccerBallPhysics->fixture->SetFriction(ballFriction);
+	soccerBallPhysics->fixture->SetRestitution(ballRestitution);
+	soccerBallPhysics->fixture->SetRestitution(ballRestitution);
+	soccerBallPhysics->myData.mass = ballMass;
 
 }
 #pragma endregion
@@ -288,14 +293,21 @@ void RocketBall::RenderSliders()
 {
 	bool open = true;
 	ImGui::Begin("#TestLabel", &open, ImVec2(500, 100), 0, ImGuiWindowFlags_NoTitleBar);
+	ImGui::LabelText("Variables", "BALL SETTINGS");
 	ImGui::SetNextWindowPos(ImVec2(500, 100));
-	ImGui::SliderFloat(": Ball Restitution", &ballRestitution, 0.0f, 1.0f);
-	ImGui::SliderFloat(": Ball Friction", &ballFriction, 0.0f, 1.0f);
-	ImGui::SliderFloat(": Ball Mass: ", &ballMass, 0.01f, 20.0f);
-	ImGui::SliderFloat(": Ball Density: ", &ballMass, 0.0f, 1.0f);
-	std::cout << "Ball is: " << ballRestitution;
-
+	ImGui::SliderFloat(": B_Restitution", &ballRestitution, 0.0f, 1.0f);
+	ImGui::SliderFloat(": B_Friction", &ballFriction, 0.0f, 1.0f);
+	ImGui::SliderFloat(": B_Mass: ", &ballMass, 0.01f, 20.0f);
+	ImGui::SliderFloat(": B_Density: ", &ballDensity, 0.0f, 1.0f);
+	ImGui::LabelText("Variables", "PKAYER SETTINGS");
+	ImGui::SetNextWindowPos(ImVec2(500, 100));
+	ImGui::SliderFloat(": P_Restitution", &playerRestitution, 0.0f, 1.0f);
+	ImGui::SliderFloat(": P_Friction", &playerFriction, 0.0f, 1.0f);
+	ImGui::SliderFloat(": P_Mass: ", &playerMass, 0.01f, 20.0f);
+	ImGui::SliderFloat(": P_Density: ", &playerDensity, 0.0f, 1.0f);
 	ImGui::End();
+	UpdateWithNewPhysics();
+	
 }
 
 #pragma endregion

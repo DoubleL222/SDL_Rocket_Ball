@@ -62,7 +62,6 @@ void PhysicsComponent::initCircle(b2BodyType type, float radius, glm::vec2 cente
     body = world->CreateBody(&bd);
 	body->SetLinearDamping(0.01f);
 	body->SetAngularDamping(0.01f);
-	b2MassData myData;
 	myData.mass = mass;
 	body->SetMassData(&myData);
     circle = new b2CircleShape();

@@ -44,7 +44,15 @@ private:
 
 	std::shared_ptr<GameObject> soccerBall;
 
-	float ballMass, ballRestitution, ballFriction = 0.0f;
+	float ballMass = 1.0f;
+	float ballRestitution = 0.8f;
+	float ballFriction = 0.4f;
+	float ballDensity = 0.1f;
+
+	float playerMass = 1.0f;
+	float playerRestitution = 0.0f;
+	float playerFriction = 0.4f;
+	float playerDensity = 0.1f;
 
 	sre::SDLRenderer r;
 

@@ -27,6 +27,7 @@ public:
 	b2Fixture* fixture = nullptr;
 	b2BodyType rbType;
 	b2Body * body = nullptr;
+	b2MassData myData;
 
     bool isSensor();
 
