@@ -8,11 +8,10 @@
 #include "sre/profiler.hpp"
 #include <iostream>
 
-
 using namespace std;
 using namespace sre;
 
-const glm::vec2 RocketBall::windowSize(800, 600); // some size for the window
+const glm::vec2 RocketBall::windowSize(1600, 900); // some size for the window
 
 RocketBall* RocketBall::gameInstance = nullptr;
 
@@ -60,22 +59,16 @@ void RocketBall::initGame() {
 	camera = camGameObj->addComponent<GameCamera>();
 	camGameObj->setPosition(windowSize*0.5f);
 
-	//Set background if it has not yet been set
-	if (!background_Layer_1.isInit) {
-		//(image, initial position X, initial position Y)
-		//
-		//background_Layer_1.init("testimage.png", -windowSize.x*0.5f, -windowSize.y*0.5f, true);
-	}
-
+#pragma region Playing Field
 	//Spawning Floor
 	auto floorGameObj = createGameObject();
 	auto spriteComp = floorGameObj->addComponent<SpriteComponent>();
 	auto floorSprite = mySpriteAtlas->get("gray.png");
-	floorSprite.setScale(glm::vec2(windowSize.x/floorSprite.getSpriteSize().x, windowSize.y / ((floorHeight/2.0f )*(floorSprite.getSpriteSize().y))));
+	floorSprite.setScale(glm::vec2(windowSize.x / floorSprite.getSpriteSize().x, windowSize.y / ((floorHeight / 2.0f)*(floorSprite.getSpriteSize().y))));
 	spriteComp->setSprite(floorSprite);
-	floorGameObj->setPosition({ 0, -windowSize.y/(2.0) + windowSize.y / floorHeight });
+	floorGameObj->setPosition({ 0, -windowSize.y / (2.0) + windowSize.y / floorHeight });
 	auto physComp = floorGameObj->addComponent<PhysicsComponent>();
-	physComp->initBox(b2BodyType::b2_staticBody,glm::vec2(windowSize.x/(physicsScale*2), windowSize.y/(physicsScale*floorHeight)),floorGameObj->getPosition()/physicsScale, 0.0f);
+	physComp->initBox(b2BodyType::b2_staticBody, glm::vec2(windowSize.x / (physicsScale * 2), windowSize.y / (physicsScale*floorHeight)), floorGameObj->getPosition() / physicsScale, 0.0f);
 
 	//Spawning Ceiling
 	auto ceilingGameObj = createGameObject();
@@ -93,22 +86,32 @@ void RocketBall::initGame() {
 	spriteComp->setSprite(floorSprite);
 	leftWall->setPosition({ windowSize.x / (2.0) - windowSize.x / wallWidth,0 });
 	physComp = leftWall->addComponent<PhysicsComponent>();
-	physComp->initBox(b2BodyType::b2_staticBody, glm::vec2(windowSize.x / (physicsScale*wallWidth), windowSize.y / (physicsScale * 2) ), leftWall->getPosition() / physicsScale, 0.0f);
+	physComp->initBox(b2BodyType::b2_staticBody, glm::vec2(windowSize.x / (physicsScale*wallWidth), windowSize.y / (physicsScale * 2)), leftWall->getPosition() / physicsScale, 0.0f);
 
 	//Spawning RightWall
 	auto rightWall = createGameObject();
 	spriteComp = rightWall->addComponent<SpriteComponent>();
 	floorSprite.setScale(glm::vec2(windowSize.x / ((wallWidth / 2.0f)*(floorSprite.getSpriteSize().x)), windowSize.y / floorSprite.getSpriteSize().y));
 	spriteComp->setSprite(floorSprite);
-	rightWall->setPosition({- windowSize.x / (2.0) + windowSize.x / wallWidth,0 });
+	rightWall->setPosition({ -windowSize.x / (2.0) + windowSize.x / wallWidth,0 });
 	physComp = rightWall->addComponent<PhysicsComponent>();
 	physComp->initBox(b2BodyType::b2_staticBody, glm::vec2(windowSize.x / (physicsScale*wallWidth), windowSize.y / (physicsScale * 2)), rightWall->getPosition() / physicsScale, 0.0f);
+
+	//Set background if it has not yet been set
+	if (!background_Layer_1.isInit) {
+		//(image, initial position X, initial position Y)
+		//background_Layer_1.init("backdropImage.jpg", -windowSize.x*0.5f, -windowSize.y*0.5f, true);
+	}
+
+#pragma endregion
+
+#pragma region Dynamic Elements
 
 	//Spawn Soccer Ball
 	soccerBall = createGameObject();
 	spriteComp = soccerBall->addComponent<SpriteComponent>();
-	auto soccerBallSprite = mySpriteAtlas->get("SoccerBall.png"); 
-	soccerBallSprite.setScale(glm::vec2(0.4f,0.4f));
+	auto soccerBallSprite = mySpriteAtlas->get("SoccerBall.png");
+	soccerBallSprite.setScale(glm::vec2(0.4f, 0.4f));
 	spriteComp->setSprite(soccerBallSprite);
 	soccerBall->setPosition(glm::vec2(0, 0));
 	physComp = soccerBall->addComponent<PhysicsComponent>();
@@ -120,7 +123,7 @@ void RocketBall::initGame() {
 	auto player1Sprite = mySpriteAtlas->get("ManUntd.png");
 	player1Sprite.setScale(glm::vec2(0.2f, 0.2f));
 	spriteComp->setSprite(player1Sprite);
-	player1->setPosition(glm::vec2(windowSize.x/4, 0));
+	player1->setPosition(glm::vec2(windowSize.x / 4, 0));
 	physComp = player1->addComponent<PhysicsComponent>();
 	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player1->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution, playerMass);
 
@@ -135,6 +138,7 @@ void RocketBall::initGame() {
 	physComp = player2->addComponent<PhysicsComponent>();
 	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player2->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution, playerMass);
 
+#pragma endregion
 
 	//SET GAME STATE
 	gameState = GameState::Running;
@@ -291,7 +295,7 @@ void RocketBall::UpdateWithNewPhysics()
 	player1Physics->fixture->SetRestitution(playerRestitution);
 	player1Physics->fixture->SetDensity(playerDensity);
 	player1Physics->myData.mass = playerMass;
-	
+
 	auto player2Physics = player2->getComponent<PhysicsComponent>();
 	player2Physics->fixture->SetFriction(playerFriction);
 	player2Physics->fixture->SetRestitution(playerRestitution);
@@ -320,7 +324,7 @@ void RocketBall::RenderSliders()
 	ImGui::SliderFloat(": P_Density: ", &playerDensity, 0.0f, 1.0f);
 	ImGui::End();
 	UpdateWithNewPhysics();
-	
+
 }
 
 #pragma endregion
