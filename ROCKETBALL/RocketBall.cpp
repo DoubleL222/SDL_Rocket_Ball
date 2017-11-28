@@ -104,7 +104,7 @@ void RocketBall::initGame() {
 	physComp->initBox(b2BodyType::b2_staticBody, glm::vec2(windowSize.x / (physicsScale*wallWidth), windowSize.y / (physicsScale * 2)), rightWall->getPosition() / physicsScale, 0.0f);
 
 	//Spawn Soccer Ball
-	auto soccerBall = createGameObject();
+	soccerBall = createGameObject();
 	spriteComp = soccerBall->addComponent<SpriteComponent>();
 	auto soccerBallSprite = mySpriteAtlas->get("SoccerBall.png"); 
 	soccerBallSprite.setScale(glm::vec2(0.4f,0.4f));
@@ -276,6 +276,11 @@ void RocketBall::updatePhysics(float deltaTime)
 		gameObject->setRotation(angle);
 	}
 }
+
+void RocketBall::UpdateWithNewPhysics()
+{
+
+}
 #pragma endregion
 
 #pragma region GUI_Section
@@ -284,8 +289,12 @@ void RocketBall::RenderSliders()
 	bool open = true;
 	ImGui::Begin("#TestLabel", &open, ImVec2(500, 100), 0, ImGuiWindowFlags_NoTitleBar);
 	ImGui::SetNextWindowPos(ImVec2(500, 100));
-	ImGui::SliderFloat("Some label", &ballRestitution, 0.0f, 1.0f);
+	ImGui::SliderFloat(": Ball Restitution", &ballRestitution, 0.0f, 1.0f);
+	ImGui::SliderFloat(": Ball Friction", &ballFriction, 0.0f, 1.0f);
+	ImGui::SliderFloat(": Ball Mass: ", &ballMass, 0.01f, 20.0f);
+	ImGui::SliderFloat(": Ball Density: ", &ballMass, 0.0f, 1.0f);
 	std::cout << "Ball is: " << ballRestitution;
+
 	ImGui::End();
 }
 

@@ -28,6 +28,8 @@ public:
 
 	void updatePhysics(float _deltaTime);
 
+	void UpdateWithNewPhysics();
+
 	void RenderSliders();
 
 	static const glm::vec2 windowSize;
@@ -40,7 +42,9 @@ public:
 
 private:
 
-	float ballMass, ballRestitution, ballFriction;
+	std::shared_ptr<GameObject> soccerBall;
+
+	float ballMass, ballRestitution, ballFriction = 0.0f;
 
 	sre::SDLRenderer r;
 
