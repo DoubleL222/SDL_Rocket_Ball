@@ -10,17 +10,17 @@
 using namespace std;
 
 PlayerController::PlayerController(GameObject *gameObject) : Component(gameObject) {
-	playerPhysics = gameObject->addComponent<PhysicsComponent>();
+	////playerPhysics = gameObject->addComponent<PhysicsComponent>();
 
-	auto physicsScale = RocketBall::gameInstance->physicsScale;
+	//auto physicsScale = RocketBall::gameInstance->physicsScale;
 
-	//Size of the physics cirle
-	radius = 10 / physicsScale;
-	playerPhysics->initCircle(b2_dynamicBody, radius, glm::vec2{ 1.5,1.5 }, 1);
-	//playerPhysics->initCircle(b2_dynamicBody, radius, glm::vec2{ 1.5,1.5 }*Level::tileSize / physicsScale, 1);
-	playerPhysics->fixture->SetRestitution(0);
-	playerPhysics->fixture->GetBody()->SetFixedRotation(true);
-	spriteComponent = gameObject->getComponent<SpriteComponent>();
+	////Size of the physics cirle
+	//radius = 10 / physicsScale;
+	////playerPhysics->initCircle(b2_dynamicBody, radius, glm::vec2{ 1.5,1.5 }, 1, 0.4, );
+	////playerPhysics->initCircle(b2_dynamicBody, radius, glm::vec2{ 1.5,1.5 }*Level::tileSize / physicsScale, 1);
+	//playerPhysics->fixture->SetRestitution(0);
+	//playerPhysics->fixture->GetBody()->SetFixedRotation(true);
+	//spriteComponent = gameObject->getComponent<SpriteComponent>();
 
 }
 
@@ -50,18 +50,22 @@ bool PlayerController::onKey(SDL_Event &event) {
 
 void PlayerController::update(float deltaTime) {
 	// raycast ignores any shape in the starting point
-	auto from = playerPhysics->getBody()->GetWorldCenter();
+	if (playerPhysics == nullptr) 
+	{
+		playerPhysics = gameObject->getComponent<PhysicsComponent>();
+	}
+	auto from = playerPhysics->body->GetWorldCenter();
 	b2Vec2 to{ from.x,from.y - radius*1.3f };
 	isGrounded = false;
-	playerPhysics->getWorld()->RayCast(this, from, to);
+	RocketBall::gameInstance->world->RayCast(this, from, to);
 
 	//playerPhysics->fixture->GetBody()->SetFixedRotation(true);
 	glm::vec2 movement{ 0,0 };
 
-	if (left) {
+	if (movingLeft) {
 		movement.x--;
 	}
-	if (right) {
+	if (movingRight) {
 		movement.x++;
 	}
 
@@ -76,7 +80,7 @@ void PlayerController::update(float deltaTime) {
 		playerPhysics->setLinearVelocity(linearVelocity);
 	}
 
-	updateSprite(deltaTime);
+	//updateSprite(deltaTime);
 }
 
 void PlayerController::jump() {

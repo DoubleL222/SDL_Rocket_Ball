@@ -4,6 +4,7 @@
 #include "sre/RenderPass.hpp"
 #include "PhysicsComponent.hpp"
 #include "SpriteComponent.hpp"
+#include "PlayerController.h"
 #include "sre/profiler.hpp"
 #include <iostream>
 
@@ -111,27 +112,28 @@ void RocketBall::initGame() {
 	spriteComp->setSprite(soccerBallSprite);
 	soccerBall->setPosition(glm::vec2(0, 0));
 	physComp = soccerBall->addComponent<PhysicsComponent>();
-	physComp->initCircle(b2BodyType::b2_dynamicBody, 50 / physicsScale, soccerBall->getPosition() / physicsScale, 0.1f, 0.4f, 0.8f, 1.0f);
+	physComp->initCircle(b2BodyType::b2_dynamicBody, 50 / physicsScale, soccerBall->getPosition() / physicsScale, ballDensity, ballFriction, ballRestitution, ballMass);
 
 	//Spawn Player1
-	auto player1 = createGameObject();
+	player1 = createGameObject();
 	spriteComp = player1->addComponent<SpriteComponent>();
 	auto player1Sprite = mySpriteAtlas->get("ManUntd.png");
 	player1Sprite.setScale(glm::vec2(0.2f, 0.2f));
 	spriteComp->setSprite(player1Sprite);
 	player1->setPosition(glm::vec2(windowSize.x/4, 0));
 	physComp = player1->addComponent<PhysicsComponent>();
-	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player1->getPosition() / physicsScale, 0.1f, 0.4f, 0, 1.0f);
+	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player1->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution, playerMass);
 
 	//Spawn Player2
-	auto player2 = createGameObject();
+	player2 = createGameObject();
+	player2->addComponent<PlayerController>();
 	spriteComp = player2->addComponent<SpriteComponent>();
 	auto player2Sprite = mySpriteAtlas->get("FCBarcelona.png");
 	player2Sprite.setScale(glm::vec2(0.2f, 0.2f));
 	spriteComp->setSprite(player2Sprite);
 	player2->setPosition(glm::vec2(-windowSize.x / 4, 0));
 	physComp = player2->addComponent<PhysicsComponent>();
-	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player2->getPosition() / physicsScale, 0.1f, 0.4f, 0, 1.0f);
+	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player2->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution, playerMass);
 
 
 	//SET GAME STATE
@@ -167,7 +169,6 @@ void RocketBall::update(float time) {
 void RocketBall::render() {
 	auto rp = RenderPass::create()
 		.withCamera(camera->getCamera())
-		.withGUI(true)
 		.build();
 
 	static Profiler profiler;
@@ -211,7 +212,7 @@ void RocketBall::onKey(SDL_Event &event) {
 		for (auto & c : gameObject->getComponents()) {
 			bool consumed = c->onKey(event);
 			if (consumed) {
-				return;
+				//return;
 			}
 		}
 	}
@@ -282,8 +283,20 @@ void RocketBall::UpdateWithNewPhysics()
 	auto soccerBallPhysics = soccerBall->getComponent<PhysicsComponent>();
 	soccerBallPhysics->fixture->SetFriction(ballFriction);
 	soccerBallPhysics->fixture->SetRestitution(ballRestitution);
-	soccerBallPhysics->fixture->SetRestitution(ballRestitution);
+	soccerBallPhysics->fixture->SetDensity(ballDensity);
 	soccerBallPhysics->myData.mass = ballMass;
+
+	auto player1Physics = player1->getComponent<PhysicsComponent>();
+	player1Physics->fixture->SetFriction(playerFriction);
+	player1Physics->fixture->SetRestitution(playerRestitution);
+	player1Physics->fixture->SetDensity(playerDensity);
+	player1Physics->myData.mass = playerMass;
+	
+	auto player2Physics = player2->getComponent<PhysicsComponent>();
+	player2Physics->fixture->SetFriction(playerFriction);
+	player2Physics->fixture->SetRestitution(playerRestitution);
+	player2Physics->fixture->SetDensity(playerDensity);
+	player2Physics->myData.mass = playerMass;
 
 }
 #pragma endregion

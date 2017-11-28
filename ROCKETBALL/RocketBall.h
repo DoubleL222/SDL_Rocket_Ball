@@ -39,24 +39,26 @@ public:
 
 	static RocketBall* gameInstance;
 	void setGameState(GameState newState);
+	b2World * world = nullptr;
 
 private:
 
 	std::shared_ptr<GameObject> soccerBall;
+	std::shared_ptr<GameObject> player1;
+	std::shared_ptr<GameObject> player2;
 
 	float ballMass = 1.0f;
 	float ballRestitution = 0.8f;
 	float ballFriction = 0.4f;
 	float ballDensity = 0.1f;
 
-	float playerMass = 1.0f;
+	float playerMass = 100.0f;
 	float playerRestitution = 0.0f;
 	float playerFriction = 0.4f;
 	float playerDensity = 0.1f;
 
 	sre::SDLRenderer r;
 
-	const float physicsScale = 100;
 	const float floorHeight = 25;
 	const float ceilingHeight = 40;
 	const float wallWidth = 80;
@@ -70,11 +72,12 @@ private:
 	//void deregisterPhysicsComponent(PhysicsComponent *r);
 
 	std::shared_ptr<sre::SpriteAtlas> mySpriteAtlas;
-	b2World * world = nullptr;
 	std::map<b2Fixture*, PhysicsComponent *> physicsComponentLookup;
 
 	Box2DDebugDraw debugDraw;
-	bool doDebugDraw = false;
+	bool doDebugDraw = true;
+
+	const float physicsScale = 100;
 
 	std::shared_ptr<GameCamera> camera;
 
