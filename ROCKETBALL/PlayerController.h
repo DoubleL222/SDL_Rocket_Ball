@@ -28,6 +28,9 @@ public:
 	void onCollisionEnd(PhysicsComponent *comp) override;
 
 private:
+
+	glm::vec2 movementVector;
+
 	sre::Sprite playerSprite_1;
 
 	std::shared_ptr<SpriteComponent> spriteComponent;

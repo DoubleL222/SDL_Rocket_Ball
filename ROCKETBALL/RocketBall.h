@@ -39,6 +39,7 @@ public:
 
 	static RocketBall* gameInstance;
 	void setGameState(GameState newState);
+	
 	b2World * world = nullptr;
 
 private:
@@ -47,13 +48,17 @@ private:
 	std::shared_ptr<GameObject> player1;
 	std::shared_ptr<GameObject> player2;
 
-	float ballRestitution = 0.8f;
-	float ballFriction = 0.4f;
-	float ballDensity = 0.01f;
+	float ballRestitution = 0.7f;
+	float ballFriction = 1.0f;
+	float ballDensity = 0.05f;
+	float ballLinearDamping = 0.0f;
+	float ballAngularDamping = 0.01f;
 
 	float playerRestitution = 0.0f;
-	float playerFriction = 0.4f;
+	float playerFriction = 1.0f;
 	float playerDensity = 0.7f;
+	float playerLinearDamping = 0.0f;
+	float playerAngularDamping = 0.01f;
 
 	sre::SDLRenderer r;
 
