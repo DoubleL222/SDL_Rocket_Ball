@@ -112,7 +112,7 @@ void RocketBall::initGame() {
 	spriteComp->setSprite(soccerBallSprite);
 	soccerBall->setPosition(glm::vec2(0, 0));
 	physComp = soccerBall->addComponent<PhysicsComponent>();
-	physComp->initCircle(b2BodyType::b2_dynamicBody, 50 / physicsScale, soccerBall->getPosition() / physicsScale, ballDensity, ballFriction, ballRestitution, ballMass);
+	physComp->initCircle(b2BodyType::b2_dynamicBody, 50 / physicsScale, soccerBall->getPosition() / physicsScale, ballDensity, ballFriction, ballRestitution);
 
 	//Spawn Player1
 	player1 = createGameObject();
@@ -122,7 +122,7 @@ void RocketBall::initGame() {
 	spriteComp->setSprite(player1Sprite);
 	player1->setPosition(glm::vec2(windowSize.x/4, 0));
 	physComp = player1->addComponent<PhysicsComponent>();
-	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player1->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution, playerMass);
+	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player1->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution);
 
 	//Spawn Player2
 	player2 = createGameObject();
@@ -133,7 +133,7 @@ void RocketBall::initGame() {
 	spriteComp->setSprite(player2Sprite);
 	player2->setPosition(glm::vec2(-windowSize.x / 4, 0));
 	physComp = player2->addComponent<PhysicsComponent>();
-	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player2->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution, playerMass);
+	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player2->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution);
 
 
 	//SET GAME STATE
@@ -195,6 +195,9 @@ void RocketBall::render() {
 	}
 
 	RenderSliders();
+
+	//YOU SUCK MARTIN!!!
+
 	//ImGui::SetNextWindowPos(ImVec2(Renderer::instance->getWindowSize().x / 2 - 50, .0f), ImGuiSetCond_Always);
 	//ImGui::SetNextWindowSize(ImVec2(100, 50), ImGuiSetCond_Always);
 	//ImGui::Begin("", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
@@ -284,20 +287,19 @@ void RocketBall::UpdateWithNewPhysics()
 	soccerBallPhysics->fixture->SetFriction(ballFriction);
 	soccerBallPhysics->fixture->SetRestitution(ballRestitution);
 	soccerBallPhysics->fixture->SetDensity(ballDensity);
-	soccerBallPhysics->myData.mass = ballMass;
+	soccerBallPhysics->body->ResetMassData();
 
 	auto player1Physics = player1->getComponent<PhysicsComponent>();
 	player1Physics->fixture->SetFriction(playerFriction);
 	player1Physics->fixture->SetRestitution(playerRestitution);
 	player1Physics->fixture->SetDensity(playerDensity);
-	player1Physics->myData.mass = playerMass;
-	
+	player1Physics->body->ResetMassData();
+
 	auto player2Physics = player2->getComponent<PhysicsComponent>();
 	player2Physics->fixture->SetFriction(playerFriction);
 	player2Physics->fixture->SetRestitution(playerRestitution);
 	player2Physics->fixture->SetDensity(playerDensity);
-	player2Physics->myData.mass = playerMass;
-
+	player2Physics->body->ResetMassData();
 }
 #pragma endregion
 
@@ -310,14 +312,12 @@ void RocketBall::RenderSliders()
 	ImGui::SetNextWindowPos(ImVec2(500, 100));
 	ImGui::SliderFloat(": B_Restitution", &ballRestitution, 0.0f, 1.0f);
 	ImGui::SliderFloat(": B_Friction", &ballFriction, 0.0f, 1.0f);
-	ImGui::SliderFloat(": B_Mass: ", &ballMass, 0.01f, 20.0f);
-	ImGui::SliderFloat(": B_Density: ", &ballDensity, 0.0f, 1.0f);
+	ImGui::SliderFloat(": B_Density: ", &ballDensity, 0.01f, 1.0f);
 	ImGui::LabelText("Variables", "PKAYER SETTINGS");
 	ImGui::SetNextWindowPos(ImVec2(500, 100));
 	ImGui::SliderFloat(": P_Restitution", &playerRestitution, 0.0f, 1.0f);
 	ImGui::SliderFloat(": P_Friction", &playerFriction, 0.0f, 1.0f);
-	ImGui::SliderFloat(": P_Mass: ", &playerMass, 0.01f, 20.0f);
-	ImGui::SliderFloat(": P_Density: ", &playerDensity, 0.0f, 1.0f);
+	ImGui::SliderFloat(": P_Density: ", &playerDensity, 0.01f, 1.0f);
 	ImGui::End();
 	UpdateWithNewPhysics();
 	

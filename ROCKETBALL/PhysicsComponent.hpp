@@ -12,7 +12,7 @@ public:
 
 	virtual ~PhysicsComponent();
 
-    void initCircle(b2BodyType type, float radius,glm::vec2 center,float density, float friction, float restitution, float mass);
+    void initCircle(b2BodyType type, float radius,glm::vec2 center,float density, float friction, float restitution);
     void initBox(b2BodyType type, glm::vec2 size,glm::vec2 center,float density);
 	void initEdge(b2BodyType type, glm::vec2 point_1, glm::vec2 point_2, float density);
 
@@ -27,7 +27,6 @@ public:
 	b2Fixture* fixture = nullptr;
 	b2BodyType rbType;
 	b2Body * body = nullptr;
-	b2MassData myData;
 
     bool isSensor();
 

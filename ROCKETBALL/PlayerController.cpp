@@ -10,21 +10,13 @@
 using namespace std;
 
 PlayerController::PlayerController(GameObject *gameObject) : Component(gameObject) {
-	////playerPhysics = gameObject->addComponent<PhysicsComponent>();
 
-	//auto physicsScale = RocketBall::gameInstance->physicsScale;
-
-	////Size of the physics cirle
-	//radius = 10 / physicsScale;
-	////playerPhysics->initCircle(b2_dynamicBody, radius, glm::vec2{ 1.5,1.5 }, 1, 0.4, );
-	////playerPhysics->initCircle(b2_dynamicBody, radius, glm::vec2{ 1.5,1.5 }*Level::tileSize / physicsScale, 1);
-	//playerPhysics->fixture->SetRestitution(0);
-	//playerPhysics->fixture->GetBody()->SetFixedRotation(true);
-	//spriteComponent = gameObject->getComponent<SpriteComponent>();
 
 }
 
 bool PlayerController::onKey(SDL_Event &event) {
+	movingLeft = false;
+	movingRight = false;
 	switch (event.key.keysym.sym) {
 	case SDLK_SPACE:
 	{
@@ -69,7 +61,7 @@ void PlayerController::update(float deltaTime) {
 		movement.x++;
 	}
 
-	float accelerationSpeed = 0.010f;
+	float accelerationSpeed = 0.1f;
 	playerPhysics->addImpulse(movement*accelerationSpeed);
 	float maximumVelocity = 2;
 	auto linearVelocity = playerPhysics->getLinearVelocity();
