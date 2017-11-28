@@ -51,7 +51,7 @@ void PhysicsComponent::setLinearVelocity(glm::vec2 velocity) {
     body->SetLinearVelocity(v);
 }
 
-void PhysicsComponent::initCircle(b2BodyType type, float radius, glm::vec2 center, float density) {
+void PhysicsComponent::initCircle(b2BodyType type, float radius, glm::vec2 center, float density, float friction, float restitution, float mass) {
     assert(body == nullptr);
     // do init
     shapeType = b2Shape::Type::e_circle;
@@ -62,13 +62,17 @@ void PhysicsComponent::initCircle(b2BodyType type, float radius, glm::vec2 cente
     body = world->CreateBody(&bd);
 	body->SetLinearDamping(0.01f);
 	body->SetAngularDamping(0.01f);
+	b2MassData myData;
+	myData.mass = mass;
+	body->SetMassData(&myData);
     circle = new b2CircleShape();
     circle->m_radius = radius;
     b2FixtureDef fxD;
     fxD.shape = circle;
-    fxD.density = 0.5f;
-	fxD.friction = 0.4f;
-	fxD.restitution = 0.6f;
+    fxD.density = density;
+	fxD.friction = friction;
+	fxD.restitution = restitution;
+	//body->ResetMassData();
     fixture = body->CreateFixture(&fxD);
 
 	RocketBall::gameInstance->registerPhysicsComponent(this);

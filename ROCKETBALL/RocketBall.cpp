@@ -111,7 +111,27 @@ void RocketBall::initGame() {
 	spriteComp->setSprite(soccerBallSprite);
 	soccerBall->setPosition(glm::vec2(0, 0));
 	physComp = soccerBall->addComponent<PhysicsComponent>();
-	physComp->initCircle(b2BodyType::b2_dynamicBody, 50 / physicsScale, soccerBall->getPosition() / physicsScale, 0.1f);
+	physComp->initCircle(b2BodyType::b2_dynamicBody, 50 / physicsScale, soccerBall->getPosition() / physicsScale, 0.1f, 0.4f, 0.8f, 1.0f);
+
+	//Spawn Player1
+	auto player1 = createGameObject();
+	spriteComp = player1->addComponent<SpriteComponent>();
+	auto player1Sprite = mySpriteAtlas->get("ManUntd.png");
+	player1Sprite.setScale(glm::vec2(0.2f, 0.2f));
+	spriteComp->setSprite(player1Sprite);
+	player1->setPosition(glm::vec2(windowSize.x/4, 0));
+	physComp = player1->addComponent<PhysicsComponent>();
+	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player1->getPosition() / physicsScale, 0.1f, 0.4f, 0, 1.0f);
+
+	//Spawn Player2
+	auto player2 = createGameObject();
+	spriteComp = player2->addComponent<SpriteComponent>();
+	auto player2Sprite = mySpriteAtlas->get("FCBarcelona.png");
+	player2Sprite.setScale(glm::vec2(0.2f, 0.2f));
+	spriteComp->setSprite(player2Sprite);
+	player2->setPosition(glm::vec2(-windowSize.x / 4, 0));
+	physComp = player2->addComponent<PhysicsComponent>();
+	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player2->getPosition() / physicsScale, 0.1f, 0.4f, 0, 1.0f);
 
 
 	//SET GAME STATE
@@ -135,7 +155,7 @@ void RocketBall::initPhysics()
 /// Core Update
 void RocketBall::update(float time) {
 	if (gameState == GameState::Running) {
-		updatePhysics();
+		updatePhysics(time);
 	}
 	for (int i = 0; i < sceneObjects.size(); i++) {
 		sceneObjects[i]->update(time);
@@ -147,6 +167,7 @@ void RocketBall::update(float time) {
 void RocketBall::render() {
 	auto rp = RenderPass::create()
 		.withCamera(camera->getCamera())
+		.withGUI(true)
 		.build();
 
 	static Profiler profiler;
@@ -172,12 +193,13 @@ void RocketBall::render() {
 		debugDraw.clear();
 	}
 
-	ImGui::SetNextWindowPos(ImVec2(Renderer::instance->getWindowSize().x / 2 - 50, .0f), ImGuiSetCond_Always);
-	ImGui::SetNextWindowSize(ImVec2(100, 50), ImGuiSetCond_Always);
-	ImGui::Begin("", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
-	ImGui::SetWindowFontScale(2.0f);
-	ImGui::PushFont;
-	ImGui::End();
+	RenderSliders();
+	//ImGui::SetNextWindowPos(ImVec2(Renderer::instance->getWindowSize().x / 2 - 50, .0f), ImGuiSetCond_Always);
+	//ImGui::SetNextWindowSize(ImVec2(100, 50), ImGuiSetCond_Always);
+	//ImGui::Begin("", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+	//ImGui::SetWindowFontScale(2.0f);
+	//ImGui::PushFont;
+	//ImGui::End();
 
 }
 #pragma endregion
@@ -238,9 +260,9 @@ void RocketBall::registerPhysicsComponent(PhysicsComponent *r)
 	physicsComponentLookup[r->fixture] = r;
 }
 
-void RocketBall::updatePhysics()
+void RocketBall::updatePhysics(float deltaTime)
 {
-	const float32 timeStep = 1.0f / 60.0f;
+	const float32 timeStep = deltaTime;
 	const int positionIterations = 2;
 	const int velocityIterations = 6;
 	world->Step(timeStep, velocityIterations, positionIterations);
@@ -256,7 +278,18 @@ void RocketBall::updatePhysics()
 }
 #pragma endregion
 
+#pragma region GUI_Section
+void RocketBall::RenderSliders()
+{
+	bool open = true;
+	ImGui::Begin("#TestLabel", &open, ImVec2(500, 100), 0, ImGuiWindowFlags_NoTitleBar);
+	ImGui::SetNextWindowPos(ImVec2(500, 100));
+	ImGui::SliderFloat("Some label", &ballRestitution, 0.0f, 1.0f);
+	std::cout << "Ball is: " << ballRestitution;
+	ImGui::End();
+}
 
+#pragma endregion
 
 void RocketBall::setGameState(GameState newState) {
 	this->gameState = newState;

@@ -26,7 +26,9 @@ public:
 
 	void registerPhysicsComponent(PhysicsComponent * r);
 
-	void updatePhysics();
+	void updatePhysics(float _deltaTime);
+
+	void RenderSliders();
 
 	static const glm::vec2 windowSize;
 
@@ -37,6 +39,9 @@ public:
 	void setGameState(GameState newState);
 
 private:
+
+	float ballMass, ballRestitution, ballFriction;
+
 	sre::SDLRenderer r;
 
 	const float physicsScale = 100;
