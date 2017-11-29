@@ -15,27 +15,45 @@ PlayerController::PlayerController(GameObject *gameObject) : Component(gameObjec
 }
 
 bool PlayerController::onKey(SDL_Event &event) {
-	movingLeft = false;
-	movingRight = false;
-	switch (event.key.keysym.sym) {
-	case SDLK_SPACE:
+	movementVector = glm::vec2(0,0);
+	if (event.type == SDL_KEYDOWN) 
 	{
-		if (isGrounded && event.type == SDL_KEYDOWN) { // prevents double jump
+		if (event.key.keysym.sym == SDLK_RIGHT) 
+		{
+			movementVector.x = 1;
+		}
+		else if (event.key.keysym.sym == SDLK_LEFT)
+		{
+			movementVector.x = -1;
+		}
+		if (event.key.keysym.sym == SDLK_SPACE) 
+		{
+			cout << "JUMP" << std::endl;
 			jump();
 		}
 	}
-	break;
-	case SDLK_LEFT:
-	{
-		movingLeft = event.type == SDL_KEYDOWN;
-	}
-	break;
-	case SDLK_RIGHT:
-	{
-		movingRight = event.type == SDL_KEYDOWN;
-	}
-	break;
-	}
+
+
+	//switch (event.key.keysym.sym) {
+	//case SDLK_SPACE:
+	//{
+	//	if (isGrounded && event.type == SDL_KEYDOWN) { // prevents double jump
+	//		jump();
+	//	}
+	//}
+	//break;
+	//case SDLK_LEFT:
+	//{
+	//	movingLeft = event.type == SDL_KEYDOWN;
+	//}
+	//break;
+	//case SDLK_RIGHT:
+	//{
+	//	cout << "Pressing Right" << std::endl;
+	//	movingRight = event.type == SDL_KEYDOWN;
+	//}
+	//break;
+	//}
 
 	return false;
 }
@@ -49,9 +67,17 @@ void PlayerController::update(float deltaTime) {
 	auto from = playerPhysics->body->GetWorldCenter();
 	b2Vec2 to{ from.x,from.y - radius*1.3f };
 	isGrounded = false;
-	RocketBall::gameInstance->world->RayCast(this, from, to);
+	//RocketBall::gameInstance->world->RayCast(this, from, to);
 
-	//playerPhysics->fixture->GetBody()->SetFixedRotation(true);
+	if (movementVector.x != 0) 
+	{
+		glm::vec2 currentVelocity = playerPhysics->getLinearVelocity();
+		if ((currentVelocity.x < 0 && movementVector.x>0) || (currentVelocity.x > 0 && movementVector.x<0))
+		{
+			playerPhysics->setLinearVelocity(glm::vec2(0, currentVelocity.y));
+		}
+
+	}
 	glm::vec2 movement{ 0,0 };
 
 	if (movingLeft) {
@@ -76,7 +102,7 @@ void PlayerController::update(float deltaTime) {
 }
 
 void PlayerController::jump() {
-	playerPhysics->addImpulse({ 0,0.15f });
+	playerPhysics->addImpulse({ 0,0.1f});
 }
 
 void PlayerController::onCollisionStart(PhysicsComponent *comp) {

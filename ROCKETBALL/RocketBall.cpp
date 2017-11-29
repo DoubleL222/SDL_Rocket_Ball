@@ -125,7 +125,7 @@ void RocketBall::initGame() {
 	spriteComp->setSprite(soccerBallSprite);
 	soccerBall->setPosition(glm::vec2(0, 0));
 	physComp = soccerBall->addComponent<PhysicsComponent>();
-	physComp->initCircle(b2BodyType::b2_dynamicBody, 50 / physicsScale + 2.0f, soccerBall->getPosition() / physicsScale, ballDensity, ballFriction, ballRestitution);
+	physComp->initCircle(b2BodyType::b2_dynamicBody, 50 / physicsScale, soccerBall->getPosition() / physicsScale, ballDensity, ballFriction, ballRestitution, ballLinearDamping, ballAngularDamping, false);
 
 	//Spawn Player1
 	player1 = createGameObject();
@@ -135,7 +135,7 @@ void RocketBall::initGame() {
 	spriteComp->setSprite(player1Sprite);
 	player1->setPosition(glm::vec2(windowSize.x / 4, 0));
 	physComp = player1->addComponent<PhysicsComponent>();
-	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player1->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution);
+	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player1->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution, playerLinearDamping, playerAngularDamping, true);
 
 	//Spawn Player2
 	player2 = createGameObject();
@@ -146,7 +146,7 @@ void RocketBall::initGame() {
 	spriteComp->setSprite(player2Sprite);
 	player2->setPosition(glm::vec2(-windowSize.x / 4, 0));
 	physComp = player2->addComponent<PhysicsComponent>();
-	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player2->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution);
+	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player2->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution, playerLinearDamping, playerAngularDamping, true);
 
 #pragma endregion
 

@@ -12,7 +12,7 @@ public:
 
 	virtual ~PhysicsComponent();
 
-    void initCircle(b2BodyType type, float radius,glm::vec2 center,float density, float friction, float restitution);
+    void initCircle(b2BodyType type, float radius,glm::vec2 center,float density, float friction, float restitution, float linearDamping, float angularDamping, bool fixedRotation);
     void initBox(b2BodyType type, glm::vec2 size,glm::vec2 center,float density);
 	void initEdge(b2BodyType type, glm::vec2 point_1, glm::vec2 point_2, float density);
 
