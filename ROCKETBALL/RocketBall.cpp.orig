@@ -11,7 +11,7 @@
 using namespace std;
 using namespace sre;
 
-const glm::vec2 RocketBall::windowSize(1600, 900); // some size for the window
+const glm::vec2 RocketBall::windowSize(800, 600); // some size for the window
 
 RocketBall* RocketBall::gameInstance = nullptr;
 
@@ -79,21 +79,31 @@ void RocketBall::initGame() {
 	physComp = ceilingGameObj->addComponent<PhysicsComponent>();
 	physComp->initBox(b2BodyType::b2_staticBody, glm::vec2(windowSize.x / (physicsScale * 2), windowSize.y / (physicsScale*ceilingHeight)), ceilingGameObj->getPosition() / physicsScale, 0.0f);
 
-	//Spawning LeftWall
-	auto leftWall = createGameObject();
-	spriteComp = leftWall->addComponent<SpriteComponent>();
-	floorSprite.setScale(glm::vec2(windowSize.x / ((wallWidth / 2.0f)*(floorSprite.getSpriteSize().x)), windowSize.y / floorSprite.getSpriteSize().y));
+	//Spawning LeftWall (1)
+	auto leftWall_1 = createGameObject();
+	spriteComp = leftWall_1->addComponent<SpriteComponent>();
+	floorSprite.setScale(glm::vec2(windowSize.x / ((wallWidth / 2.0f)*(floorSprite.getSpriteSize().x)), (windowSize.y / floorSprite.getSpriteSize().y)*0.3f));
 	spriteComp->setSprite(floorSprite);
-	leftWall->setPosition({ windowSize.x / (2.0) - windowSize.x / wallWidth,0 });
-	physComp = leftWall->addComponent<PhysicsComponent>();
-	physComp->initBox(b2BodyType::b2_staticBody, glm::vec2(windowSize.x / (physicsScale*wallWidth), windowSize.y / (physicsScale * 2)), leftWall->getPosition() / physicsScale, 0.0f);
+	leftWall_1->setPosition({ windowSize.x / (2.0) - windowSize.x / wallWidth, (windowSize.y * 0.5f) });
+	physComp = leftWall_1->addComponent<PhysicsComponent>();
+	physComp->initBox(b2BodyType::b2_staticBody, glm::vec2(windowSize.x / (physicsScale*wallWidth), windowSize.y / (physicsScale * 2)), leftWall_1->getPosition() / physicsScale, 0.0f);
+
+	//Spawning LeftWall (2)
+	auto leftWall_2 = createGameObject();
+	spriteComp = leftWall_2->addComponent<SpriteComponent>();
+	floorSprite.setScale(glm::vec2(windowSize.x / ((wallWidth / 2.0f)*(floorSprite.getSpriteSize().x)), (windowSize.y / floorSprite.getSpriteSize().y)*1.0f));
+	spriteComp->setSprite(floorSprite);
+	leftWall_2->setPosition({ windowSize.x / (2.0) - windowSize.x / wallWidth, -(windowSize.y * 0.5f) });
+	physComp = leftWall_2->addComponent<PhysicsComponent>();
+	physComp->initBox(b2BodyType::b2_staticBody, glm::vec2(windowSize.x / (physicsScale*wallWidth), windowSize.y / (physicsScale * 2)), leftWall_2->getPosition() / physicsScale, 0.0f);
+
 
 	//Spawning RightWall
 	auto rightWall = createGameObject();
 	spriteComp = rightWall->addComponent<SpriteComponent>();
 	floorSprite.setScale(glm::vec2(windowSize.x / ((wallWidth / 2.0f)*(floorSprite.getSpriteSize().x)), windowSize.y / floorSprite.getSpriteSize().y));
 	spriteComp->setSprite(floorSprite);
-	rightWall->setPosition({ -windowSize.x / (2.0) + windowSize.x / wallWidth,0 });
+	rightWall->setPosition({ -windowSize.x / (2.0) + windowSize.x / wallWidth, 0 });
 	physComp = rightWall->addComponent<PhysicsComponent>();
 	physComp->initBox(b2BodyType::b2_staticBody, glm::vec2(windowSize.x / (physicsScale*wallWidth), windowSize.y / (physicsScale * 2)), rightWall->getPosition() / physicsScale, 0.0f);
 
@@ -115,7 +125,11 @@ void RocketBall::initGame() {
 	spriteComp->setSprite(soccerBallSprite);
 	soccerBall->setPosition(glm::vec2(0, 0));
 	physComp = soccerBall->addComponent<PhysicsComponent>();
-	physComp->initCircle(b2BodyType::b2_dynamicBody, 50 / physicsScale, soccerBall->getPosition() / physicsScale, ballDensity, ballFriction, ballRestitution);
+<<<<<<< HEAD
+	physComp->initCircle(b2BodyType::b2_dynamicBody, 50 / physicsScale + 2.0f, soccerBall->getPosition() / physicsScale, ballDensity, ballFriction, ballRestitution);
+=======
+	physComp->initCircle(b2BodyType::b2_dynamicBody, 50 / physicsScale, soccerBall->getPosition() / physicsScale, ballDensity, ballFriction, ballRestitution, ballLinearDamping, ballAngularDamping, false);
+>>>>>>> e4706962ef8d321bc2b0fc74206553953aeb6a5d
 
 	//Spawn Player1
 	player1 = createGameObject();
@@ -125,7 +139,7 @@ void RocketBall::initGame() {
 	spriteComp->setSprite(player1Sprite);
 	player1->setPosition(glm::vec2(windowSize.x / 4, 0));
 	physComp = player1->addComponent<PhysicsComponent>();
-	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player1->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution);
+	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player1->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution, playerLinearDamping, playerAngularDamping, true);
 
 	//Spawn Player2
 	player2 = createGameObject();
@@ -136,7 +150,7 @@ void RocketBall::initGame() {
 	spriteComp->setSprite(player2Sprite);
 	player2->setPosition(glm::vec2(-windowSize.x / 4, 0));
 	physComp = player2->addComponent<PhysicsComponent>();
-	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player2->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution);
+	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player2->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution, playerLinearDamping, playerAngularDamping, true);
 
 #pragma endregion
 
@@ -175,10 +189,6 @@ void RocketBall::render() {
 		.withCamera(camera->getCamera())
 		.build();
 
-	static Profiler profiler;
-	profiler.update();
-	profiler.gui(/*usewindow=*/ true);
-
 	auto pos = camera->getGameObject()->getPosition();
 
 	//Render the background Layer_1
@@ -190,25 +200,23 @@ void RocketBall::render() {
 	}
 
 	auto sb = spriteBatchBuilder.build();
-	rp.draw(sb);
+
+	ImGui::SetNextWindowPos(ImVec2(Renderer::instance->getWindowSize().x / 2 - 50, .0f), ImGuiSetCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(100, 50), ImGuiSetCond_Always);
+	ImGui::Begin("", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+	ImGui::SetWindowFontScale(2.0f);
+	ImGui::PushFont;
+	ImGui::End();
 
 	if (doDebugDraw) {
+		static Profiler profiler;
+		profiler.update();
+		profiler.gui(/*usewindow=*/ true);
 		world->DrawDebugData();
 		rp.drawLines(debugDraw.getLines());
 		debugDraw.clear();
+		RenderSliders();
 	}
-
-	RenderSliders();
-
-	//YOU SUCK MARTIN!!!
-
-	//ImGui::SetNextWindowPos(ImVec2(Renderer::instance->getWindowSize().x / 2 - 50, .0f), ImGuiSetCond_Always);
-	//ImGui::SetNextWindowSize(ImVec2(100, 50), ImGuiSetCond_Always);
-	//ImGui::Begin("", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
-	//ImGui::SetWindowFontScale(2.0f);
-	//ImGui::PushFont;
-	//ImGui::End();
-
 }
 #pragma endregion
 
@@ -219,7 +227,7 @@ void RocketBall::onKey(SDL_Event &event) {
 		for (auto & c : gameObject->getComponents()) {
 			bool consumed = c->onKey(event);
 			if (consumed) {
-				//return;
+				return;
 			}
 		}
 	}
@@ -262,7 +270,7 @@ std::shared_ptr<GameObject> RocketBall::createGameObject() {
 
 
 #pragma region Physics
-///Place phyiscs
+///Phyiscs
 void RocketBall::registerPhysicsComponent(PhysicsComponent *r)
 {
 	physicsComponentLookup[r->fixture] = r;
@@ -297,11 +305,7 @@ void RocketBall::UpdateWithNewPhysics()
 	player1Physics->fixture->SetFriction(playerFriction);
 	player1Physics->fixture->SetRestitution(playerRestitution);
 	player1Physics->fixture->SetDensity(playerDensity);
-<<<<<<< HEAD
-	player1Physics->myData.mass = playerMass;
-=======
 	player1Physics->body->ResetMassData();
->>>>>>> LukaBranch
 
 	auto player2Physics = player2->getComponent<PhysicsComponent>();
 	player2Physics->fixture->SetFriction(playerFriction);
