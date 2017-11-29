@@ -20,7 +20,7 @@
 },
 {
 	"filename": "ManUntd.png",
-	"frame": {"x":384,"y":0,"w":256,"h":256},
+	"frame": {"x":0,"y":256,"w":256,"h":256},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
@@ -29,7 +29,7 @@
 },
 {
 	"filename": "SoccerBall.png",
-	"frame": {"x":640,"y":0,"w":256,"h":256},
+	"frame": {"x":256,"y":256,"w":256,"h":256},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
@@ -41,8 +41,8 @@
 	"version": "1.0",
 	"image": "RocketBallSprites.png",
 	"format": "RGBA8888",
-	"size": {"w":896,"h":256},
+	"size": {"w":512,"h":512},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:ab9cd811b92e8cf0895bdf28e2e58c5b:e9c9d23c7ed8ad2e90499ae7185e72e7:abc763de9f831949696569c25140e526$"
+	"smartupdate": "$TexturePacker:SmartUpdate:ecc7157613bfd8a6600a9721326d4ae7:e9c9d23c7ed8ad2e90499ae7185e72e7:abc763de9f831949696569c25140e526$"
 }
 }
