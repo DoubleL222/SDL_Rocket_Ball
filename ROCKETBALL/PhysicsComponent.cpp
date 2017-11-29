@@ -15,7 +15,7 @@ PhysicsComponent::PhysicsComponent(GameObject *gameObject)
 
 PhysicsComponent::~PhysicsComponent()
 {
-	//BirdGame::instance->deregisterPhysicsComponent(this);
+	//RocketBall::instance->deregisterPhysicsComponent(this);
 	delete polygon;
 	delete circle;
 	if (body != nullptr && fixture != nullptr) {
