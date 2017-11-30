@@ -30,6 +30,8 @@ public:
 
     bool isSensor();
 
+	float radius;
+
     void setSensor(bool enabled);
 private:
     b2PolygonShape * polygon = nullptr;
@@ -37,7 +39,6 @@ private:
 	b2EdgeShape * edge = nullptr;
     
     b2Shape::Type shapeType;
-    
     
     std::vector<PhysicsComponent *> collidingBodies;
     b2World * world = nullptr;

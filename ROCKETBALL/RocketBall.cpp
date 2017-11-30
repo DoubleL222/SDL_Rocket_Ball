@@ -26,6 +26,10 @@ RocketBall::RocketBall()
 	initGame();
 
 	// setup callback functions
+	r.joystickEvent = [&](SDL_Event& e)
+	{
+		onJoyInput(e);
+	};
 	r.keyEvent = [&](SDL_Event& e) {
 		onKey(e);
 	};
@@ -41,6 +45,18 @@ RocketBall::RocketBall()
 }
 
 void RocketBall::initGame() {
+	//Joystick init
+	//cout << "number of joysticks " << SDL_NumJoysticks();
+	int numJoysticks = SDL_NumJoysticks();
+	if (numJoysticks >= 1)
+	{
+		joy1 = SDL_JoystickOpen(0);
+	}
+	if (numJoysticks == 2) 
+	{
+		joy2 = SDL_JoystickOpen(1);
+	}
+
 	//MAKING THE SPRITE ATLAS
 	mySpriteAtlas = SpriteAtlas::create("RocketBallSprites.json", "RocketBallSprites.png");
 
@@ -119,6 +135,7 @@ void RocketBall::initGame() {
 
 	//Spawn Player1
 	player1 = createGameObject();
+	player1->addComponent<PlayerController>();
 	spriteComp = player1->addComponent<SpriteComponent>();
 	auto player1Sprite = mySpriteAtlas->get("ManUntd.png");
 	player1Sprite.setScale(glm::vec2(0.2f, 0.2f));
@@ -160,6 +177,7 @@ void RocketBall::initPhysics()
 
 /// Core Update
 void RocketBall::update(float time) {
+	//cout<< "Num of joysticks: " << SDL_NumJoysticks() <<std::endl;
 	if (gameState == GameState::Running) {
 		updatePhysics(time);
 	}
@@ -214,16 +232,26 @@ void RocketBall::render() {
 
 
 #pragma region Handle_Inputs
+void RocketBall::onJoyInput(SDL_Event &event)
+{
+	if (event.jdevice.which == 0) 
+	{
+		player2->getComponent<PlayerController>()->onJoyInput(event);
+	}
+	else if (event.jdevice.which == 1) 
+	{
+		player1->getComponent<PlayerController>()->onJoyInput(event);
+	}
+}
 void RocketBall::onKey(SDL_Event &event) {
 	for (auto & gameObject : sceneObjects) {
 		for (auto & c : gameObject->getComponents()) {
 			bool consumed = c->onKey(event);
 			if (consumed) {
-				//return;
+				return;
 			}
 		}
 	}
-
 	if (event.type == SDL_KEYDOWN) {
 		switch (event.key.keysym.sym) {
 		case SDLK_d:
