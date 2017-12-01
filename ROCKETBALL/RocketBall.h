@@ -72,24 +72,18 @@ private:
 
 	sre::SDLRenderer r;
 
-	//const float floorHeight = 25;
-	//const float ceilingHeight = 40;
-	//const float wallWidth = 80;
-
 	void initGame();
 
 	void initPhysics();
-	//void updatePhysics();
 	void handleContact(b2Contact *contact, bool begin);
-	//void registerPhysicsComponent(PhysicsComponent *r);
-	//void deregisterPhysicsComponent(PhysicsComponent *r);
+	void deregisterPhysicsComponent(PhysicsComponent *r);
 
 	std::shared_ptr<sre::SpriteAtlas> mySpriteAtlas;
 	std::map<b2Fixture*, PhysicsComponent *> physicsComponentLookup;
 
 	const float physicsScale = 100;
 
-	
+
 
 	Box2DDebugDraw debugDraw;
 	bool doDebugDraw = false;

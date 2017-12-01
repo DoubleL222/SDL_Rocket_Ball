@@ -13,7 +13,7 @@ BallComponent::BallComponent(GameObject *gameObject) : Component(gameObject) {
 	// initiate bird physics
 	ballPhysics = gameObject->getComponent<PhysicsComponent>();
 	initialPosition = gameObject->getPosition();
-	blowBackForce = 0.1f;
+	blowBackForce = 0.5f;
 }
 
 void BallComponent::update(float deltaTime) {
@@ -38,7 +38,7 @@ void BallComponent::update(float deltaTime) {
 
 
 void BallComponent::onCollisionStart(PhysicsComponent *PhysComp) {
-	if (PhysComp->getGameObject()->name == "Goal_1") {
+	if (PhysComp->getGameObject()->name == "Goal_1" && !goalAchieved) {
 		std::cout << "Collision between: " + ballPhysics->getGameObject()->name + " and " + PhysComp->getGameObject()->name << std::endl;
 		engageSlowmotion = true;
 		//RocketBall::gameInstance->timeScale = timeScaleConstant;
@@ -46,9 +46,10 @@ void BallComponent::onCollisionStart(PhysicsComponent *PhysComp) {
 		RocketBall::gameInstance->player2Goals++;
 		ballPhysics->getGameObject()->setPosition({ initialPosition });
 		RocketBall::gameInstance->setGameState(GameState::RoundComplete);
+		goalAchieved = true;
 	}
 
-	else if (PhysComp->getGameObject()->name == "Goal_2") {
+	else if (PhysComp->getGameObject()->name == "Goal_2" && !goalAchieved) {
 		std::cout << "Collision between: " + ballPhysics->getGameObject()->name + " and " + PhysComp->getGameObject()->name << std::endl;
 		engageSlowmotion = true;
 		//RocketBall::gameInstance->timeScale = timeScaleConstant;
@@ -56,6 +57,7 @@ void BallComponent::onCollisionStart(PhysicsComponent *PhysComp) {
 		RocketBall::gameInstance->player1Goals++;
 		ballPhysics->getGameObject()->setPosition({ initialPosition });
 		RocketBall::gameInstance->setGameState(GameState::RoundComplete);
+		goalAchieved = true;
 	}
 }
 

@@ -46,31 +46,36 @@ RocketBall::RocketBall()
 }
 
 void RocketBall::initGame() {
+
 	//Joystick init
 	//cout << "number of joysticks " << SDL_NumJoysticks();
+
 	int numJoysticks = SDL_NumJoysticks();
 	if (numJoysticks >= 1)
 	{
 		joy1 = SDL_JoystickOpen(0);
 	}
-	if (numJoysticks == 2) 
+	if (numJoysticks == 2)
 	{
 		joy2 = SDL_JoystickOpen(1);
 	}
-
-	//MAKING THE SPRITE ATLAS
-	mySpriteAtlas = SpriteAtlas::create("RocketBallSprites.json", "RocketBallSprites.png");
 
 	if (world) {
 		world->SetContactListener(nullptr);
 	}
 
+	sceneObjects.clear();
+	camera.reset();
+	physicsComponentLookup.clear();
+
+	//MAKING THE SPRITE ATLAS
+	if (!mySpriteAtlas)
+		mySpriteAtlas = SpriteAtlas::create("RocketBallSprites.json", "RocketBallSprites.png");
+
 	//INITIALIZING PHYSICS
 	initPhysics();
 
 	//Setup Camera
-	sceneObjects.clear();
-	camera.reset();
 	auto camGameObj = createGameObject();
 	camGameObj->name = "Camera";
 	camera = camGameObj->addComponent<GameCamera>();
@@ -105,10 +110,10 @@ void RocketBall::initGame() {
 #pragma region Goals
 	//Debug center goal
 	//createGoal("Goal_1", mySpriteAtlas->get("gray.png"), createGameObject(), { 0,-windowSize.y * 0.25 }, { 1 ,1 }, { 0,0 }, glm::vec4{ 1.0f, 0.3f, 0.3f, 0.8f }, physicsScale);
-	
+
 	//Real goals:
 	createGoal("Goal_1", mySpriteAtlas->get("gray.png"), createGameObject(), { windowSize.x *0.5 - 70,-windowSize.y * 0.25 }, { 1 ,2 }, { 0,0 }, glm::vec4{ 1.0f, 0.3f, 0.3f, 0.8f }, physicsScale);
-	createGoal("Goal_2", mySpriteAtlas->get("gray.png"), createGameObject(), { -windowSize.x *0.5 + 70,-windowSize.y * 0.25}, { 1 ,2 }, { 0,0 }, glm::vec4{ 0.3f, 0.3f, 1.0f, 0.8f }, physicsScale);
+	createGoal("Goal_2", mySpriteAtlas->get("gray.png"), createGameObject(), { -windowSize.x *0.5 + 70,-windowSize.y * 0.25 }, { 1 ,2 }, { 0,0 }, glm::vec4{ 0.3f, 0.3f, 1.0f, 0.8f }, physicsScale);
 #pragma endregion
 
 
@@ -351,11 +356,11 @@ void RocketBall::EndContact(b2Contact *contact) {
 #pragma region Handle_Inputs
 void RocketBall::onJoyInput(SDL_Event &event)
 {
-	if (event.jdevice.which == 0) 
+	if (event.jdevice.which == 0)
 	{
 		player2->getComponent<PlayerController>()->onJoyInput(event);
 	}
-	else if (event.jdevice.which == 1) 
+	else if (event.jdevice.which == 1)
 	{
 		player1->getComponent<PlayerController>()->onJoyInput(event);
 	}
@@ -393,8 +398,10 @@ void RocketBall::onKey(SDL_Event &event) {
 				gameState = GameState::Running;
 			}
 			else if (gameState == GameState::RoundComplete) {
-				//call a reset function
-				gameState = GameState::Running;
+				soccerBall->getComponent<BallComponent>()->goalAchieved = false;
+				//Needs a game reset sort of thing here..
+				//initGame();
+				gameState = GameState::Ready;
 			}
 			break;
 		}
@@ -416,6 +423,18 @@ void RocketBall::registerPhysicsComponent(PhysicsComponent *r)
 {
 	physicsComponentLookup[r->fixture] = r;
 }
+
+void RocketBall::deregisterPhysicsComponent(PhysicsComponent *r) {
+	auto iter = physicsComponentLookup.find(r->fixture);
+	if (iter != physicsComponentLookup.end()) {
+		physicsComponentLookup.erase(iter);
+	}
+	else {
+		assert(false); // cannot find physics object
+	}
+}
+
+
 
 void RocketBall::updatePhysics(float deltaTime)
 {

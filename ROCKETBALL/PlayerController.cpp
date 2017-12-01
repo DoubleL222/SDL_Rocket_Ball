@@ -16,93 +16,97 @@ PlayerController::PlayerController(GameObject *gameObject) : Component(gameObjec
 
 bool PlayerController::onJoyInput(SDL_Event &event)
 {
-//	movementVector = glm::vec2(0,0);
-	if (event.type == SDL_JOYAXISMOTION)
-	{
-		int axisIndex = (int)(event.jaxis.axis);
-		if (axisIndex == 0) 
+	//	movementVector = glm::vec2(0,0);
+	if (RocketBall::gameInstance->getGameState() == GameState::Running) {
+		if (event.type == SDL_JOYAXISMOTION)
 		{
-			float newX = (float)(event.jaxis.value) / (float)(32767);
+			int axisIndex = (int)(event.jaxis.axis);
+			if (axisIndex == 0)
+			{
+				float newX = (float)(event.jaxis.value) / (float)(32767);
 
-			//SENSITIVITY
-			if (abs(newX) <= 0.2f) 
-			{
-				movementVector.x = 0;
-			}
-			else 
-			{
-				movementVector.x = newX;
-			}
-			
-		}
-		else if (axisIndex == 1) 
-		{
-			float newY = - (float)(event.jaxis.value) / (float)(32767);
+				//SENSITIVITY
+				if (abs(newX) <= 0.2f)
+				{
+					movementVector.x = 0;
+				}
+				else
+				{
+					movementVector.x = newX;
+				}
 
-			//SENSITIVITY
-			if (abs(newY) <= 0.2f)
-			{
-				movementVector.y = 0;
 			}
-			else
+			else if (axisIndex == 1)
 			{
-				movementVector.y = newY;
+				float newY = -(float)(event.jaxis.value) / (float)(32767);
+
+				//SENSITIVITY
+				if (abs(newY) <= 0.2f)
+				{
+					movementVector.y = 0;
+				}
+				else
+				{
+					movementVector.y = newY;
+				}
 			}
 		}
-	}
-	if (event.type == SDL_JOYBUTTONDOWN) 
-	{
-		if (event.jbutton.button == 0) 
+		if (event.type == SDL_JOYBUTTONDOWN)
 		{
-			jump();
+			if (event.jbutton.button == 0)
+			{
+				jump();
+			}
 		}
+		return false;
 	}
-	return false;
 }
 
 
 bool PlayerController::onKey(SDL_Event &event) {
-//	movementVector = glm::vec2(0,0);
+	//	movementVector = glm::vec2(0,0);
 
-	if (event.type == SDL_KEYDOWN)
-	{
-		if (event.key.keysym.sym == SDLK_RIGHT)
+	if (RocketBall::gameInstance->getGameState() == GameState::Running) {
+		if (event.type == SDL_KEYDOWN)
 		{
-			movementVector.x = 1;
+			if (event.key.keysym.sym == SDLK_RIGHT)
+			{
+				movementVector.x = 1;
+			}
+			else if (event.key.keysym.sym == SDLK_LEFT)
+			{
+				movementVector.x = -1;
+			}
+			if (event.key.keysym.sym == SDLK_SPACE)
+			{
+				jump();
+			}
+			if (event.key.keysym.sym == SDLK_DOWN)
+			{
+				movementVector.y = -1;
+			}
+			else if (event.key.keysym.sym == SDLK_UP)
+			{
+				movementVector.y = 1;
+			}
 		}
-		else if (event.key.keysym.sym == SDLK_LEFT)
+		else if (event.type == SDL_KEYUP)
 		{
-			movementVector.x = -1;
-		}
-		if (event.key.keysym.sym == SDLK_SPACE)
-		{
-			jump();
-		}
-		if (event.key.keysym.sym == SDLK_DOWN) 
-		{
-			movementVector.y = -1;
-		}
-		else if (event.key.keysym.sym == SDLK_UP) 
-		{
-			movementVector.y = 1;
+			if (event.key.keysym.sym == SDLK_RIGHT && movementVector.x > 0)
+			{
+				movementVector.x = 0;
+			}
+			if (event.key.keysym.sym == SDLK_LEFT && movementVector.x < 0)
+			{
+				movementVector.x = 0;
+			}
+			if (event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_DOWN)
+			{
+				movementVector.y = 0;
+			}
 		}
 	}
-	else if (event.type == SDL_KEYUP)
-	{
-		if (event.key.keysym.sym == SDLK_RIGHT && movementVector.x>0)
-		{
-			movementVector.x = 0;
-		}
-		if (event.key.keysym.sym == SDLK_LEFT && movementVector.x<0)
-		{
-			movementVector.x = 0;
-		}
-		if (event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_DOWN) 
-		{
-			movementVector.y = 0;
-		}
-	}
-	
+
 	return false;
 }
 
@@ -165,16 +169,16 @@ void PlayerController::update(float deltaTime) {
 	}
 }
 
-void PlayerController::jump() 
+void PlayerController::jump()
 {
-	if (!isGrounded) 
+	if (!isGrounded)
 	{
 		//IF player has already dashed mid jump
-		if (airDashCounter >= airDashesAvailable) 
+		if (airDashCounter >= airDashesAvailable)
 		{
 			return;
 		}
-		else 
+		else
 		{
 			airDashCounter++;
 		}
@@ -184,25 +188,25 @@ void PlayerController::jump()
 	inDash = true;
 	dashCounter = 0;
 	cout << "moveVector: x: " << movementVector.x << "; y:" << movementVector.y << std::endl;
-	
+
 	//Check if direction vecor is zero, apply vertical jump
 	bool fakeJump = false;
-	if (movementVector.y == 0 && movementVector.x == 0) 
+	if (movementVector.y == 0 && movementVector.x == 0)
 	{
 		fakeJump = true;
 		movementVector.y = 1;
 	}
 	playerPhysics->setLinearVelocity(movementVector*dashSpeed);
-	if (fakeJump) 
+	if (fakeJump)
 	{
 		movementVector.y = 0;
 	}
 	//playerPhysics->addImpulse(glm::vec2(0.0f, 5.0f));
 }
 
-void PlayerController::endDash() 
+void PlayerController::endDash()
 {
-	playerPhysics->setLinearVelocity(glm::vec2(0,0));
+	playerPhysics->setLinearVelocity(glm::vec2(0, 0));
 }
 
 void PlayerController::onCollisionStart(PhysicsComponent *comp) {
@@ -228,7 +232,7 @@ void PlayerController::updateSprite(float deltaTime) {
 	spriteComponent->setSprite(playerSprite_1);
 }
 
-void PlayerController::resetJumps() 
+void PlayerController::resetJumps()
 {
 	airDashCounter = 0;
 }

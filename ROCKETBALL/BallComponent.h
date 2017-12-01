@@ -14,8 +14,11 @@ private:
 
 	bool engageSlowmotion = false;
 
+
 public:
 	explicit BallComponent(GameObject *gameObject);
+
+	bool goalAchieved = false;
 
 	float totalTime = 0;
 	float tIndex = 0;
