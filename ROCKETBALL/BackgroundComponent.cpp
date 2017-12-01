@@ -1,7 +1,3 @@
-//
-// Created by Morten Nobel-Jørgensen on 10/10/2017.
-//
-
 #include <sre/SpriteAtlas.hpp>
 #include <sre/Texture.hpp>
 #include <glm/gtx/transform.hpp>

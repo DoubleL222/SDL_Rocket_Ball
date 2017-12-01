@@ -1,7 +1,7 @@
 {"frames": [
 
 {
-	"filename": "FCBarcelona.png",
+	"filename": "brickWall.png",
 	"frame": {"x":0,"y":0,"w":256,"h":256},
 	"rotated": false,
 	"trimmed": false,
@@ -10,16 +10,16 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "gray.png",
-	"frame": {"x":256,"y":0,"w":128,"h":128},
+	"filename": "FCBarcelona.png",
+	"frame": {"x":256,"y":0,"w":256,"h":256},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
-	"sourceSize": {"w":128,"h":128},
+	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
+	"sourceSize": {"w":256,"h":256},
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "ManUntd.png",
+	"filename": "Grass.png",
 	"frame": {"x":0,"y":256,"w":256,"h":256},
 	"rotated": false,
 	"trimmed": false,
@@ -28,8 +28,26 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
+	"filename": "gray.png",
+	"frame": {"x":256,"y":256,"w":128,"h":128},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
+	"sourceSize": {"w":128,"h":128},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "ManUntd.png",
+	"frame": {"x":0,"y":512,"w":256,"h":256},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
+	"sourceSize": {"w":256,"h":256},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
 	"filename": "SoccerBall.png",
-	"frame": {"x":256,"y":256,"w":256,"h":256},
+	"frame": {"x":256,"y":512,"w":256,"h":256},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
@@ -41,8 +59,8 @@
 	"version": "1.0",
 	"image": "RocketBallSprites.png",
 	"format": "RGBA8888",
-	"size": {"w":512,"h":512},
+	"size": {"w":512,"h":1024},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:ecc7157613bfd8a6600a9721326d4ae7:e9c9d23c7ed8ad2e90499ae7185e72e7:abc763de9f831949696569c25140e526$"
+	"smartupdate": "$TexturePacker:SmartUpdate:1fdc3321bd3e4f238f4266bb04859eb5:39ba1d9ff4e0320edd32cda5e1d5a445:abc763de9f831949696569c25140e526$"
 }
 }

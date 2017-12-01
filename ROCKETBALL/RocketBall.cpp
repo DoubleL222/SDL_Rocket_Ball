@@ -4,6 +4,7 @@
 #include "sre/RenderPass.hpp"
 #include "PhysicsComponent.hpp"
 #include "SpriteComponent.hpp"
+#include "BallComponent.h"
 #include "PlayerController.h"
 #include "sre/profiler.hpp"
 #include <iostream>
@@ -11,7 +12,7 @@
 using namespace std;
 using namespace sre;
 
-const glm::vec2 RocketBall::windowSize(800, 600); // some size for the window
+const glm::vec2 RocketBall::windowSize(1600, 900); // some size for the window
 
 RocketBall* RocketBall::gameInstance = nullptr;
 
@@ -30,7 +31,7 @@ RocketBall::RocketBall()
 		onKey(e);
 	};
 	r.frameUpdate = [&](float deltaTime) {
-		update(deltaTime);
+		update(deltaTime * timeScale);
 	};
 	r.frameRender = [&]() {
 		render();
@@ -59,73 +60,55 @@ void RocketBall::initGame() {
 	camera = camGameObj->addComponent<GameCamera>();
 	camGameObj->setPosition(windowSize*0.5f);
 
-#pragma region Playing Field
-	//Spawning Floor
-	auto floorGameObj = createGameObject();
-	auto spriteComp = floorGameObj->addComponent<SpriteComponent>();
-	auto floorSprite = mySpriteAtlas->get("gray.png");
-	floorSprite.setScale(glm::vec2(windowSize.x / floorSprite.getSpriteSize().x, windowSize.y / ((floorHeight / 2.0f)*(floorSprite.getSpriteSize().y))));
-	spriteComp->setSprite(floorSprite);
-	floorGameObj->setPosition({ 0, -windowSize.y / (2.0) + windowSize.y / floorHeight });
-	auto physComp = floorGameObj->addComponent<PhysicsComponent>();
-	physComp->initBox(b2BodyType::b2_staticBody, glm::vec2(windowSize.x / (physicsScale * 2), windowSize.y / (physicsScale*floorHeight)), floorGameObj->getPosition() / physicsScale, 0.0f);
-
-	//Spawning Ceiling
-	auto ceilingGameObj = createGameObject();
-	spriteComp = ceilingGameObj->addComponent<SpriteComponent>();
-	floorSprite.setScale(glm::vec2(windowSize.x / floorSprite.getSpriteSize().x, windowSize.y / ((ceilingHeight / 2.0f)*(floorSprite.getSpriteSize().y))));
-	spriteComp->setSprite(floorSprite);
-	ceilingGameObj->setPosition({ 0, windowSize.y / (2.0) - windowSize.y / ceilingHeight });
-	physComp = ceilingGameObj->addComponent<PhysicsComponent>();
-	physComp->initBox(b2BodyType::b2_staticBody, glm::vec2(windowSize.x / (physicsScale * 2), windowSize.y / (physicsScale*ceilingHeight)), ceilingGameObj->getPosition() / physicsScale, 0.0f);
-
-	//Spawning LeftWall (1)
-	auto leftWall_1 = createGameObject();
-	spriteComp = leftWall_1->addComponent<SpriteComponent>();
-	floorSprite.setScale(glm::vec2(windowSize.x / ((wallWidth / 2.0f)*(floorSprite.getSpriteSize().x)), (windowSize.y / floorSprite.getSpriteSize().y)*0.3f));
-	spriteComp->setSprite(floorSprite);
-	leftWall_1->setPosition({ windowSize.x / (2.0) - windowSize.x / wallWidth, (windowSize.y * 0.5f) });
-	physComp = leftWall_1->addComponent<PhysicsComponent>();
-	physComp->initBox(b2BodyType::b2_staticBody, glm::vec2(windowSize.x / (physicsScale*wallWidth), windowSize.y / (physicsScale * 2)), leftWall_1->getPosition() / physicsScale, 0.0f);
-
-	//Spawning LeftWall (2)
-	auto leftWall_2 = createGameObject();
-	spriteComp = leftWall_2->addComponent<SpriteComponent>();
-	floorSprite.setScale(glm::vec2(windowSize.x / ((wallWidth / 2.0f)*(floorSprite.getSpriteSize().x)), (windowSize.y / floorSprite.getSpriteSize().y)*1.0f));
-	spriteComp->setSprite(floorSprite);
-	leftWall_2->setPosition({ windowSize.x / (2.0) - windowSize.x / wallWidth, -(windowSize.y * 0.5f) });
-	physComp = leftWall_2->addComponent<PhysicsComponent>();
-	physComp->initBox(b2BodyType::b2_staticBody, glm::vec2(windowSize.x / (physicsScale*wallWidth), windowSize.y / (physicsScale * 2)), leftWall_2->getPosition() / physicsScale, 0.0f);
-
-
-	//Spawning RightWall
-	auto rightWall = createGameObject();
-	spriteComp = rightWall->addComponent<SpriteComponent>();
-	floorSprite.setScale(glm::vec2(windowSize.x / ((wallWidth / 2.0f)*(floorSprite.getSpriteSize().x)), windowSize.y / floorSprite.getSpriteSize().y));
-	spriteComp->setSprite(floorSprite);
-	rightWall->setPosition({ -windowSize.x / (2.0) + windowSize.x / wallWidth, 0 });
-	physComp = rightWall->addComponent<PhysicsComponent>();
-	physComp->initBox(b2BodyType::b2_staticBody, glm::vec2(windowSize.x / (physicsScale*wallWidth), windowSize.y / (physicsScale * 2)), rightWall->getPosition() / physicsScale, 0.0f);
-
 	//Set background if it has not yet been set
 	if (!background_Layer_1.isInit) {
-		//(image, initial position X, initial position Y)
-		//background_Layer_1.init("backdropImage.jpg", -windowSize.x*0.5f, -windowSize.y*0.5f, true);
+		background_Layer_1.init("skybackdrop.png", -windowSize.x*0.5f, -windowSize.y*0.5f, true);
 	}
 
+#pragma region Playing Field
+
+	//Floor and Ceiling (issue: stretches the texture, maybe make into tiles instead)
+	createStetchedStaticBox("floor", mySpriteAtlas->get("Grass.png"), createGameObject(), { 0,-windowSize.y * 0.5f }, true, false, { 1,1 }, { 0,-30.0 }, physicsScale);
+	createStetchedStaticBox("ceiling", mySpriteAtlas->get("gray.png"), createGameObject(), { 0,windowSize.y * 0.5f }, true, false, { 0,0 }, { 0,0 }, physicsScale);
+	createStetchedStaticBox("rightBound", mySpriteAtlas->get("gray.png"), createGameObject(), { windowSize.x * 0.5f,0 }, false, true, { 0,0 }, { 0,0 }, physicsScale);
+	createStetchedStaticBox("leftBound", mySpriteAtlas->get("gray.png"), createGameObject(), { -windowSize.x * 0.5f,0 }, false, true, { 0,0 }, { 0,0 }, physicsScale);
+
+	//Field Walls
+	//createPlayFieldWall("leftwall_Bot", mySpriteAtlas->get("brickWall.png"), createGameObject(), true, false, { -windowSize.x * 0.5f , -windowSize.y * 0.5f }, { 80.0f, 4.0f }, physicsScale);
+	//createPlayFieldWall("leftwall_Top", mySpriteAtlas->get("gray.png"), createGameObject(), false, false, { -windowSize.x * 0.5f , windowSize.y * 0.5f }, { 80.0f, 8.0f }, physicsScale);
+	//createPlayFieldWall("rightwall_Bot", mySpriteAtlas->get("gray.png"), createGameObject(), true, true, { windowSize.x * 0.5f , -windowSize.y * 0.5f }, { 80.0f, 4.0f }, physicsScale);
+	//createPlayFieldWall("rightwall_Top", mySpriteAtlas->get("gray.png"), createGameObject(), false, true, { windowSize.x * 0.5f , windowSize.y * 0.5f }, { 80.0f, 8.0f }, physicsScale);
+
+	//Platforms
+	createStaticBox("Platform_center", mySpriteAtlas->get("gray.png"), createGameObject(), { 0,0 }, { 2.0f, 0.2f }, { 0,0 }, physicsScale);
+	createStaticBox("Platform_left", mySpriteAtlas->get("gray.png"), createGameObject(), { -windowSize.x * 0.2, -windowSize.y * 0.2 }, { 1.5f, 0.2f }, { 0,0 }, physicsScale);
+	createStaticBox("Platform_right", mySpriteAtlas->get("gray.png"), createGameObject(), { windowSize.x * 0.2, -windowSize.y * 0.2 }, { 1.5f, 0.2f }, { 0,0 }, physicsScale);
+
 #pragma endregion
+
+#pragma region Goals
+	//Debug center goal
+	//createGoal("Goal_1", mySpriteAtlas->get("gray.png"), createGameObject(), { 0,-windowSize.y * 0.25 }, { 1 ,1 }, { 0,0 }, glm::vec4{ 1.0f, 0.3f, 0.3f, 0.8f }, physicsScale);
+	
+	//Real goals:
+	createGoal("Goal_1", mySpriteAtlas->get("gray.png"), createGameObject(), { windowSize.x *0.5 - 70,-windowSize.y * 0.25 }, { 1 ,2 }, { 0,0 }, glm::vec4{ 1.0f, 0.3f, 0.3f, 0.8f }, physicsScale);
+	createGoal("Goal_2", mySpriteAtlas->get("gray.png"), createGameObject(), { -windowSize.x *0.5 + 70,-windowSize.y * 0.25}, { 1 ,2 }, { 0,0 }, glm::vec4{ 0.3f, 0.3f, 1.0f, 0.8f }, physicsScale);
+#pragma endregion
+
 
 #pragma region Dynamic Elements
 
 	//Spawn Soccer Ball
 	soccerBall = createGameObject();
-	spriteComp = soccerBall->addComponent<SpriteComponent>();
+	soccerBall->name = "Ball";
+	auto spriteComp = soccerBall->addComponent<SpriteComponent>();
 	auto soccerBallSprite = mySpriteAtlas->get("SoccerBall.png");
 	soccerBallSprite.setScale(glm::vec2(0.4f, 0.4f));
 	spriteComp->setSprite(soccerBallSprite);
-	soccerBall->setPosition(glm::vec2(0, 0));
-	physComp = soccerBall->addComponent<PhysicsComponent>();
+	soccerBall->setPosition(glm::vec2(0, windowSize.y * 0.3f));
+	auto physComp = soccerBall->addComponent<PhysicsComponent>();
 	physComp->initCircle(b2BodyType::b2_dynamicBody, 50 / physicsScale, soccerBall->getPosition() / physicsScale, ballDensity, ballFriction, ballRestitution, ballLinearDamping, ballAngularDamping, false);
+	soccerBall->addComponent<BallComponent>();
 
 	//Spawn Player1
 	player1 = createGameObject();
@@ -133,7 +116,7 @@ void RocketBall::initGame() {
 	auto player1Sprite = mySpriteAtlas->get("ManUntd.png");
 	player1Sprite.setScale(glm::vec2(0.2f, 0.2f));
 	spriteComp->setSprite(player1Sprite);
-	player1->setPosition(glm::vec2(windowSize.x / 4, 0));
+	player1->setPosition(glm::vec2(windowSize.x * 0.2, -windowSize.y * 0.2 + (player1Sprite.getSpriteSize().y * 0.5f)));
 	physComp = player1->addComponent<PhysicsComponent>();
 	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player1->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution, playerLinearDamping, playerAngularDamping, true);
 
@@ -144,17 +127,106 @@ void RocketBall::initGame() {
 	auto player2Sprite = mySpriteAtlas->get("FCBarcelona.png");
 	player2Sprite.setScale(glm::vec2(0.2f, 0.2f));
 	spriteComp->setSprite(player2Sprite);
-	player2->setPosition(glm::vec2(-windowSize.x / 4, 0));
+	player2->setPosition(glm::vec2(-windowSize.x * 0.2, -windowSize.y * 0.2 + (player2Sprite.getSpriteSize().y * 0.5f)));
 	physComp = player2->addComponent<PhysicsComponent>();
 	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player2->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution, playerLinearDamping, playerAngularDamping, true);
 
 #pragma endregion
 
 	//SET GAME STATE
-	gameState = GameState::Running;
+	gameState = GameState::Ready;
 }
 
+#pragma region Playfield Creators
+//Note: needs to be moved to own class
+void RocketBall::createGoal(std::string name, sre::Sprite sprite, std::shared_ptr<GameObject> obj, glm::vec2 pos, glm::vec2 scale, glm::vec2 colBuffer, glm::vec4 color, const float phyScale) {
+	auto goalSprite = sprite;
+	goalSprite.setScale(scale);
+	goalSprite.setColor(color);
+	auto goal_obj = obj;
+	goal_obj->name = name;
+	auto goalSpriteComp = goal_obj->addComponent<SpriteComponent>();
+	glm::vec2 pos_1{ pos };
+	goal_obj->setPosition(pos_1);
+	glm::vec2 scaleCol{ (goalSprite.getSpriteSize().x * goalSprite.getScale().x / 2) + colBuffer.x, (goalSprite.getSpriteSize().y * goalSprite.getScale().y / 2) + colBuffer.y };
+	goalSpriteComp->setSprite(goalSprite);
+	auto goalPhysics = goal_obj->addComponent<PhysicsComponent>();
+	goalPhysics->initBox(b2_staticBody, scaleCol / physicsScale, { goal_obj->getPosition().x / physicsScale, goal_obj->getPosition().y / physicsScale }, 0);
+	goalPhysics->setSensor(true);
+}
 
+void RocketBall::createStaticBox(std::string name, sre::Sprite sprite, std::shared_ptr<GameObject> obj, glm::vec2 pos, glm::vec2 scale, glm::vec2 colBuffer, const float phyScale) {
+	auto box = sprite;
+	box.setScale({ scale.x, scale.y });
+	auto box_obj = obj;
+	box_obj->name = name;
+	auto boxSprite = box_obj->addComponent<SpriteComponent>();
+	box_obj->setPosition(pos);
+	glm::vec2 scaleCol{ (box.getSpriteSize().x * box.getScale().x / 2) + colBuffer.x, (box.getSpriteSize().y * box.getScale().y / 2) + colBuffer.y };
+	boxSprite->setSprite(box);
+	auto box_physics = box_obj->addComponent<PhysicsComponent>();
+	box_physics->initBox(b2_staticBody, scaleCol / phyScale, { box_obj->getPosition().x / phyScale, box_obj->getPosition().y / phyScale }, 0);
+}
+
+void RocketBall::createStetchedStaticBox(std::string name, sre::Sprite sprite, std::shared_ptr<GameObject> obj, glm::vec2 pos, bool horizontalStretch, bool verticalStretch, glm::vec2 customScale, glm::vec2 colBuffer, float phyScale) {
+	float scaleX, scaleY;
+	auto stretchedBox = sprite;
+	auto stretchedBox_obj = obj;
+	stretchedBox_obj->name = name;
+	auto stetchedBoxSprite = stretchedBox_obj->addComponent<SpriteComponent>();
+
+	if (horizontalStretch) {
+		scaleX = windowSize.x / stretchedBox.getSpriteSize().x;
+	}
+	else {
+		scaleX = customScale.x;
+	}
+	if (verticalStretch) {
+		scaleY = windowSize.y / stretchedBox.getSpriteSize().y;
+	}
+	else {
+		scaleY = customScale.y;
+	}
+	stretchedBox.setScale({ scaleX, scaleY });
+	stetchedBoxSprite->setSprite(stretchedBox);
+	stretchedBox_obj->setPosition({ pos.x, pos.y /*+ stretchedBox.getSpriteSize().y *0.5f */ });
+	glm::vec2 scaleCol{ (stretchedBox.getSpriteSize().x * stretchedBox.getScale().x / 2) + colBuffer.x, (stretchedBox.getSpriteSize().y * stretchedBox.getScale().y / 2) + colBuffer.y };
+	auto stretchedBoxPhysics = stretchedBox_obj->addComponent<PhysicsComponent>();
+	stretchedBoxPhysics->initBox(b2BodyType::b2_staticBody, scaleCol / phyScale, stretchedBox_obj->getPosition() / phyScale, 0.0f);
+}
+
+void RocketBall::createPlayFieldWall(std::string name, sre::Sprite sprite, std::shared_ptr<GameObject> obj, bool botWall, bool rightWall, glm::vec2 pos, glm::vec2 customScale, float phyScale) {
+
+	auto wall = sprite;
+	auto wall_obj = obj;
+	wall_obj->name = name;
+	auto wallSprite = wall_obj->addComponent<SpriteComponent>();
+
+	wall.setScale(glm::vec2(windowSize.x / ((customScale.x / 2.0f)*(wall.getSpriteSize().x)), windowSize.y / ((customScale.y / 2.0f)*(wall.getSpriteSize().y))));
+	wallSprite->setSprite(wall);
+	if (!rightWall) {
+		if (botWall) {
+			wall_obj->setPosition({ pos.x + (windowSize.x / customScale.x), pos.y + (windowSize.y / customScale.y) });
+		}
+		else {
+			wall_obj->setPosition({ pos.x + (windowSize.x / customScale.x), pos.y - (windowSize.y / customScale.y) });
+		}
+	}
+	else {
+		if (botWall) {
+			wall_obj->setPosition({ pos.x - (windowSize.x / customScale.x), pos.y + (windowSize.y / customScale.y) });
+		}
+		else {
+			wall_obj->setPosition({ pos.x - (windowSize.x / customScale.x), pos.y - (windowSize.y / customScale.y) });
+		}
+	}
+
+	glm::vec2 scaleCol{ (wall.getSpriteSize().x * wall.getScale().x / 2), (wall.getSpriteSize().y * wall.getScale().y / 2) };
+	auto wallPhysics = wall_obj->addComponent<PhysicsComponent>();
+	wallPhysics->initBox(b2BodyType::b2_staticBody, scaleCol / phyScale, wall_obj->getPosition() / physicsScale, 0.0f);
+}
+
+#pragma endregion
 
 void RocketBall::initPhysics()
 {
@@ -170,12 +242,16 @@ void RocketBall::initPhysics()
 
 /// Core Update
 void RocketBall::update(float time) {
-	if (gameState == GameState::Running) {
+	if (gameState == GameState::Running || gameState == GameState::RoundComplete) {
 		updatePhysics(time);
 	}
 	for (int i = 0; i < sceneObjects.size(); i++) {
 		sceneObjects[i]->update(time);
 	}
+}
+
+GameState RocketBall::getGameState() {
+	return gameState;
 }
 
 /// Region for Render engine
@@ -196,10 +272,13 @@ void RocketBall::render() {
 	}
 
 	auto sb = spriteBatchBuilder.build();
+	rp.draw(sb);
 
 	ImGui::SetNextWindowPos(ImVec2(Renderer::instance->getWindowSize().x / 2 - 50, .0f), ImGuiSetCond_Always);
-	ImGui::SetNextWindowSize(ImVec2(100, 50), ImGuiSetCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(150, 75), ImGuiSetCond_Always);
 	ImGui::Begin("", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+	ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Goal P1 %i", player1Goals);
+	ImGui::TextColored(ImVec4(0.3f, 0.3f, 1.0f, 1.0f), "Goal P2 %i", player2Goals);
 	ImGui::SetWindowFontScale(2.0f);
 	ImGui::PushFont;
 	ImGui::End();
@@ -216,6 +295,41 @@ void RocketBall::render() {
 }
 #pragma endregion
 
+
+void RocketBall::handleContact(b2Contact *contact, bool begin) {
+	auto fixA = contact->GetFixtureA();
+	auto fixB = contact->GetFixtureB();
+	PhysicsComponent* physA = physicsComponentLookup[fixA];
+	PhysicsComponent* physB = physicsComponentLookup[fixB];
+	auto & aComponents = physA->getGameObject()->getComponents();
+	auto & bComponents = physB->getGameObject()->getComponents();
+	for (auto & c : aComponents) {
+		if (begin) {
+			c->onCollisionStart(physB);
+		}
+		else {
+			c->onCollisionEnd(physB);
+		}
+	}
+	for (auto & c : bComponents) {
+		if (begin) {
+			c->onCollisionStart(physA);
+		}
+		else {
+			c->onCollisionEnd(physA);
+		}
+	}
+}
+
+void RocketBall::BeginContact(b2Contact *contact) {
+	b2ContactListener::BeginContact(contact);
+	handleContact(contact, true);
+}
+
+void RocketBall::EndContact(b2Contact *contact) {
+	b2ContactListener::EndContact(contact);
+	handleContact(contact, false);
+}
 
 #pragma region Handle_Inputs
 void RocketBall::onKey(SDL_Event &event) {
@@ -249,6 +363,10 @@ void RocketBall::onKey(SDL_Event &event) {
 				gameState = GameState::Ready;
 			}
 			else if (gameState == GameState::Ready) {
+				gameState = GameState::Running;
+			}
+			else if (gameState == GameState::RoundComplete) {
+				//call a reset function
 				gameState = GameState::Running;
 			}
 			break;

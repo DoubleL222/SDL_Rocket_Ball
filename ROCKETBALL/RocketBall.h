@@ -13,6 +13,7 @@ class PhysicsComponent;
 enum class GameState {
 	Ready,
 	Running,
+	RoundComplete,
 	GameOver
 };
 
@@ -34,12 +35,18 @@ public:
 
 	static const glm::vec2 windowSize;
 
-	//void BeginContact(b2Contact *contact) override;
-	//void EndContact(b2Contact *contact) override;
+	float timeScale = 1.0f;
+
+	int player1Goals = 0;
+	int player2Goals = 0;
+
+	void BeginContact(b2Contact *contact) override;
+	void EndContact(b2Contact *contact) override;
 
 	static RocketBall* gameInstance;
 	void setGameState(GameState newState);
-	
+	GameState getGameState();
+
 	b2World * world = nullptr;
 
 private:
@@ -62,27 +69,32 @@ private:
 
 	sre::SDLRenderer r;
 
-	const float floorHeight = 25;
-	const float ceilingHeight = 40;
-	const float wallWidth = 80;
+	//const float floorHeight = 25;
+	//const float ceilingHeight = 40;
+	//const float wallWidth = 80;
 
 	void initGame();
 
 	void initPhysics();
 	//void updatePhysics();
-	//void handleContact(b2Contact *contact, bool begin);
+	void handleContact(b2Contact *contact, bool begin);
 	//void registerPhysicsComponent(PhysicsComponent *r);
 	//void deregisterPhysicsComponent(PhysicsComponent *r);
 
 	std::shared_ptr<sre::SpriteAtlas> mySpriteAtlas;
 	std::map<b2Fixture*, PhysicsComponent *> physicsComponentLookup;
 
+	const float physicsScale = 100;
+
 	Box2DDebugDraw debugDraw;
 	bool doDebugDraw = false;
 
-	const float physicsScale = 100;
-
 	std::shared_ptr<GameCamera> camera;
+
+	void createStaticBox(std::string name, sre::Sprite sprite, std::shared_ptr<GameObject> obj, glm::vec2 pos, glm::vec2 scale, glm::vec2 colBuffer, const float phyScale);
+	void createStetchedStaticBox(std::string name, sre::Sprite sprite, std::shared_ptr<GameObject> obj, glm::vec2 pos, bool horizontalStretch, bool verticalStretch, glm::vec2 customScale, glm::vec2 colBuffer, float phyScale);
+	void createPlayFieldWall(std::string name, sre::Sprite sprite, std::shared_ptr<GameObject> obj, bool botWall, bool rightWall, glm::vec2 pos, glm::vec2 customScale, float phyScale);
+	void createGoal(std::string name, sre::Sprite sprite, std::shared_ptr<GameObject> obj, glm::vec2 pos, glm::vec2 scale, glm::vec2 colBuffer, glm::vec4 color, const float phyScale);
 
 	void update(float time);
 

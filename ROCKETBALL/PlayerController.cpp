@@ -15,10 +15,10 @@ PlayerController::PlayerController(GameObject *gameObject) : Component(gameObjec
 }
 
 bool PlayerController::onKey(SDL_Event &event) {
-	movementVector = glm::vec2(0,0);
-	if (event.type == SDL_KEYDOWN) 
+	movementVector = glm::vec2(0, 0);
+	if (event.type == SDL_KEYDOWN)
 	{
-		if (event.key.keysym.sym == SDLK_RIGHT) 
+		if (event.key.keysym.sym == SDLK_RIGHT)
 		{
 			movementVector.x = 1;
 		}
@@ -26,7 +26,7 @@ bool PlayerController::onKey(SDL_Event &event) {
 		{
 			movementVector.x = -1;
 		}
-		if (event.key.keysym.sym == SDLK_SPACE) 
+		if (event.key.keysym.sym == SDLK_SPACE)
 		{
 			cout << "JUMP" << std::endl;
 			jump();
@@ -60,7 +60,7 @@ bool PlayerController::onKey(SDL_Event &event) {
 
 void PlayerController::update(float deltaTime) {
 	// raycast ignores any shape in the starting point
-	if (playerPhysics == nullptr) 
+	if (playerPhysics == nullptr)
 	{
 		playerPhysics = gameObject->getComponent<PhysicsComponent>();
 	}
@@ -69,10 +69,10 @@ void PlayerController::update(float deltaTime) {
 	isGrounded = false;
 	//RocketBall::gameInstance->world->RayCast(this, from, to);
 
-	if (movementVector.x != 0) 
+	if (movementVector.x != 0)
 	{
 		glm::vec2 currentVelocity = playerPhysics->getLinearVelocity();
-		if ((currentVelocity.x < 0 && movementVector.x>0) || (currentVelocity.x > 0 && movementVector.x<0))
+		if ((currentVelocity.x < 0 && movementVector.x>0) || (currentVelocity.x > 0 && movementVector.x < 0))
 		{
 			playerPhysics->setLinearVelocity(glm::vec2(0, currentVelocity.y));
 		}
@@ -102,7 +102,7 @@ void PlayerController::update(float deltaTime) {
 }
 
 void PlayerController::jump() {
-	playerPhysics->addImpulse({ 0,0.1f});
+	playerPhysics->addImpulse({ 0,0.1f });
 }
 
 void PlayerController::onCollisionStart(PhysicsComponent *comp) {
