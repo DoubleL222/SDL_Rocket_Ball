@@ -54,6 +54,7 @@ void PhysicsComponent::setLinearVelocity(glm::vec2 velocity) {
 void PhysicsComponent::initCircle(b2BodyType type, float radius, glm::vec2 center, float density, float friction, float restitution, float linearDamping, float angularDamping, bool fixedRotation) {
     assert(body == nullptr);
     // do init
+	this->radius = radius;
     shapeType = b2Shape::Type::e_circle;
     b2BodyDef bd;
     bd.type = type;

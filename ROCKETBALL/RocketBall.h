@@ -55,17 +55,20 @@ private:
 	std::shared_ptr<GameObject> player1;
 	std::shared_ptr<GameObject> player2;
 
-	float ballRestitution = 0.7f;
+	SDL_Joystick * joy1;
+	SDL_Joystick * joy2;
+
+	float ballRestitution = 0.5f;
 	float ballFriction = 1.0f;
-	float ballDensity = 0.05f;
+	float ballDensity = 0.1f;
 	float ballLinearDamping = 0.0f;
 	float ballAngularDamping = 0.01f;
 
 	float playerRestitution = 0.0f;
-	float playerFriction = 1.0f;
+	float playerFriction = 0.0f;
 	float playerDensity = 0.7f;
 	float playerLinearDamping = 0.0f;
-	float playerAngularDamping = 0.01f;
+	float playerAngularDamping = 0.0f;
 
 	sre::SDLRenderer r;
 
@@ -86,6 +89,8 @@ private:
 
 	const float physicsScale = 100;
 
+	
+
 	Box2DDebugDraw debugDraw;
 	bool doDebugDraw = false;
 
@@ -99,6 +104,8 @@ private:
 	void update(float time);
 
 	void render();
+
+	void onJoyInput(SDL_Event & event);
 
 	void onKey(SDL_Event &event);
 
