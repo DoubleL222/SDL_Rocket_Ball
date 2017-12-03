@@ -5,6 +5,7 @@
 #include <Box2D/Box2D.h>
 #include "PhysicsComponent.hpp"
 #include "RocketBall.h"
+
 //#include "BirdGame.hpp"
 
 PhysicsComponent::PhysicsComponent(GameObject *gameObject)
@@ -116,6 +117,31 @@ void PhysicsComponent::initEdge(b2BodyType type, glm::vec2 point_1, glm::vec2 po
 	fxD.shape = edge;
 	fxD.density = density;
 	body->ResetMassData();
+	fixture = body->CreateFixture(&fxD);
+
+	RocketBall::gameInstance->registerPhysicsComponent(this);
+}
+
+void PhysicsComponent::initPolygon(b2BodyType type, std::vector<glm::vec2> polygonVerticies)
+{
+	assert(body == nullptr);
+	shapeType = b2Shape::Type::e_polygon;
+	b2BodyDef bd;
+	bd.type = type;
+	rbType = type;
+	body = world->CreateBody(&bd);
+	polygon = new b2PolygonShape();
+	b2Vec2 vertices[3];
+	int i = 0;
+	for each(glm::vec2 curr_vec in polygonVerticies)
+	{
+		vertices[i].Set(curr_vec.x, curr_vec.y);
+		i++;
+	}
+	polygon->Set(vertices, polygonVerticies.size());
+	b2FixtureDef fxD;
+	fxD.shape = polygon;
+	fxD.density = 0.7f;
 	fixture = body->CreateFixture(&fxD);
 
 	RocketBall::gameInstance->registerPhysicsComponent(this);
