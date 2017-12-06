@@ -14,6 +14,8 @@ public:
 
     void initCircle(b2BodyType type, float radius,glm::vec2 center,float density, float friction, float restitution, float linearDamping, float angularDamping, bool fixedRotation);
     void initBox(b2BodyType type, glm::vec2 size,glm::vec2 center,float density);
+	void initCarCollider(glm::vec2 size, glm::vec2 center, float _friction, float _density, float _linearDamping, float _angularDamping);
+	void initCarSensorCollider(glm::vec2 size, glm::vec2 center);
 	void initEdge(b2BodyType type, glm::vec2 point_1, glm::vec2 point_2, float density);
 
     void addForce(glm::vec2 force);     // Force gradually affects the velocity over time

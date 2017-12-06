@@ -1,8 +1,17 @@
 {"frames": [
 
 {
+	"filename": "BlackCarCropped.png",
+	"frame": {"x":0,"y":0,"w":319,"h":103},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":319,"h":103},
+	"sourceSize": {"w":319,"h":103},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
 	"filename": "FCBarcelona.png",
-	"frame": {"x":0,"y":0,"w":256,"h":256},
+	"frame": {"x":0,"y":103,"w":256,"h":256},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
@@ -11,7 +20,7 @@
 },
 {
 	"filename": "gray.png",
-	"frame": {"x":256,"y":0,"w":128,"h":128},
+	"frame": {"x":256,"y":103,"w":128,"h":128},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
@@ -20,7 +29,7 @@
 },
 {
 	"filename": "ManUntd.png",
-	"frame": {"x":0,"y":256,"w":256,"h":256},
+	"frame": {"x":0,"y":359,"w":256,"h":256},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
@@ -29,7 +38,7 @@
 },
 {
 	"filename": "SoccerBall.png",
-	"frame": {"x":256,"y":256,"w":256,"h":256},
+	"frame": {"x":256,"y":359,"w":256,"h":256},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
@@ -41,8 +50,8 @@
 	"version": "1.0",
 	"image": "RocketBallSprites.png",
 	"format": "RGBA8888",
-	"size": {"w":512,"h":512},
+	"size": {"w":512,"h":1024},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:ecc7157613bfd8a6600a9721326d4ae7:e9c9d23c7ed8ad2e90499ae7185e72e7:abc763de9f831949696569c25140e526$"
+	"smartupdate": "$TexturePacker:SmartUpdate:cf9d203aff85f9ac1cd2339cc133c324:1eddbd7a081171ec9967563270de4887:abc763de9f831949696569c25140e526$"
 }
 }

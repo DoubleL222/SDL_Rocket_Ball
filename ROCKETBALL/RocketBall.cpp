@@ -11,7 +11,7 @@
 using namespace std;
 using namespace sre;
 
-const glm::vec2 RocketBall::windowSize(800, 600); // some size for the window
+const glm::vec2 RocketBall::windowSize(1600, 600); // some size for the window
 
 RocketBall* RocketBall::gameInstance = nullptr;
 
@@ -78,6 +78,7 @@ void RocketBall::initGame() {
 #pragma region Playing Field
 	//Spawning Floor
 	auto floorGameObj = createGameObject();
+	floorGameObj->name = "Floor";
 	auto spriteComp = floorGameObj->addComponent<SpriteComponent>();
 	auto floorSprite = mySpriteAtlas->get("gray.png");
 	floorSprite.setScale(glm::vec2(windowSize.x / floorSprite.getSpriteSize().x, windowSize.y / ((floorHeight / 2.0f)*(floorSprite.getSpriteSize().y))));
@@ -88,6 +89,7 @@ void RocketBall::initGame() {
 
 	//Spawning Ceiling
 	auto ceilingGameObj = createGameObject();
+	ceilingGameObj->name = "Ceiling";
 	spriteComp = ceilingGameObj->addComponent<SpriteComponent>();
 	floorSprite.setScale(glm::vec2(windowSize.x / floorSprite.getSpriteSize().x, windowSize.y / ((ceilingHeight / 2.0f)*(floorSprite.getSpriteSize().y))));
 	spriteComp->setSprite(floorSprite);
@@ -97,6 +99,7 @@ void RocketBall::initGame() {
 
 	//Spawning LeftWall
 	auto leftWall = createGameObject();
+	leftWall->name = "LeftWall";
 	spriteComp = leftWall->addComponent<SpriteComponent>();
 	floorSprite.setScale(glm::vec2(windowSize.x / ((wallWidth / 2.0f)*(floorSprite.getSpriteSize().x)), windowSize.y / floorSprite.getSpriteSize().y));
 	spriteComp->setSprite(floorSprite);
@@ -106,6 +109,7 @@ void RocketBall::initGame() {
 
 	//Spawning RightWall
 	auto rightWall = createGameObject();
+	rightWall->name = "RightWall";
 	spriteComp = rightWall->addComponent<SpriteComponent>();
 	floorSprite.setScale(glm::vec2(windowSize.x / ((wallWidth / 2.0f)*(floorSprite.getSpriteSize().x)), windowSize.y / floorSprite.getSpriteSize().y));
 	spriteComp->setSprite(floorSprite);
@@ -125,17 +129,19 @@ void RocketBall::initGame() {
 
 	//Spawn Soccer Ball
 	soccerBall = createGameObject();
+	soccerBall->name = "Ball";
 	spriteComp = soccerBall->addComponent<SpriteComponent>();
 	auto soccerBallSprite = mySpriteAtlas->get("SoccerBall.png");
-	soccerBallSprite.setScale(glm::vec2(0.4f, 0.4f));
+	soccerBallSprite.setScale(glm::vec2(0.34f, 0.34f));
 	spriteComp->setSprite(soccerBallSprite);
 	soccerBall->setPosition(glm::vec2(0, 0));
 	physComp = soccerBall->addComponent<PhysicsComponent>();
-	physComp->initCircle(b2BodyType::b2_dynamicBody, 50 / physicsScale, soccerBall->getPosition() / physicsScale, ballDensity, ballFriction, ballRestitution, ballLinearDamping, ballAngularDamping, false);
+	physComp->initCircle(b2BodyType::b2_dynamicBody, 41 / physicsScale, soccerBall->getPosition() / physicsScale, ballDensity, ballFriction, ballRestitution, ballLinearDamping, ballAngularDamping, false);
 
 	//Spawn Player1
 	player1 = createGameObject();
-	player1->addComponent<PlayerController>();
+	player1->name = "Player1";
+	//player1->addComponent<PlayerController>();
 	spriteComp = player1->addComponent<SpriteComponent>();
 	auto player1Sprite = mySpriteAtlas->get("ManUntd.png");
 	player1Sprite.setScale(glm::vec2(0.2f, 0.2f));
@@ -146,14 +152,17 @@ void RocketBall::initGame() {
 
 	//Spawn Player2
 	player2 = createGameObject();
+	player2->name = "Player2";
 	player2->addComponent<PlayerController>();
 	spriteComp = player2->addComponent<SpriteComponent>();
-	auto player2Sprite = mySpriteAtlas->get("FCBarcelona.png");
+	auto player2Sprite = mySpriteAtlas->get("BlackCarCropped.png");
+	player2Sprite.setFlip(glm::vec2(-1, 0));
 	player2Sprite.setScale(glm::vec2(0.2f, 0.2f));
 	spriteComp->setSprite(player2Sprite);
 	player2->setPosition(glm::vec2(-windowSize.x / 4, 0));
 	physComp = player2->addComponent<PhysicsComponent>();
-	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player2->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution, playerLinearDamping, playerAngularDamping, true);
+	physComp->initCarCollider(glm::vec2(0.3f, 0.07f), player2->getPosition() / physicsScale, playerFriction, playerDensity, playerLinearDamping, playerAngularDamping);
+	//physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player2->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution, playerLinearDamping, playerAngularDamping, true);
 
 #pragma endregion
 
@@ -309,7 +318,8 @@ void RocketBall::updatePhysics(float deltaTime)
 		float angle = phys.second->body->GetAngle();
 		auto gameObject = phys.second->getGameObject();
 		gameObject->setPosition(glm::vec2(position.x*physicsScale, position.y*physicsScale));
-		gameObject->setRotation(angle);
+		//COMENTED OUT BECAUSE IT WAS GIVING ME TROUBLE //// LUKA /////
+		//gameObject->setRotation(angle);
 	}
 }
 

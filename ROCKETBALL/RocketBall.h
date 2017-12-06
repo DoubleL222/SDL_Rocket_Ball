@@ -51,17 +51,17 @@ private:
 	SDL_Joystick * joy1;
 	SDL_Joystick * joy2;
 
-	float ballRestitution = 0.5f;
-	float ballFriction = 1.0f;
+	float ballRestitution = 0.6f;
+	float ballFriction = 0.3f;
 	float ballDensity = 0.1f;
-	float ballLinearDamping = 0.0f;
+	float ballLinearDamping = 0.00f;
 	float ballAngularDamping = 0.01f;
 
 	float playerRestitution = 0.0f;
-	float playerFriction = 0.0f;
-	float playerDensity = 0.7f;
-	float playerLinearDamping = 0.0f;
-	float playerAngularDamping = 0.0f;
+	float playerFriction = 0.3f;
+	float playerDensity = 0.9f;
+	float playerLinearDamping = 0.05f;
+	float playerAngularDamping = 0.01f;
 
 	sre::SDLRenderer r;
 
