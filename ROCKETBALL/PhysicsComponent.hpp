@@ -18,6 +18,8 @@ public:
 	void initCarSensorCollider(glm::vec2 size, glm::vec2 center);
 	void initEdge(b2BodyType type, glm::vec2 point_1, glm::vec2 point_2, float density);
 
+	void initPolygon(b2BodyType type, std::vector<glm::vec2> polygonVerticies);
+
     void addForce(glm::vec2 force);     // Force gradually affects the velocity over time
 
     void addImpulse(glm::vec2 force);   // Instantly affects velocity

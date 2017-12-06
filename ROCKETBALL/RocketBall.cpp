@@ -139,6 +139,11 @@ void RocketBall::initGame() {
 	physComp->initCircle(b2BodyType::b2_dynamicBody, 41 / physicsScale, soccerBall->getPosition() / physicsScale, ballDensity, ballFriction, ballRestitution, ballLinearDamping, ballAngularDamping, false);
 
 	//Spawn Player1
+	std::vector<glm::vec2> vertices;
+	vertices.push_back(glm::vec2(-2, 0));
+	vertices.push_back(glm::vec2(1, 1));
+	vertices.push_back(glm::vec2(1, 0));
+
 	player1 = createGameObject();
 	player1->name = "Player1";
 	//player1->addComponent<PlayerController>();
@@ -148,7 +153,8 @@ void RocketBall::initGame() {
 	spriteComp->setSprite(player1Sprite);
 	player1->setPosition(glm::vec2(windowSize.x / 4, 0));
 	physComp = player1->addComponent<PhysicsComponent>();
-	physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player1->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution, playerLinearDamping, playerAngularDamping, true);
+	physComp->initPolygon(b2BodyType::b2_dynamicBody, vertices);
+	//physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player1->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution, playerLinearDamping, playerAngularDamping, true);
 
 	//Spawn Player2
 	player2 = createGameObject();
