@@ -10,21 +10,22 @@ private:
 	glm::vec2 initialPosition;
 	float blowBackForce;
 
+
 	void update(float deltaTime) override;
-
-	bool engageSlowmotion = false;
-
 
 public:
 	explicit BallComponent(GameObject *gameObject);
 
 	bool goalAchieved = false;
 
+	bool engageSlowmotion = false;
+
+	void setOuterBall(std::shared_ptr<PhysicsComponent> _outerBallPhysics);
+
 	float totalTime = 0;
 	float tIndex = 0;
 	float slowMotionSet = 0.2f;
 	float slowMotionReturn = 1.0f;
-
 
 	void onCollisionStart(PhysicsComponent *comp) override;
 

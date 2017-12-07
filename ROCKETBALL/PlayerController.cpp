@@ -110,6 +110,12 @@ bool PlayerController::onKey(SDL_Event &event) {
 	return false;
 }
 
+void PlayerController::resetInputs() {
+	movementVector.x = 0;
+	movementVector.y = 0;
+	resetJumps();
+}
+
 void PlayerController::update(float deltaTime) {
 	// raycast ignores any shape in the starting point
 	if (playerPhysics == nullptr)

@@ -23,7 +23,16 @@ public:
 
 	void jump();
 
+	void resetInputs();
+
 	void endDash();
+
+
+	float maxSpeed = 5.0f;
+	float acceleration = 1.0f;
+	float dashSpeed = 15.0f;
+	float dashDuration = 0.15f;
+	int airDashesAvailable = 1;
 
 	//Raycasting
 	virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point,
@@ -44,12 +53,12 @@ private:
 	std::shared_ptr<SpriteComponent> spriteComponent;
 	std::shared_ptr<PhysicsComponent> playerPhysics;
 
-	const float maxSpeed = 5.0f;
-	const float acceleration = 1.0f;
-	const float dashSpeed = 15.0f;
-	const float dashDuration = 0.15f;
+	//const float maxSpeed = 5.0f;
+	//const float acceleration = 1.0f;
+	//const float dashSpeed = 15.0f;
+	//const float dashDuration = 0.15f;
 
-	int airDashesAvailable = 1;
+	//int airDashesAvailable = 1;
 	int airDashCounter = 0;
 
 	float dashCounter = 0;
