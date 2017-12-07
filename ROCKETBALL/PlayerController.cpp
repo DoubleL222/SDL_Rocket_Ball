@@ -17,8 +17,6 @@ PlayerController::PlayerController(GameObject *gameObject) : Component(gameObjec
 
 bool PlayerController::onJoyInput(SDL_Event &event)
 {
-
-	//	movementVector = glm::vec2(0,0);
 	if (RocketBall::gameInstance->getGameState() == GameState::Running) {
 		if (event.type == SDL_JOYAXISMOTION)
 		{
@@ -26,66 +24,42 @@ bool PlayerController::onJoyInput(SDL_Event &event)
 			if (axisIndex == 0)
 			{
 				float newX = (float)(event.jaxis.value) / (float)(32767);
-
-				//SENSITIVITY
-			/*if (abs(newX) <= 0.0f) 
-				{
-				facingVector.x = 0;
-				}
-				else
-				{
 				facingVector.x = newX;
-			}*/
-			facingVector.x = newX;
-
 			}
 			else if (axisIndex == 1)
 			{
 				float newY = -(float)(event.jaxis.value) / (float)(32767);
-
-				//SENSITIVITY
-			/*if (abs(newY) <= 0.2f)
-				{
-				facingVector.y = 0;
-				}
-				else
-				{
 				facingVector.y = newY;
-			}*/
-			facingVector.y = newY;
-		}
-		float angle = glm::angle(glm::vec2(1, 0), facingVector);
-		angle = angleBetweenVectors(glm::vec2(1, 0), facingVector);
-		angle = glm::degrees(angle);
-		if (axisIndex == 5) 
-		{
-			float newVal = Remap(event.jaxis.value, -32768, 32767, 0, 1);
-			movementVector.x = newVal;
-		}
-		if (axisIndex == 2)
-		{
-			float newVal = Remap(event.jaxis.value, -32768, 32767, 0, 1);
-			movementVector.x = -newVal;
+			}
+			if (axisIndex == 5) 
+			{
+				float newVal = Remap(event.jaxis.value, -32768, 32767, 0, 1);
+				movementVector.x = newVal;
+			}
+			if (axisIndex == 2)
+			{
+				float newVal = Remap(event.jaxis.value, -32768, 32767, 0, 1);
+				movementVector.x = -newVal;
 			}
 		}
-	if (event.type == SDL_JOYBUTTONDOWN)
+		if (event.type == SDL_JOYBUTTONDOWN)
 		{
-		//cout << "Joy Button: " << (int)(event.jbutton.button) << std::endl;
-		if (event.jbutton.button == 0)
+			//cout << "Joy Button: " << (int)(event.jbutton.button) << std::endl;
+			if (event.jbutton.button == 0)
 			{
 				jump();
 			}
-		if (event.jbutton.button == 1) 
-		{
-			isBoosting = true;
+			if (event.jbutton.button == 1) 
+			{
+				isBoosting = true;
+			}
 		}
-	}
-	else if (event.type == SDL_JOYBUTTONUP) 
-	{
-		if (event.jbutton.button == 1)
+		else if (event.type == SDL_JOYBUTTONUP) 
 		{
-			isBoosting = false;
-		}
+			if (event.jbutton.button == 1)
+			{
+				isBoosting = false;
+			}
 		}
 		return false;
 	}
@@ -233,9 +207,7 @@ void PlayerController::update(float deltaTime)
 				playerPhysics->setLinearVelocity(glm::vec2(currentX, currentVelocity.y));
 			}
 			//If Speed is more than maxSpeed
-			//cout << "curr velocity x: " << currentVelocity.x <<"; y:" << currentVelocity.y << std::endl;
 			float currentSpeed = glm::length(currentVelocity);
-			//cout << "curr speed: " << currentSpeed << std::endl;
 			if (currentSpeed > maxSpeed && !isBoosting)
 			{
 				playerPhysics->setLinearVelocity((maxSpeed / currentSpeed) * currentVelocity);
@@ -243,9 +215,7 @@ void PlayerController::update(float deltaTime)
 			//IF not, increase speed
 			else
 			{
-				//currentX += movementVector.x*acceleration;
 				playerPhysics->addForce(glm::vec2(movementVector.x * acceleration * deltaTime, 0));
-				//playerPhysics->setLinearVelocity(glm::vec2(movementVector.x * maxSpeed, currentVelocity.y));
 			}
 		}
 		else
@@ -359,11 +329,8 @@ void PlayerController::jump()
 	{
 		moveNormalized = glm::vec2(0, 1);
 	}
-	//playerPhysics->body->ApplyForce(b2Vec2(moveNormalized.x*dashSpeed, moveNormalized.y*dashSpeed), b2Vec2(0.2, -0.1), true);
 	playerPhysics->addImpulse(moveNormalized*dashSpeed);
-	//void ApplyForce(const b2Vec2& force, const b2Vec2& point);
-	//playerPhysics->setLinearVelocity(moveNormalized*dashSpeed);
-	//playerPhysics->addImpulse(glm::vec2(0.0f, 5.0f));
+
 }
 
 void PlayerController::resetInputs()
@@ -392,13 +359,6 @@ float32 PlayerController::ReportFixture(b2Fixture *fixture, const b2Vec2 &point,
 		cout << "GROUNDED" << std::endl;
 		isGrounded = true;
 	}
-	/*if (objName == "LeftWall" || objName == "RightWall") 
-	{
-		isNextToWall = true;
-		std::cout << "STOP HORIZONTAL " << std::endl;
-		stopHorizontalMovement();
-	}*/
-	//cout << "3: Raycast HIT" << std::endl;
 	return 0; // terminate raycast
 }
 
