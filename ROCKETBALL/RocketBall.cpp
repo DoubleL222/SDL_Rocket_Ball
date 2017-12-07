@@ -466,6 +466,11 @@ void RocketBall::RenderSliders()
 	UpdateWithNewPhysics();
 }
 
+void RocketBall::applyForcesToPlayersAfterGoal()
+{
+	
+}
+
 #pragma endregion
 
 void RocketBall::setGameState(GameState newState) {

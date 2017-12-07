@@ -35,9 +35,13 @@ public:
 
 	void RenderSliders();
 
+	//CALCULATE DISTANCE TO PLAYER
+	void applyForcesToPlayersAfterGoal();
+
 	static const glm::vec2 windowSize;
 
 	float timeScale = 1.0f;
+
 
 	int player1Goals = 0;
 	int player2Goals = 0;
