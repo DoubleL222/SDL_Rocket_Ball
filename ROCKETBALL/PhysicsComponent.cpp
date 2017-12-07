@@ -87,6 +87,7 @@ void PhysicsComponent::initCircle(b2BodyType type, float radius, glm::vec2 cente
 	rbType = type;
 	bd.position = b2Vec2(center.x, center.y);
 	bd.fixedRotation = fixedRotation;
+	bd.userData = gameObject;
 	body = world->CreateBody(&bd);
 	circle = new b2CircleShape();
 	circle->m_radius = radius;
@@ -106,6 +107,7 @@ void PhysicsComponent::initBox(b2BodyType type, glm::vec2 size, glm::vec2 center
 	b2BodyDef bd;
 	bd.type = type;
 	rbType = type;
+	bd.userData = gameObject;
 	//bd.position = b2Vec2(center.x, center.y);
 	body = world->CreateBody(&bd);
 	body->SetTransform(b2Vec2(center.x, center.y), rotation);

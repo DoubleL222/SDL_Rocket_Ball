@@ -350,6 +350,26 @@ void PlayerController::onCollisionEnd(PhysicsComponent *comp) {
 
 }
 
+void PlayerController::rechargeBoost(float _val)
+{
+}
+
+void PlayerController::gravityPowerUp()
+{
+}
+
+void PlayerController::speedPowerUp()
+{
+}
+
+void PlayerController::dashPowerUp()
+{
+}
+
+void PlayerController::dashCountPowerUp()
+{
+}
+
 float32 PlayerController::ReportFixture(b2Fixture *fixture, const b2Vec2 &point, const b2Vec2 &normal, float32 fraction) {
 	string objName = ((GameObject*)fixture->GetBody()->GetUserData())->name;
 	//std::cout << "Obj HIT: " << objName << std::endl;

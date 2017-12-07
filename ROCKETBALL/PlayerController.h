@@ -54,6 +54,15 @@ public:
 
 	void onCollisionEnd(PhysicsComponent *comp) override;
 
+	//PICKIN UP BOOST (BETWWEN 0 and 1)
+	void rechargeBoost(float _val);
+
+	//POWERUP SETTING FUNCTIONS
+	void gravityPowerUp();
+	void speedPowerUp();
+	void dashPowerUp();
+	void dashCountPowerUp();
+
 
 	glm::vec2 movementVector = glm::vec2(0, 0);
 	glm::vec2 facingVector = glm::vec2(0, 0);
