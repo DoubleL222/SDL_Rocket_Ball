@@ -59,8 +59,9 @@ private:
 	std::shared_ptr<PhysicsComponent> playerPhysics;
 
 	//Player car Settings
-	const float maxSpeed = 3.0f;
-	const float acceleration = 100.0f;
+	const float maxSpeed = 5.0f;
+	const float maxSpeedWhenBoosting = 15.0f;
+	const float acceleration = 500.0f;
 	const float dashSpeed = 0.5f;
 	const float dashDuration = 0.07f;
 	const float boostSpeed = 1.5f;

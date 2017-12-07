@@ -227,20 +227,12 @@ void PlayerController::update(float deltaTime)
 				playerPhysics->setLinearVelocity(glm::vec2(currentX, currentVelocity.y));
 			}
 			//If Speed is more than maxSpeed
-			cout << "curr velocity x: " << currentVelocity.x <<"; y:" << currentVelocity.y << std::endl;
+			//cout << "curr velocity x: " << currentVelocity.x <<"; y:" << currentVelocity.y << std::endl;
 			float currentSpeed = glm::length(currentVelocity);
-			cout << "curr speed: " << currentSpeed << std::endl;
-			if (currentSpeed >= maxSpeed && !isBoosting)
+			//cout << "curr speed: " << currentSpeed << std::endl;
+			if (currentSpeed > maxSpeed && !isBoosting)
 			{
-				//playerPhysics->setLinearVelocity((maxSpeed / currentSpeed) * currentVelocity);
-				if (currentX < 0)
-				{
-					//playerPhysics->setLinearVelocity(glm::vec2(-maxSpeed, currentVelocity.y));
-				}
-				else if (currentX > 0)
-				{
-					//playerPhysics->setLinearVelocity(glm::vec2(maxSpeed, currentVelocity.y));
-				}
+				playerPhysics->setLinearVelocity((maxSpeed / currentSpeed) * currentVelocity);
 			}
 			//IF not, increase speed
 			else
@@ -259,7 +251,17 @@ void PlayerController::update(float deltaTime)
 	//Boosting player
 	if (isBoosting) 
 	{
-		playerPhysics->addForce(glm::vec2(glm::rotate(glm::vec2(1, 0), glm::radians(rotation)))* boostSpeed);
+		currentVelocity = playerPhysics->getLinearVelocity();
+		float currentSpeed = glm::length(currentVelocity);
+		//cout << "curr speed: " << currentSpeed << std::endl;
+		if (glm::length(currentVelocity) > maxSpeedWhenBoosting) 
+		{
+			playerPhysics->setLinearVelocity((maxSpeedWhenBoosting / currentSpeed) * currentVelocity);
+		}
+		else 
+		{
+			playerPhysics->addForce(glm::vec2(glm::rotate(glm::vec2(1, 0), glm::radians(rotation)))* boostSpeed);
+		}
 	}
 
 	//CHECK FOR DASH
@@ -315,7 +317,7 @@ void PlayerController::stopHorizontalMovement()
 void PlayerController::setRotation(float _rot)
 {
 	rotation = _rot;
-	gameObject->setRotation(rotation);
+	//gameObject->setRotation(rotation);
 	playerPhysics->body->SetTransform(playerPhysics->body->GetPosition(), glm::radians(rotation));
 }
 

@@ -55,7 +55,7 @@ private:
 	float ballFriction = 0.3f;
 	float ballDensity = 0.1f;
 	float ballLinearDamping = 0.00f;
-	float ballAngularDamping = 0.01f;
+	float ballAngularDamping = 0.00f;
 
 	float playerRestitution = 0.0f;
 	float playerFriction = 0.3f;

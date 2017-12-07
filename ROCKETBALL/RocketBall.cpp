@@ -139,10 +139,6 @@ void RocketBall::initGame() {
 	physComp->initCircle(b2BodyType::b2_dynamicBody, 41 / physicsScale, soccerBall->getPosition() / physicsScale, ballDensity, ballFriction, ballRestitution, ballLinearDamping, ballAngularDamping, false);
 
 	//Spawn Player1
-	std::vector<glm::vec2> vertices;
-	vertices.push_back(glm::vec2(-2, 0));
-	vertices.push_back(glm::vec2(1, 1));
-	vertices.push_back(glm::vec2(1, 0));
 
 	player1 = createGameObject();
 	player1->name = "Player1";
@@ -153,8 +149,8 @@ void RocketBall::initGame() {
 	spriteComp->setSprite(player1Sprite);
 	player1->setPosition(glm::vec2(windowSize.x / 4, 0));
 	physComp = player1->addComponent<PhysicsComponent>();
-	physComp->initPolygon(b2BodyType::b2_dynamicBody, vertices);
-	//physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player1->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution, playerLinearDamping, playerAngularDamping, true);
+	//physComp->initPolygon(b2BodyType::b2_dynamicBody, vertices);
+	physComp->initCarCollider(glm::vec2(0.3f, 0.07f), player1->getPosition() / physicsScale, playerFriction, playerDensity, playerLinearDamping, playerAngularDamping);
 
 	//Spawn Player2
 	player2 = createGameObject();
@@ -325,7 +321,7 @@ void RocketBall::updatePhysics(float deltaTime)
 		auto gameObject = phys.second->getGameObject();
 		gameObject->setPosition(glm::vec2(position.x*physicsScale, position.y*physicsScale));
 		//COMENTED OUT BECAUSE IT WAS GIVING ME TROUBLE //// LUKA /////
-		//gameObject->setRotation(angle);
+		gameObject->setRotation(glm::degrees(angle));
 	}
 }
 
