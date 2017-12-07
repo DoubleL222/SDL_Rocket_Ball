@@ -6,12 +6,14 @@
 #include "SpriteComponent.hpp"
 #include "PhysicsComponent.hpp"
 #include "RocketBall.h"
+#include "AbilityComponent.h"
 #include "SpriteComponent.hpp"
 
 using namespace std;
 
 void SetPlayfield::setGoalSizes(glm::vec2 _goalSizes) {
 	goalSize = _goalSizes;
+	grassColBuffer = -20.0f;
 }
 
 void SetPlayfield::createPlayField(std::shared_ptr<sre::SpriteAtlas> _mySpriteAtlas) {
@@ -22,7 +24,7 @@ void SetPlayfield::createPlayField(std::shared_ptr<sre::SpriteAtlas> _mySpriteAt
 		/*Sprite:*/_mySpriteAtlas->get("Grass.png"),
 		/*Position:*/{ 0, (-RocketBall::gameInstance->windowSize.y * 0.5f) + ((_mySpriteAtlas->get("Grass.png").getSpriteSize().y * 0.5f) * 0.5f) },
 		/*Scale:*/{ RocketBall::windowSize.x / _mySpriteAtlas->get("Grass.png").getSpriteSize().x, 0.5f },
-		/*Collider Buffer:*/{ 0,-20.0 },
+		/*Collider Buffer:*/{ 0, grassColBuffer },
 		/*Physics Scale:*/ RocketBall::gameInstance->getPhysicsScale(),
 		RocketBall::gameInstance->BOUNDARY,
 		0xFFFF /*0xFFFF is default for collision with everything*/
@@ -67,6 +69,9 @@ void SetPlayfield::createPlayField(std::shared_ptr<sre::SpriteAtlas> _mySpriteAt
 		RocketBall::gameInstance->BOUNDARY,
 		0xFFFF
 	);
+	
+	createAbilityBox("Boost_1", _mySpriteAtlas->get("gray.png"), RocketBall::gameInstance->createGameObject(), { 0, ((_mySpriteAtlas->get("gray.png").getSpriteSize().y)) - 20.0f }, { 0.5, 0.5 }, { 0,0 }, RocketBall::gameInstance->getPhysicsScale());
+	
 
 	//Platforms
 	if (usePlatforms) {
@@ -130,6 +135,7 @@ void SetPlayfield::createWallAndGoals(std::string name, sre::Sprite Goalsprite, 
 	{ pos.x * (((RocketBall::gameInstance->windowSize.x *0.5f)) - (Goalsprite.getSpriteSize().x * 0.5f)*customScale.x),
 	  pos.y + (-(RocketBall::gameInstance->windowSize.y * 0.5f) + (Goalsprite.getSpriteSize().x * 0.5f)*customScale.y) }
 	);
+
 	staticBox_obj->setPosition(
 	{ goalBox_obj->getPosition().x,
 	  goalBox_obj->getPosition().y + (Goalsprite.getSpriteSize().y)* customScale.y * 2.5 }
@@ -148,4 +154,20 @@ void SetPlayfield::createWallAndGoals(std::string name, sre::Sprite Goalsprite, 
 	auto staticBoxPhysicsComp = staticBox_obj->addComponent<PhysicsComponent>();
 	staticBoxPhysicsComp->initBox(b2BodyType::b2_staticBody, scaleCol_staticBox / phyScale, staticBox_obj->getPosition() / phyScale, 0.0f, categoryBits, maskBits);
 
+}
+
+
+void SetPlayfield::createAbilityBox(std::string name, sre::Sprite sprite, std::shared_ptr<GameObject> obj, glm::vec2 pos, glm::vec2 scale, glm::vec2 colBuffer, const float phyScale) {
+	auto abilityBox = sprite;
+	abilityBox.setScale({ scale.x, scale.y });
+	auto abilityBox_obj = obj;
+	abilityBox_obj->name = name;
+	auto abilityBoxSpriteComp = abilityBox_obj->addComponent<SpriteComponent>();
+	abilityBox_obj->setPosition({pos.x, pos.y + (-(RocketBall::gameInstance->windowSize.y * 0.5f) + (sprite.getSpriteSize().x * 0.5f)*scale.y) });
+	glm::vec2 scaleCol{ (abilityBox.getSpriteSize().x * abilityBox.getScale().x / 2) + colBuffer.x, (abilityBox.getSpriteSize().y * abilityBox.getScale().y / 2) + colBuffer.y };
+	abilityBoxSpriteComp->setSprite(abilityBox);
+	auto abilityBox_physics = abilityBox_obj->addComponent<PhysicsComponent>();
+	abilityBox_physics->initBox(b2_staticBody, scaleCol / phyScale, { abilityBox_obj->getPosition().x / phyScale, abilityBox_obj->getPosition().y / phyScale }, 0, RocketBall::gameInstance->ABILITYBOX, RocketBall::gameInstance->ABILITYBOX | RocketBall::gameInstance->BOUNDARY | RocketBall::gameInstance->PLAYER);
+	abilityBox_physics->setSensor(true);
+	auto abilityBoxBehaviour = abilityBox_obj->addComponent<AbilityComponent>();
 }

@@ -42,7 +42,7 @@ void AbilityComponent::update(float deltaTime) {
 			affectedObject = nullptr;
 			provideAbility = false;
 
-			DestroyAbillityBox(this->gameObject);
+			//DestroyAbillityBox(this->gameObject);
 		}
 	}
 }
@@ -85,7 +85,7 @@ void AbilityComponent::setSpriteInvis(bool setInvis) {
 	else {
 		_sprite.setColor({ color.x, color.y, color.z, 1 });
 		this->getGameObject()->getComponent<SpriteComponent>()->setSprite(_sprite);
-	} 
+	}
 }
 
 void AbilityComponent::SelectAndProvide(PhysicsComponent *PhysComp) {
@@ -95,6 +95,7 @@ void AbilityComponent::SelectAndProvide(PhysicsComponent *PhysComp) {
 	affectedObject = PhysComp;
 
 	indexer = rand() % 4;
+	abilityDuration = 3.0f;
 
 	/*switch (indexer)
 	{
