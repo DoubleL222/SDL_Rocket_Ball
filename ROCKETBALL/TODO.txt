@@ -5,6 +5,9 @@ PRIORITY 1:
 	Flip when dash,
 	New sprites,
 	PlayerColors,
+	delayed rotation,
+	add second player support,
+
 	
 PRIORITY 2:
     Remove powerups from player,
@@ -39,5 +42,7 @@ PRIROTY 1:
 PRIORITY 2:
 	Game mode selection (powerups or classic),
 	
-
+	
+CODE CLEANUP AND DOCUMENTATiON (MARTIN & LUKA)
+STRESS TEST CO
 	
