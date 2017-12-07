@@ -12,9 +12,15 @@ public:
 
 	virtual ~PhysicsComponent();
 
-	void initCircle(b2BodyType type, float radius, glm::vec2 center, float density);
-	void initBox(b2BodyType type, glm::vec2 size, glm::vec2 center, float density);
+	void initCircle(b2BodyType type, float radius, glm::vec2 center, float density, float friction, float restitution, float linearDamping, float angularDamping, bool fixedRotation, uint16 categoryBits, uint16 maskBits);
+	void initCircle(b2BodyType type, float radius, glm::vec2 center, float density, bool fixedRotation, uint16 categoryBits, uint16 maskBits);
+	void initCarCollider(glm::vec2 size, glm::vec2 center, float _friction, float _density, float _linearDamping, float _angularDamping);
+	void initCarSensorCollider(glm::vec2 size, glm::vec2 center);
+	void initBox(b2BodyType type, glm::vec2 size, glm::vec2 center, float rotation, float density, uint16 categoryBits, uint16 maskBits);
+	void initBox(b2BodyType type, glm::vec2 size, glm::vec2 center, float density, uint16 categoryBits, uint16 maskBits);
 	void initEdge(b2BodyType type, glm::vec2 point_1, glm::vec2 point_2, float density);
+
+	void initPolygon(b2BodyType type, std::vector<glm::vec2> polygonVerticies);
 
 	void addForce(glm::vec2 force);     // Force gradually affects the velocity over time
 
@@ -25,19 +31,12 @@ public:
 	glm::vec2 getLinearVelocity();
 
 	b2Fixture* fixture = nullptr;
-	b2Fixture* getFixture();
-
 	b2BodyType rbType;
 	b2Body * body = nullptr;
-<<<<<<< HEAD
-	b2Body * getBody();
-
-	b2World * getWorld();
-=======
-	b2MassData myData;
->>>>>>> LukaBranch
 
 	bool isSensor();
+
+	float radius;
 
 	void setSensor(bool enabled);
 private:
@@ -47,10 +46,9 @@ private:
 
 	b2Shape::Type shapeType;
 
-
 	std::vector<PhysicsComponent *> collidingBodies;
 	b2World * world = nullptr;
-	friend class BirdGame;
+	friend class RocketBall;
 
 
 };

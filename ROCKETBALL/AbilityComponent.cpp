@@ -21,7 +21,7 @@ void AbilityComponent::update(float deltaTime) {
 		totalTime += deltaTime;
 
 		if (totalTime >= abilityDuration) {
-			if (indexer == 0) {
+			/*if (indexer == 0) {
 				affectedObject->body->SetGravityScale(initialGravity);
 			}
 			else if (indexer == 1) {
@@ -34,7 +34,7 @@ void AbilityComponent::update(float deltaTime) {
 			}
 			else if (indexer == 3) {
 				affectedObject->getGameObject()->getComponent<PlayerController>()->airDashesAvailable = InitialAirDashesAvailable;
-			}
+			}*/
 
 			totalTime = 0;
 			setSpriteInvis(false);
@@ -96,7 +96,7 @@ void AbilityComponent::SelectAndProvide(PhysicsComponent *PhysComp) {
 
 	indexer = rand() % 4;
 
-	switch (indexer)
+	/*switch (indexer)
 	{
 	case 0:
 		std::cout << "Ability 1: Lower Gravity!" << std::endl;
@@ -126,7 +126,7 @@ void AbilityComponent::SelectAndProvide(PhysicsComponent *PhysComp) {
 		affectedObject->getGameObject()->getComponent<PlayerController>()->airDashesAvailable = InitialAirDashesAvailable + 2;
 		abilityDuration = 3.0f;
 		break;
-	}
+	}*/
 
 	totalTime = 0;
 

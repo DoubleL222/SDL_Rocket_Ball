@@ -10,8 +10,8 @@
 
 using namespace std;
 
-PlayerController::PlayerController(GameObject *gameObject) : Component(gameObject) {
-
+PlayerController::PlayerController(GameObject *gameObject) : Component(gameObject)
+{
 
 }
 
@@ -366,6 +366,10 @@ void PlayerController::jump()
 	//playerPhysics->addImpulse(glm::vec2(0.0f, 5.0f));
 }
 
+void PlayerController::resetInputs()
+{
+}
+
 void PlayerController::endDash()
 {
 	//playerPhysics->setLinearVelocity(glm::vec2(0,0));
@@ -382,9 +386,10 @@ void PlayerController::onCollisionEnd(PhysicsComponent *comp) {
 float32 PlayerController::ReportFixture(b2Fixture *fixture, const b2Vec2 &point, const b2Vec2 &normal, float32 fraction) {
 	string objName = ((GameObject*)fixture->GetBody()->GetUserData())->name;
 	//std::cout << "Obj HIT: " << objName << std::endl;
-	if (objName == "Floor" || objName == "Ball" || objName == "Player1" || objName == "Player2") 
+	if (objName == "grass" || objName == "OuterBall" || objName == "Player_1" || objName == "Player_2") 
 	{
 		resetJumps();
+		cout << "GROUNDED" << std::endl;
 		isGrounded = true;
 	}
 	/*if (objName == "LeftWall" || objName == "RightWall") 

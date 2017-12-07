@@ -82,10 +82,6 @@ void RocketBall::initGame() {
 	camera = camGameObj->addComponent<GameCamera>();
 	camGameObj->setPosition(windowSize*0.5f);
 
-	floorGameObj->name = "Floor";
-	ceilingGameObj->name = "Ceiling";
-	leftWall->name = "LeftWall";
-	rightWall->name = "RightWall";
 	//Set background if it has not yet been set
 	if (!background_Layer_1.isInit) {
 		background_Layer_1.init("skybackdrop.png", -windowSize.x*0.5f, -windowSize.y*0.5f, true);
@@ -97,7 +93,7 @@ void RocketBall::initGame() {
 	setPlayField.createPlayField(mySpriteAtlas);
 
 	for (int i = 0; i < 5; i++) {
-		createAbilityBox("ability_" + i, mySpriteAtlas->get("gray.png"), createGameObject(), { 1 * i,1 * i }, { 0.5,0.5 }, { 0,0 }, physicsScale);
+		//createAbilityBox("ability_" + i, mySpriteAtlas->get("gray.png"), createGameObject(), { 1 * i,1 * i }, { 0.5,0.5 }, { 0,0 }, physicsScale);
 	}
 
 #pragma region Dynamic Elements
@@ -107,14 +103,15 @@ void RocketBall::initGame() {
 	player1->name = "Player_1";
 	//player1->addComponent<PlayerController>();
 	auto spriteComp = player1->addComponent<SpriteComponent>();
-	auto player1Sprite = mySpriteAtlas->get("ManUntd.png");
+	auto player1Sprite = mySpriteAtlas->get("BlackCarCropped.png");
 	player1Sprite.setScale(glm::vec2(0.2f, 0.2f));
 	spriteComp->setSprite(player1Sprite);
-	player1->setPosition(glm::vec2(windowSize.x * 0.2, -windowSize.y * 0.2 + (player1Sprite.getSpriteSize().y * 0.5f)));
+	P1Origin = glm::vec2(windowSize.x * 0.2, -windowSize.y * 0.2 + (player1Sprite.getSpriteSize().y * 0.5f));
+	player1->setPosition(P1Origin);
 	auto physComp = player1->addComponent<PhysicsComponent>();
 	//physComp->initPolygon(b2BodyType::b2_dynamicBody, vertices);
 	physComp->initCarCollider(glm::vec2(0.3f, 0.07f), player1->getPosition() / physicsScale, playerFriction, playerDensity, playerLinearDamping, playerAngularDamping);
-	P1Origin = player1->getPosition();
+	
 
 	//Spawn Player2
 	player2 = createGameObject();
@@ -125,11 +122,12 @@ void RocketBall::initGame() {
 	player2Sprite.setFlip(glm::vec2(-1, 0));
 	player2Sprite.setScale(glm::vec2(0.2f, 0.2f));
 	spriteComp->setSprite(player2Sprite);
-	player2->setPosition(glm::vec2(-windowSize.x * 0.2, -windowSize.y * 0.2 + (player2Sprite.getSpriteSize().y * 0.5f)));
+	P2Origin = glm::vec2(-windowSize.x * 0.2, -windowSize.y * 0.2 + (player2Sprite.getSpriteSize().y * 0.5f));
+	player2->setPosition(P2Origin);
 	physComp = player2->addComponent<PhysicsComponent>();
 	physComp->initCarCollider(glm::vec2(0.3f, 0.07f), player2->getPosition() / physicsScale, playerFriction, playerDensity, playerLinearDamping, playerAngularDamping);
 	//physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player2->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution, playerLinearDamping, playerAngularDamping, true);
-	P2Origin = player2->getPosition();
+	
 
 	//Spawn (outer) Soccer Ball w/e sprite
 	soccerBall = createGameObject();
@@ -182,14 +180,14 @@ void RocketBall::createAbilityBox(std::string name, sre::Sprite sprite, std::sha
 
 void RocketBall::nextRound() {
 	player1->setPosition(P1Origin);
-	player1->getComponent<PhysicsComponent>()->body->SetTransform(b2P1Origin, 0);
+	glm::vec2 bodPos = P1Origin / physicsScale;
+	player1->getComponent<PhysicsComponent>()->body->SetTransform(b2Vec2(bodPos.x, bodPos.y), 0);
 	player1->getComponent<PhysicsComponent>()->setLinearVelocity({ 0,0 });;
 	player1->getComponent<PlayerController>()->resetInputs();
-	//Needs to reset player inputs, too!
-	//player1->getComponent<PlayerController>()->resetJumps();
 
 	player2->setPosition(P2Origin);
-	player2->getComponent<PhysicsComponent>()->body->SetTransform(b2P2Origin, 0);
+	bodPos = P2Origin / physicsScale;
+	player2->getComponent<PhysicsComponent>()->body->SetTransform(b2Vec2(bodPos.x, bodPos.y),  0);
 	player2->getComponent<PhysicsComponent>()->setLinearVelocity({ 0,0 });
 	player2->getComponent<PlayerController>()->resetInputs();
 
@@ -393,6 +391,7 @@ void RocketBall::onKey(SDL_Event &event) {
 			}
 			else if (gameState == GameState::Ready) {
 				gameState = GameState::Running;
+				cout << "Game runing" << std::endl;
 			}
 			else if (gameState == GameState::RoundComplete) {
 				soccerBallInner->getComponent<BallComponent>()->goalAchieved = false;
