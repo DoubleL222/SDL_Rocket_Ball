@@ -4,6 +4,8 @@
 #include "sre/RenderPass.hpp"
 #include "PhysicsComponent.hpp"
 #include "SpriteComponent.hpp"
+#include "BallComponent.h"
+#include "AbilityComponent.h"
 #include "PlayerController.h"
 #include "sre/profiler.hpp"
 #include <iostream>
@@ -11,7 +13,7 @@
 using namespace std;
 using namespace sre;
 
-const glm::vec2 RocketBall::windowSize(1600, 600); // some size for the window
+const glm::vec2 RocketBall::windowSize(1600, 900); // some size for the window
 
 RocketBall* RocketBall::gameInstance = nullptr;
 
@@ -34,7 +36,7 @@ RocketBall::RocketBall()
 		onKey(e);
 	};
 	r.frameUpdate = [&](float deltaTime) {
-		update(deltaTime);
+		update(deltaTime * timeScale);
 	};
 	r.frameRender = [&]() {
 		render();
@@ -45,134 +47,163 @@ RocketBall::RocketBall()
 }
 
 void RocketBall::initGame() {
+
 	//Joystick init
 	//cout << "number of joysticks " << SDL_NumJoysticks();
+
 	int numJoysticks = SDL_NumJoysticks();
 	if (numJoysticks >= 1)
 	{
 		joy1 = SDL_JoystickOpen(0);
 	}
-	if (numJoysticks == 2) 
+	if (numJoysticks == 2)
 	{
 		joy2 = SDL_JoystickOpen(1);
 	}
-
-	//MAKING THE SPRITE ATLAS
-	mySpriteAtlas = SpriteAtlas::create("RocketBallSprites.json", "RocketBallSprites.png");
 
 	if (world) {
 		world->SetContactListener(nullptr);
 	}
 
+	sceneObjects.clear();
+	camera.reset();
+	physicsComponentLookup.clear();
+
+	//MAKING THE SPRITE ATLAS
+	if (!mySpriteAtlas)
+		mySpriteAtlas = SpriteAtlas::create("RocketBallSprites.json", "RocketBallSprites.png");
+
 	//INITIALIZING PHYSICS
 	initPhysics();
 
 	//Setup Camera
-	sceneObjects.clear();
-	camera.reset();
 	auto camGameObj = createGameObject();
 	camGameObj->name = "Camera";
 	camera = camGameObj->addComponent<GameCamera>();
 	camGameObj->setPosition(windowSize*0.5f);
 
-#pragma region Playing Field
-	//Spawning Floor
-	auto floorGameObj = createGameObject();
 	floorGameObj->name = "Floor";
-	auto spriteComp = floorGameObj->addComponent<SpriteComponent>();
-	auto floorSprite = mySpriteAtlas->get("gray.png");
-	floorSprite.setScale(glm::vec2(windowSize.x / floorSprite.getSpriteSize().x, windowSize.y / ((floorHeight / 2.0f)*(floorSprite.getSpriteSize().y))));
-	spriteComp->setSprite(floorSprite);
-	floorGameObj->setPosition({ 0, -windowSize.y / (2.0) + windowSize.y / floorHeight });
-	auto physComp = floorGameObj->addComponent<PhysicsComponent>();
-	physComp->initBox(b2BodyType::b2_staticBody, glm::vec2(windowSize.x / (physicsScale * 2), windowSize.y / (physicsScale*floorHeight)), floorGameObj->getPosition() / physicsScale, 0.0f);
-
-	//Spawning Ceiling
-	auto ceilingGameObj = createGameObject();
 	ceilingGameObj->name = "Ceiling";
-	spriteComp = ceilingGameObj->addComponent<SpriteComponent>();
-	floorSprite.setScale(glm::vec2(windowSize.x / floorSprite.getSpriteSize().x, windowSize.y / ((ceilingHeight / 2.0f)*(floorSprite.getSpriteSize().y))));
-	spriteComp->setSprite(floorSprite);
-	ceilingGameObj->setPosition({ 0, windowSize.y / (2.0) - windowSize.y / ceilingHeight });
-	physComp = ceilingGameObj->addComponent<PhysicsComponent>();
-	physComp->initBox(b2BodyType::b2_staticBody, glm::vec2(windowSize.x / (physicsScale * 2), windowSize.y / (physicsScale*ceilingHeight)), ceilingGameObj->getPosition() / physicsScale, 0.0f);
-
-	//Spawning LeftWall
-	auto leftWall = createGameObject();
 	leftWall->name = "LeftWall";
-	spriteComp = leftWall->addComponent<SpriteComponent>();
-	floorSprite.setScale(glm::vec2(windowSize.x / ((wallWidth / 2.0f)*(floorSprite.getSpriteSize().x)), windowSize.y / floorSprite.getSpriteSize().y));
-	spriteComp->setSprite(floorSprite);
-	leftWall->setPosition({ windowSize.x / (2.0) - windowSize.x / wallWidth,0 });
-	physComp = leftWall->addComponent<PhysicsComponent>();
-	physComp->initBox(b2BodyType::b2_staticBody, glm::vec2(windowSize.x / (physicsScale*wallWidth), windowSize.y / (physicsScale * 2)), leftWall->getPosition() / physicsScale, 0.0f);
-
-	//Spawning RightWall
-	auto rightWall = createGameObject();
 	rightWall->name = "RightWall";
-	spriteComp = rightWall->addComponent<SpriteComponent>();
-	floorSprite.setScale(glm::vec2(windowSize.x / ((wallWidth / 2.0f)*(floorSprite.getSpriteSize().x)), windowSize.y / floorSprite.getSpriteSize().y));
-	spriteComp->setSprite(floorSprite);
-	rightWall->setPosition({ -windowSize.x / (2.0) + windowSize.x / wallWidth,0 });
-	physComp = rightWall->addComponent<PhysicsComponent>();
-	physComp->initBox(b2BodyType::b2_staticBody, glm::vec2(windowSize.x / (physicsScale*wallWidth), windowSize.y / (physicsScale * 2)), rightWall->getPosition() / physicsScale, 0.0f);
-
 	//Set background if it has not yet been set
 	if (!background_Layer_1.isInit) {
-		//(image, initial position X, initial position Y)
-		//background_Layer_1.init("backdropImage.jpg", -windowSize.x*0.5f, -windowSize.y*0.5f, true);
+		background_Layer_1.init("skybackdrop.png", -windowSize.x*0.5f, -windowSize.y*0.5f, true);
 	}
 
-#pragma endregion
+	//Set size for the goals
+	setPlayField.setGoalSizes(goalSizes);
+	//Init playing field
+	setPlayField.createPlayField(mySpriteAtlas);
+
+	for (int i = 0; i < 5; i++) {
+		createAbilityBox("ability_" + i, mySpriteAtlas->get("gray.png"), createGameObject(), { 1 * i,1 * i }, { 0.5,0.5 }, { 0,0 }, physicsScale);
+	}
 
 #pragma region Dynamic Elements
-
-	//Spawn Soccer Ball
-	soccerBall = createGameObject();
-	soccerBall->name = "Ball";
-	spriteComp = soccerBall->addComponent<SpriteComponent>();
-	auto soccerBallSprite = mySpriteAtlas->get("SoccerBall.png");
-	soccerBallSprite.setScale(glm::vec2(0.34f, 0.34f));
-	spriteComp->setSprite(soccerBallSprite);
-	soccerBall->setPosition(glm::vec2(0, 0));
-	physComp = soccerBall->addComponent<PhysicsComponent>();
-	physComp->initCircle(b2BodyType::b2_dynamicBody, 41 / physicsScale, soccerBall->getPosition() / physicsScale, ballDensity, ballFriction, ballRestitution, ballLinearDamping, ballAngularDamping, false);
-
 	//Spawn Player1
 
 	player1 = createGameObject();
-	player1->name = "Player1";
+	player1->name = "Player_1";
 	//player1->addComponent<PlayerController>();
-	spriteComp = player1->addComponent<SpriteComponent>();
+	auto spriteComp = player1->addComponent<SpriteComponent>();
 	auto player1Sprite = mySpriteAtlas->get("ManUntd.png");
 	player1Sprite.setScale(glm::vec2(0.2f, 0.2f));
 	spriteComp->setSprite(player1Sprite);
-	player1->setPosition(glm::vec2(windowSize.x / 4, 0));
-	physComp = player1->addComponent<PhysicsComponent>();
+	player1->setPosition(glm::vec2(windowSize.x * 0.2, -windowSize.y * 0.2 + (player1Sprite.getSpriteSize().y * 0.5f)));
+	auto physComp = player1->addComponent<PhysicsComponent>();
 	//physComp->initPolygon(b2BodyType::b2_dynamicBody, vertices);
 	physComp->initCarCollider(glm::vec2(0.3f, 0.07f), player1->getPosition() / physicsScale, playerFriction, playerDensity, playerLinearDamping, playerAngularDamping);
+	P1Origin = player1->getPosition();
 
 	//Spawn Player2
 	player2 = createGameObject();
-	player2->name = "Player2";
+	player2->name = "Player_2";
 	player2->addComponent<PlayerController>();
 	spriteComp = player2->addComponent<SpriteComponent>();
 	auto player2Sprite = mySpriteAtlas->get("BlackCarCropped.png");
 	player2Sprite.setFlip(glm::vec2(-1, 0));
 	player2Sprite.setScale(glm::vec2(0.2f, 0.2f));
 	spriteComp->setSprite(player2Sprite);
-	player2->setPosition(glm::vec2(-windowSize.x / 4, 0));
+	player2->setPosition(glm::vec2(-windowSize.x * 0.2, -windowSize.y * 0.2 + (player2Sprite.getSpriteSize().y * 0.5f)));
 	physComp = player2->addComponent<PhysicsComponent>();
 	physComp->initCarCollider(glm::vec2(0.3f, 0.07f), player2->getPosition() / physicsScale, playerFriction, playerDensity, playerLinearDamping, playerAngularDamping);
 	//physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player2->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution, playerLinearDamping, playerAngularDamping, true);
+	P2Origin = player2->getPosition();
+
+	//Spawn (outer) Soccer Ball w/e sprite
+	soccerBall = createGameObject();
+	soccerBall->name = "OuterBall";
+	spriteComp = soccerBall->addComponent<SpriteComponent>();
+	auto soccerBallSprite = mySpriteAtlas->get("SoccerBall.png");
+	soccerBallSprite.setScale(glm::vec2(0.4f, 0.4f));
+	spriteComp->setSprite(soccerBallSprite);
+	soccerBall->setPosition(glm::vec2(0, windowSize.y * 0.3f));
+	OuterBallPhyiscs = soccerBall->addComponent<PhysicsComponent>();
+	OuterBallPhyiscs->initCircle(b2BodyType::b2_dynamicBody, 50 / physicsScale, soccerBall->getPosition() / physicsScale, ballDensity, ballFriction, ballRestitution, ballLinearDamping, ballAngularDamping, false, SOCCERBALL, BOUNDARY | PLAYER | SOCCERBALL);
+	b2sbOuterOrigin = OuterBallPhyiscs->body->GetPosition();
+	sbOuterOrigin = soccerBall->getPosition();
+
+	//Create an inner circle collider in the soccerball to score goals only 
+	//when the ball is roughly 50% inside the goal (i.e. a very smaller cirlce collider inside the big)
+	//The position of the inner collider is set in the update().
+	soccerBallInner = createGameObject();
+	soccerBallInner->name = "InnerBall";
+	soccerBallInner->setPosition(soccerBall->getPosition());
+	InnerBallPhysics = soccerBallInner->addComponent<PhysicsComponent>();
+	InnerBallPhysics->initCircle(b2BodyType::b2_dynamicBody, 1 / physicsScale, soccerBall->getPosition() / physicsScale, ballDensity, false, SOCCERBALL, BOUNDARY | PLAYER | SOCCERBALL);
+	InnerBallPhysics->setSensor(true);
+	auto soccerBallInnerMechanics = soccerBallInner->addComponent<BallComponent>();
+	soccerBallInnerMechanics->setOuterBall(OuterBallPhyiscs);
+	b2sbInnerOrigin = InnerBallPhysics->body->GetPosition();
+	sbInnerOrigin = soccerBallInner->getPosition();
 
 #pragma endregion
 
 	//SET GAME STATE
-	gameState = GameState::Running;
+	gameState = GameState::Ready;
+}
+
+#pragma endregion
+void RocketBall::createAbilityBox(std::string name, sre::Sprite sprite, std::shared_ptr<GameObject> obj, glm::vec2 pos, glm::vec2 scale, glm::vec2 colBuffer, const float phyScale) {
+	auto abilityBox = sprite;
+	abilityBox.setScale({ scale.x, scale.y });
+	auto abilityBox_obj = obj;
+	abilityBox_obj->name = name;
+	auto abilityBoxSpriteComp = abilityBox_obj->addComponent<SpriteComponent>();
+	abilityBox_obj->setPosition(pos);
+	glm::vec2 scaleCol{ (abilityBox.getSpriteSize().x * abilityBox.getScale().x / 2) + colBuffer.x, (abilityBox.getSpriteSize().y * abilityBox.getScale().y / 2) + colBuffer.y };
+	abilityBoxSpriteComp->setSprite(abilityBox);
+	auto abilityBox_physics = abilityBox_obj->addComponent<PhysicsComponent>();
+	abilityBox_physics->initBox(b2_dynamicBody, scaleCol / phyScale, { abilityBox_obj->getPosition().x / phyScale, abilityBox_obj->getPosition().y / phyScale }, 0, ABILITYBOX, ABILITYBOX | BOUNDARY | PLAYER);
+	auto abilityBoxBehaviour = abilityBox_obj->addComponent<AbilityComponent>();
 }
 
 
+void RocketBall::nextRound() {
+	player1->setPosition(P1Origin);
+	player1->getComponent<PhysicsComponent>()->body->SetTransform(b2P1Origin, 0);
+	player1->getComponent<PhysicsComponent>()->setLinearVelocity({ 0,0 });;
+	player1->getComponent<PlayerController>()->resetInputs();
+	//Needs to reset player inputs, too!
+	//player1->getComponent<PlayerController>()->resetJumps();
+
+	player2->setPosition(P2Origin);
+	player2->getComponent<PhysicsComponent>()->body->SetTransform(b2P2Origin, 0);
+	player2->getComponent<PhysicsComponent>()->setLinearVelocity({ 0,0 });
+	player2->getComponent<PlayerController>()->resetInputs();
+
+	soccerBall->setPosition(sbOuterOrigin);
+	soccerBall->getComponent<PhysicsComponent>()->body->SetTransform(b2sbOuterOrigin, 0);
+	soccerBall->getComponent<PhysicsComponent>()->setLinearVelocity({ 0,0 });
+	soccerBall->getComponent<PhysicsComponent>()->body->SetAngularVelocity(0);
+
+	soccerBallInner->setPosition(sbInnerOrigin);
+	soccerBallInner->getComponent<PhysicsComponent>()->body->SetTransform(b2sbInnerOrigin, 0);
+	soccerBallInner->getComponent<PhysicsComponent>()->setLinearVelocity({ 0,0 });
+	soccerBallInner->getComponent<PhysicsComponent>()->body->SetAngularVelocity(0);
+	soccerBallInner->getComponent<BallComponent>()->engageSlowmotion = false;
+}
 
 void RocketBall::initPhysics()
 {
@@ -186,15 +217,27 @@ void RocketBall::initPhysics()
 	}
 }
 
+
+const float RocketBall::getPhysicsScale() {
+	return physicsScale;
+}
+
 /// Core Update
 void RocketBall::update(float time) {
-	//cout<< "Num of joysticks: " << SDL_NumJoysticks() <<std::endl;
-	if (gameState == GameState::Running) {
+	if (gameState == GameState::Running || gameState == GameState::RoundComplete) {
 		updatePhysics(time);
 	}
 	for (int i = 0; i < sceneObjects.size(); i++) {
 		sceneObjects[i]->update(time);
 	}
+
+
+	InnerBallPhysics->body->SetTransform(OuterBallPhyiscs->body->GetPosition(), OuterBallPhyiscs->body->GetAngle());
+	soccerBallInner->setPosition(soccerBall->getPosition());
+}
+
+GameState RocketBall::getGameState() {
+	return gameState;
 }
 
 /// Region for Render engine
@@ -203,10 +246,6 @@ void RocketBall::render() {
 	auto rp = RenderPass::create()
 		.withCamera(camera->getCamera())
 		.build();
-
-	static Profiler profiler;
-	profiler.update();
-	profiler.gui(/*usewindow=*/ true);
 
 	auto pos = camera->getGameObject()->getPosition();
 
@@ -221,35 +260,104 @@ void RocketBall::render() {
 	auto sb = spriteBatchBuilder.build();
 	rp.draw(sb);
 
+	ImGui::SetNextWindowPos(ImVec2(Renderer::instance->getWindowSize().x / 2 - 50, .0f), ImGuiSetCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(150, 75), ImGuiSetCond_Always);
+	ImGui::Begin("", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+	ImGui::TextColored(ImVec4(player1Color.x, player1Color.y, player1Color.z, player1Color.w), "Goal P1 %i", player1Goals);
+	ImGui::TextColored(ImVec4(player2Color.x, player2Color.y, player2Color.z, player2Color.w), "Goal P2 %i", player2Goals);
+	ImGui::SetWindowFontScale(2.0f);
+	ImGui::PushFont;
+	ImGui::End();
+
 	if (doDebugDraw) {
+		static Profiler profiler;
+		profiler.update();
+		profiler.gui(/*usewindow=*/ true);
 		world->DrawDebugData();
 		rp.drawLines(debugDraw.getLines());
 		debugDraw.clear();
+		RenderSliders();
 	}
-
-	RenderSliders();
-
-	//YOU SUCK MARTIN!!!
-
-	//ImGui::SetNextWindowPos(ImVec2(Renderer::instance->getWindowSize().x / 2 - 50, .0f), ImGuiSetCond_Always);
-	//ImGui::SetNextWindowSize(ImVec2(100, 50), ImGuiSetCond_Always);
-	//ImGui::Begin("", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
-	//ImGui::SetWindowFontScale(2.0f);
-	//ImGui::PushFont;
-	//ImGui::End();
-
 }
 #pragma endregion
+void RocketBall::handleContact(b2Contact *contact, bool begin) {
+	auto fixA = contact->GetFixtureA();
+	auto fixB = contact->GetFixtureB();
+	auto physAIter = physicsComponentLookup.find(fixA);
+	auto physBIter = physicsComponentLookup.find(fixB);
+	auto physA = physAIter == physicsComponentLookup.end() ? nullptr : (*physAIter).second;
+	auto physB = physBIter == physicsComponentLookup.end() ? nullptr : (*physBIter).second;
 
+	if (physAIter != physicsComponentLookup.end()) {
+
+		auto & aComponents = physA->getGameObject()->getComponents();
+		//std::cout << "fixA" << std::endl;
+		for (auto & c : aComponents) {
+			if (begin) {
+				c->onCollisionStart(physB);
+			}
+			else {
+				c->onCollisionEnd(physB);
+			}
+		}
+	}
+	if (physBIter != physicsComponentLookup.end()) {
+		auto & bComponents = physB->getGameObject()->getComponents();
+		//std::cout << "fixB" << std::endl;
+		for (auto & c : bComponents) {
+			if (begin) {
+				c->onCollisionStart(physA);
+			}
+			else {
+				c->onCollisionEnd(physA);
+			}
+		}
+	}
+}
+//
+//void RocketBall::handleContact(b2Contact *contact, bool begin) {
+//	auto fixA = contact->GetFixtureA();
+//	auto fixB = contact->GetFixtureB();
+//	PhysicsComponent* physA = physicsComponentLookup[fixA];
+//	PhysicsComponent* physB = physicsComponentLookup[fixB];
+//	auto & aComponents = physA->getGameObject()->getComponents();
+//	auto & bComponents = physB->getGameObject()->getComponents();
+//	for (auto & c : aComponents) {
+//		if (begin) {
+//			c->onCollisionStart(physB);
+//		}
+//		else {
+//			c->onCollisionEnd(physB);
+//		}
+//	}
+//	for (auto & c : bComponents) {
+//		if (begin) {
+//			c->onCollisionStart(physA);
+//		}
+//		else {
+//			c->onCollisionEnd(physA);
+//		}
+//	}
+//}
+//
+void RocketBall::BeginContact(b2Contact *contact) {
+	b2ContactListener::BeginContact(contact);
+	handleContact(contact, true);
+}
+
+void RocketBall::EndContact(b2Contact *contact) {
+	b2ContactListener::EndContact(contact);
+	handleContact(contact, false);
+}
 
 #pragma region Handle_Inputs
 void RocketBall::onJoyInput(SDL_Event &event)
 {
-	if (event.jdevice.which == 0) 
+	if (event.jdevice.which == 0)
 	{
 		player2->getComponent<PlayerController>()->onJoyInput(event);
 	}
-	else if (event.jdevice.which == 1) 
+	else if (event.jdevice.which == 1)
 	{
 		player1->getComponent<PlayerController>()->onJoyInput(event);
 	}
@@ -286,6 +394,11 @@ void RocketBall::onKey(SDL_Event &event) {
 			else if (gameState == GameState::Ready) {
 				gameState = GameState::Running;
 			}
+			else if (gameState == GameState::RoundComplete) {
+				soccerBallInner->getComponent<BallComponent>()->goalAchieved = false;
+				nextRound();
+				gameState = GameState::Ready;
+			}
 			break;
 		}
 	}
@@ -301,11 +414,23 @@ std::shared_ptr<GameObject> RocketBall::createGameObject() {
 
 
 #pragma region Physics
-///Place phyiscs
+///Phyiscs
 void RocketBall::registerPhysicsComponent(PhysicsComponent *r)
 {
 	physicsComponentLookup[r->fixture] = r;
 }
+
+void RocketBall::deregisterPhysicsComponent(PhysicsComponent *r) {
+	auto iter = physicsComponentLookup.find(r->fixture);
+	if (iter != physicsComponentLookup.end()) {
+		physicsComponentLookup.erase(iter);
+	}
+	else {
+		assert(false); // cannot find physics object
+	}
+}
+
+
 
 void RocketBall::updatePhysics(float deltaTime)
 {
@@ -352,6 +477,7 @@ void RocketBall::RenderSliders()
 {
 	bool open = true;
 	ImGui::Begin("#TestLabel", &open, ImVec2(500, 100), 0, ImGuiWindowFlags_NoTitleBar);
+
 	ImGui::LabelText("Variables", "BALL SETTINGS");
 	ImGui::SetNextWindowPos(ImVec2(500, 100));
 	ImGui::SliderFloat(": B_Restitution", &ballRestitution, 0.0f, 1.0f);
@@ -362,9 +488,9 @@ void RocketBall::RenderSliders()
 	ImGui::SliderFloat(": P_Restitution", &playerRestitution, 0.0f, 1.0f);
 	ImGui::SliderFloat(": P_Friction", &playerFriction, 0.0f, 1.0f);
 	ImGui::SliderFloat(": P_Density: ", &playerDensity, 0.01f, 1.0f);
+
 	ImGui::End();
 	UpdateWithNewPhysics();
-
 }
 
 #pragma endregion

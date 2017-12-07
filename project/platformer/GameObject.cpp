@@ -13,7 +13,7 @@ GameObject::~GameObject(){
 bool GameObject::removeComponent(std::shared_ptr<Component> component) {
     auto comp = std::find(components.begin(), components.end(),component);
     if (comp != components.end()){
-		components.erase(comp);
+        components.erase(comp);
     }
     return false;
 }

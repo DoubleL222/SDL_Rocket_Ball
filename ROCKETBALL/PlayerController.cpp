@@ -18,37 +18,38 @@ PlayerController::PlayerController(GameObject *gameObject) : Component(gameObjec
 bool PlayerController::onJoyInput(SDL_Event &event)
 {
 
-//	movementVector = glm::vec2(0,0);
-	if (event.type == SDL_JOYAXISMOTION)
-	{
-		int axisIndex = (int)(event.jaxis.axis);
-		if (axisIndex == 0) 
+	//	movementVector = glm::vec2(0,0);
+	if (RocketBall::gameInstance->getGameState() == GameState::Running) {
+		if (event.type == SDL_JOYAXISMOTION)
 		{
-			float newX = (float)(event.jaxis.value) / (float)(32767);
+			int axisIndex = (int)(event.jaxis.axis);
+			if (axisIndex == 0)
+			{
+				float newX = (float)(event.jaxis.value) / (float)(32767);
 
-			//SENSITIVITY
+				//SENSITIVITY
 			/*if (abs(newX) <= 0.0f) 
-			{
+				{
 				facingVector.x = 0;
-			}
-			else 
-			{
+				}
+				else
+				{
 				facingVector.x = newX;
 			}*/
 			facingVector.x = newX;
-			
-		}
-		else if (axisIndex == 1) 
-		{
-			float newY = - (float)(event.jaxis.value) / (float)(32767);
 
-			//SENSITIVITY
-			/*if (abs(newY) <= 0.2f)
-			{
-				facingVector.y = 0;
 			}
-			else
+			else if (axisIndex == 1)
 			{
+				float newY = -(float)(event.jaxis.value) / (float)(32767);
+
+				//SENSITIVITY
+			/*if (abs(newY) <= 0.2f)
+				{
+				facingVector.y = 0;
+				}
+				else
+				{
 				facingVector.y = newY;
 			}*/
 			facingVector.y = newY;
@@ -65,15 +66,15 @@ bool PlayerController::onJoyInput(SDL_Event &event)
 		{
 			float newVal = Remap(event.jaxis.value, -32768, 32767, 0, 1);
 			movementVector.x = -newVal;
+			}
 		}
-	}
 	if (event.type == SDL_JOYBUTTONDOWN)
-	{
+		{
 		//cout << "Joy Button: " << (int)(event.jbutton.button) << std::endl;
 		if (event.jbutton.button == 0)
-		{
-			jump();
-		}
+			{
+				jump();
+			}
 		if (event.jbutton.button == 1) 
 		{
 			isBoosting = true;
@@ -85,8 +86,9 @@ bool PlayerController::onJoyInput(SDL_Event &event)
 		{
 			isBoosting = false;
 		}
+		}
+		return false;
 	}
-	return false;
 }
 
 float PlayerController::Remap(float value, float from1, float to1, float from2, float to2)
@@ -95,53 +97,57 @@ float PlayerController::Remap(float value, float from1, float to1, float from2, 
 }
 
 bool PlayerController::onKey(SDL_Event &event) {
-//	movementVector = glm::vec2(0,0);
+	//	movementVector = glm::vec2(0,0);
 
-	if (event.type == SDL_KEYDOWN) 
-	{
-		if (event.key.keysym.sym == SDLK_RIGHT) 
+	if (RocketBall::gameInstance->getGameState() == GameState::Running) {
+		if (event.type == SDL_KEYDOWN)
 		{
-			movementVector.x = 1;
+			if (event.key.keysym.sym == SDLK_RIGHT)
+			{
+				movementVector.x = 1;
+			}
+			else if (event.key.keysym.sym == SDLK_LEFT)
+			{
+				movementVector.x = -1;
+			}
+			if (event.key.keysym.sym == SDLK_SPACE)
+			{
+				jump();
+			}
+			if (event.key.keysym.sym == SDLK_DOWN)
+			{
+				movementVector.y = -1;
+			}
+			else if (event.key.keysym.sym == SDLK_UP)
+			{
+				movementVector.y = 1;
+			}
 		}
-		else if (event.key.keysym.sym == SDLK_LEFT)
+		else if (event.type == SDL_KEYUP)
 		{
-			movementVector.x = -1;
-		}
-		if (event.key.keysym.sym == SDLK_SPACE) 
-		{
-			jump();
-		}
-		if (event.key.keysym.sym == SDLK_DOWN) 
-		{
-			movementVector.y = -1;
-		}
-		else if (event.key.keysym.sym == SDLK_UP) 
-		{
-			movementVector.y = 1;
+			if (event.key.keysym.sym == SDLK_RIGHT && movementVector.x > 0)
+			{
+				movementVector.x = 0;
+			}
+			if (event.key.keysym.sym == SDLK_LEFT && movementVector.x < 0)
+			{
+				movementVector.x = 0;
+			}
+			if (event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_DOWN)
+			{
+				movementVector.y = 0;
+			}
 		}
 	}
-	else if (event.type == SDL_KEYUP)
-	{
-		if (event.key.keysym.sym == SDLK_RIGHT && movementVector.x>0)
-		{
-			movementVector.x = 0;
-		}
-		if (event.key.keysym.sym == SDLK_LEFT && movementVector.x<0)
-		{
-			movementVector.x = 0;
-		}
-		if (event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_DOWN) 
-		{
-			movementVector.y = 0;
-		}
-	}
-	
+
 	return false;
 }
 
 void PlayerController::update(float deltaTime)
 {
 	timePassed += deltaTime;
+
+
 	// raycast ignores any shape in the starting point
 	if (playerPhysics == nullptr)
 	{
@@ -321,17 +327,17 @@ void PlayerController::setRotation(float _rot)
 	playerPhysics->body->SetTransform(playerPhysics->body->GetPosition(), glm::radians(rotation));
 }
 
-void PlayerController::jump() 
+void PlayerController::jump()
 {
 	bool verticalJump = false;
-	if (!isGrounded) 
+	if (!isGrounded)
 	{
 		//IF player has already dashed mid jump
-		if (airDashCounter >= airDashesAvailable) 
+		if (airDashCounter >= airDashesAvailable)
 		{
 			return;
 		}
-		else 
+		else
 		{
 			airDashCounter++;
 		}
@@ -345,7 +351,7 @@ void PlayerController::jump()
 	//
 	inDash = true;
 	cout << "facing vector: x: " << facingVector.x << "; y:" << facingVector.y << std::endl;
-	
+
 	//Check if direction vecor is zero, apply vertical jump
 
 	glm::vec2 moveNormalized = glm::normalize(facingVector);
@@ -360,7 +366,7 @@ void PlayerController::jump()
 	//playerPhysics->addImpulse(glm::vec2(0.0f, 5.0f));
 }
 
-void PlayerController::endDash() 
+void PlayerController::endDash()
 {
 	//playerPhysics->setLinearVelocity(glm::vec2(0,0));
 }
@@ -400,7 +406,7 @@ void PlayerController::updateSprite(float deltaTime) {
 	playerSprite->setSprite(playerSprite_1);
 }
 
-void PlayerController::resetJumps() 
+void PlayerController::resetJumps()
 {
 	airDashCounter = 0;
 }
