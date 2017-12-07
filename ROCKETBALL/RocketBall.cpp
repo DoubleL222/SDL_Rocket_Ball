@@ -109,9 +109,7 @@ void RocketBall::initGame() {
 	P1Origin = glm::vec2(windowSize.x * 0.2, -windowSize.y * 0.2 + (player1Sprite.getSpriteSize().y * 0.5f));
 	player1->setPosition(P1Origin);
 	auto physComp = player1->addComponent<PhysicsComponent>();
-	//physComp->initPolygon(b2BodyType::b2_dynamicBody, vertices);
 	physComp->initCarCollider(glm::vec2(0.3f, 0.07f), player1->getPosition() / physicsScale, playerFriction, playerDensity, playerLinearDamping, playerAngularDamping);
-	
 
 	//Spawn Player2
 	player2 = createGameObject();
@@ -126,8 +124,6 @@ void RocketBall::initGame() {
 	player2->setPosition(P2Origin);
 	physComp = player2->addComponent<PhysicsComponent>();
 	physComp->initCarCollider(glm::vec2(0.3f, 0.07f), player2->getPosition() / physicsScale, playerFriction, playerDensity, playerLinearDamping, playerAngularDamping);
-	//physComp->initCircle(b2BodyType::b2_dynamicBody, 20 / physicsScale, player2->getPosition() / physicsScale, playerDensity, playerFriction, playerRestitution, playerLinearDamping, playerAngularDamping, true);
-	
 
 	//Spawn (outer) Soccer Ball w/e sprite
 	soccerBall = createGameObject();
@@ -312,32 +308,7 @@ void RocketBall::handleContact(b2Contact *contact, bool begin) {
 		}
 	}
 }
-//
-//void RocketBall::handleContact(b2Contact *contact, bool begin) {
-//	auto fixA = contact->GetFixtureA();
-//	auto fixB = contact->GetFixtureB();
-//	PhysicsComponent* physA = physicsComponentLookup[fixA];
-//	PhysicsComponent* physB = physicsComponentLookup[fixB];
-//	auto & aComponents = physA->getGameObject()->getComponents();
-//	auto & bComponents = physB->getGameObject()->getComponents();
-//	for (auto & c : aComponents) {
-//		if (begin) {
-//			c->onCollisionStart(physB);
-//		}
-//		else {
-//			c->onCollisionEnd(physB);
-//		}
-//	}
-//	for (auto & c : bComponents) {
-//		if (begin) {
-//			c->onCollisionStart(physA);
-//		}
-//		else {
-//			c->onCollisionEnd(physA);
-//		}
-//	}
-//}
-//
+
 void RocketBall::BeginContact(b2Contact *contact) {
 	b2ContactListener::BeginContact(contact);
 	handleContact(contact, true);
@@ -391,6 +362,9 @@ void RocketBall::onKey(SDL_Event &event) {
 			}
 			else if (gameState == GameState::Ready) {
 				gameState = GameState::Running;
+				player1->getComponent<PhysicsComponent>()->body->SetAwake(true);
+				player2->getComponent<PhysicsComponent>()->body->SetAwake(true);
+				soccerBall->getComponent<PhysicsComponent>()->body->SetAwake(true);
 				cout << "Game runing" << std::endl;
 			}
 			else if (gameState == GameState::RoundComplete) {

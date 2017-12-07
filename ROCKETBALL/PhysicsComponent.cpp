@@ -87,6 +87,7 @@ void PhysicsComponent::initCircle(b2BodyType type, float radius, glm::vec2 cente
 	rbType = type;
 	bd.position = b2Vec2(center.x, center.y);
 	bd.fixedRotation = fixedRotation;
+	bd.userData = gameObject;
 	body = world->CreateBody(&bd);
 	circle = new b2CircleShape();
 	circle->m_radius = radius;
@@ -106,6 +107,7 @@ void PhysicsComponent::initBox(b2BodyType type, glm::vec2 size, glm::vec2 center
 	b2BodyDef bd;
 	bd.type = type;
 	rbType = type;
+	bd.userData = gameObject;
 	//bd.position = b2Vec2(center.x, center.y);
 	body = world->CreateBody(&bd);
 	body->SetTransform(b2Vec2(center.x, center.y), rotation);
@@ -169,82 +171,6 @@ void PhysicsComponent::initCarCollider(glm::vec2 size, glm::vec2 center, float _
 	fxD.shape = polygon;
 	fxD.density = _density;
 
-	fixture = body->CreateFixture(&fxD);
-
-	RocketBall::gameInstance->registerPhysicsComponent(this);
-}
-
-void PhysicsComponent::initCarSensorCollider(glm::vec2 size, glm::vec2 center)
-{
-	assert(body == nullptr);
-	// do init
-	shapeType = b2Shape::Type::e_polygon;
-	b2BodyDef bd;
-	bd.type = b2BodyType::b2_dynamicBody;
-	rbType = b2BodyType::b2_dynamicBody;
-	bd.position = b2Vec2(center.x, center.y);
-	bd.userData = gameObject;
-	//bd.fixedRotation = true;
-	body = world->CreateBody(&bd);
-	//body->SetLinearDamping(0.01f);
-	//body->SetAngularDamping(100.0f);
-	polygon = new b2PolygonShape();
-	polygon->SetAsBox(size.x, size.y, { 0,0 }, 0);
-	b2FixtureDef fxD;
-	fxD.isSensor = true;
-	fxD.friction = 1.0f;
-	fxD.shape = polygon;
-	//fxD.density = 0.1f;
-	
-	fixture = body->CreateFixture(&fxD);
-
-	RocketBall::gameInstance->registerPhysicsComponent(this);
-}
-
-void PhysicsComponent::initEdge(b2BodyType type, glm::vec2 point_1, glm::vec2 point_2, float density)
-{
-	assert(body == nullptr);
-	// do init
-	shapeType = b2Shape::Type::e_edge;
-	b2BodyDef bd;
-	bd.type = type;
-	rbType = type;
-	bd.userData = gameObject;
-	//bd.position = b2Vec2(center.x, center.y);
-	body = world->CreateBody(&bd);
-	edge = new b2EdgeShape();
-	edge->Set(b2Vec2(point_1.x, point_1.y), b2Vec2(point_2.x, point_2.y));
-	//polygon = new b2PolygonShape();
-	//polygon->SetAsBox(size.x, size.y, { 0,0 }, 0);
-	b2FixtureDef fxD;
-	fxD.shape = edge;
-	fxD.density = density;
-	body->ResetMassData();
-	fixture = body->CreateFixture(&fxD);
-
-	RocketBall::gameInstance->registerPhysicsComponent(this);
-}
-
-void PhysicsComponent::initPolygon(b2BodyType type, std::vector<glm::vec2> polygonVerticies)
-{
-	assert(body == nullptr);
-	shapeType = b2Shape::Type::e_polygon;
-	b2BodyDef bd;
-	bd.type = type;
-	rbType = type;
-	body = world->CreateBody(&bd);
-	polygon = new b2PolygonShape();
-	b2Vec2 vertices[3];
-	int i = 0;
-	for each(glm::vec2 curr_vec in polygonVerticies)
-	{
-		vertices[i].Set(curr_vec.x, curr_vec.y);
-		i++;
-	}
-	polygon->Set(vertices, polygonVerticies.size());
-	b2FixtureDef fxD;
-	fxD.shape = polygon;
-	fxD.density = 0.7f;
 	fixture = body->CreateFixture(&fxD);
 
 	RocketBall::gameInstance->registerPhysicsComponent(this);
