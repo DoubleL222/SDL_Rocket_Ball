@@ -1,0 +1,43 @@
+PlayerController (LUKA):
+PRIORITY 1:
+	Limited Boost,
+	Boost Recharging,
+	Flip when dash,
+	New sprites,
+	PlayerColors,
+	
+PRIORITY 2:
+    Remove powerups from player,
+	Powerup effects,
+	Simple animations,
+	BALANCING,
+	
+
+Powerups & Boost (MARTIN):
+PRIORITY 1:
+	Sprites,
+	Spawning,
+	Respawning,
+	Refreshing boost,
+	
+Game management (MARTIN):
+PRIORITY 1:
+	Reset on goal,
+	10 goals restart game,
+	Respawn all bosts on goal,
+	
+Sound:
+	boost sound,
+	drive sound,
+	goal sound,
+	soundtrack,
+	
+UI:
+PRIROTY 1:
+	Boost Display,
+	On goal score show GOAAAAL!,
+PRIORITY 2:
+	Game mode selection (powerups or classic),
+	
+
+	
