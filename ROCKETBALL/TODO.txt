@@ -19,15 +19,15 @@ PRIORITY 2:
 Powerups & Boost (MARTIN):
 PRIORITY 1:
 	Sprites,
-	Spawning,
-	Respawning,
-	Refreshing boost,
+	Spawning, (DONE)
+	Respawning, (DONE)
+	Refreshing boost, (DONE)
 	
 Game management (MARTIN):
 PRIORITY 1:
-	Reset on goal,
-	10 goals restart game,
-	Respawn all bosts on goal,
+	Reset on goal, (DONE)
+	10 goals restart game, (DONE)
+	Respawn all bosts on goal, (DONE)
 	
 Sound:
 	boost sound,

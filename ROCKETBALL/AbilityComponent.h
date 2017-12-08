@@ -8,31 +8,33 @@ class AbilityComponent : public Component {
 private:
 	int indexer;
 
-	bool provideAbility = false;
+	bool hasProvidedAbility = false;
 
-	float InitialmaxSpeed;
-	float Initialacceleration;
-	float InitialdashSpeed;
-	float InitialdashDuration;
+	sre::Sprite abilitySprite;
 
-	int InitialAirDashesAvailable;
-	float32 initialGravity;
-	PhysicsComponent *affectedObject = nullptr;
-	void update(float deltaTime) override;
 	void DestroyAbillityBox(GameObject * gameObject);
-	void SelectAndProvide(PhysicsComponent *PhysComp);
+	void ProvideAbility(PhysicsComponent *PhysComp);
+
+	glm::vec4 color{1,1,1,1};
+	float totalTime = 0.0f;
+	float cooldown = 1.0f;
+	bool destroy = false;
+
+	//void setCollisionFilter(uint16 categoryBits);
+	bool largeBoostRecharge = false;
 
 public:
 	explicit AbilityComponent(GameObject *gameObject);
 
+	void update(float deltaTime) override;
 
 	void onCollisionStart(PhysicsComponent *comp) override;
+	void setBoostTypeInClassic(bool isLargeBoost);
+	void SelectAbilityType();
 	void onCollisionEnd(PhysicsComponent* PhysComp) override;
 
-	void setCollisionFilter(uint16 categoryBits);
+	void readyBox(bool ready);
 
-	void setSpriteInvis(bool setInvis);
+	void setCooldown(float cooldown);
 
-	float abilityDuration;
-	float totalTime = 0;
 };

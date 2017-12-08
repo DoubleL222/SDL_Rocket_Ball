@@ -8,42 +8,165 @@
 #include "SpriteComponent.hpp"
 #include "PlayerController.h"
 
-
+using namespace std;
 
 AbilityComponent::AbilityComponent(GameObject *gameObject) : Component(gameObject) {
-	abilityDuration = 0.0f;
+	//SelectAbilityType();
+	color = glm::vec4{ 0,0,0,0 };
+	destroy = false;
 }
-
 void AbilityComponent::update(float deltaTime) {
 
-	if (provideAbility && affectedObject != nullptr) {
-
+	if (hasProvidedAbility && RocketBall::gameInstance->getGameState() == GameState::Running) {
 		totalTime += deltaTime;
 
-		if (totalTime >= abilityDuration) {
-			/*if (indexer == 0) {
-				affectedObject->body->SetGravityScale(initialGravity);
-			}
-			else if (indexer == 1) {
-				affectedObject->getGameObject()->getComponent<PlayerController>()->maxSpeed = InitialmaxSpeed;
-				affectedObject->getGameObject()->getComponent<PlayerController>()->acceleration = Initialacceleration;
-			}
-			else if (indexer == 2) {
-				affectedObject->getGameObject()->getComponent<PlayerController>()->dashSpeed = InitialdashSpeed;
-				affectedObject->getGameObject()->getComponent<PlayerController>()->dashDuration = InitialdashDuration;
-			}
-			else if (indexer == 3) {
-				affectedObject->getGameObject()->getComponent<PlayerController>()->airDashesAvailable = InitialAirDashesAvailable;
-			}*/
-
+		if (totalTime >= cooldown) {
 			totalTime = 0;
-			setSpriteInvis(false);
-			setCollisionFilter(RocketBall::gameInstance->ABILITYBOX);
-			affectedObject = nullptr;
-			provideAbility = false;
-
-			//DestroyAbillityBox(this->gameObject);
+			readyBox(true);
 		}
+	}
+
+	if (destroy) {
+		DestroyAbillityBox(this->gameObject);
+	}
+}
+
+void AbilityComponent::onCollisionStart(PhysicsComponent *PhysComp) {
+	if (PhysComp->getGameObject()->name == "Player_1" ||
+		PhysComp->getGameObject()->name == "Player_2" &&
+		!hasProvidedAbility) {
+		ProvideAbility(PhysComp);
+		//destroy = true;
+	}
+}
+
+void AbilityComponent::onCollisionEnd(PhysicsComponent* PhysComp) {
+
+}
+
+void AbilityComponent::setCooldown(float _cooldown) {
+	cooldown = _cooldown;
+}
+
+void AbilityComponent::setBoostTypeInClassic(bool isLargeBoost) {
+	largeBoostRecharge = isLargeBoost;
+}
+
+void AbilityComponent::SelectAbilityType() {
+	glm::vec2 originalScale = this->getGameObject()->getComponent<SpriteComponent>()->getSprite().getScale();
+
+	if (RocketBall::gameInstance->gameModeClassic) {
+		if (largeBoostRecharge) {
+			//select large boost
+			indexer = 1;
+		}
+		else {
+			//select small boost
+			indexer = 0;
+		}
+	}
+	else {
+		indexer = rand() % 6;
+	}
+
+	switch (indexer)
+	{
+	case 0:
+		//Boost Power
+		abilitySprite = RocketBall::gameInstance->mySpriteAtlas->get("gray.png");
+		color = glm::vec4{ 1.0f, 0.2f, 0.2f, 1.0f };
+		abilitySprite.setColor(color);
+		abilitySprite.setScale(originalScale);
+		this->gameObject->getComponent<SpriteComponent>()->setSprite(abilitySprite);
+		break;
+	case 1:
+		//Large Boost
+		abilitySprite = RocketBall::gameInstance->mySpriteAtlas->get("gray.png");
+		color = glm::vec4{ 0.2f, 1.0f, 0.2f, 1.0f };
+		abilitySprite.setColor(color);
+		abilitySprite.setScale(originalScale);
+		this->gameObject->getComponent<SpriteComponent>()->setSprite(abilitySprite);
+		break;
+	case 2:
+		//Gravity
+		abilitySprite = RocketBall::gameInstance->mySpriteAtlas->get("gray.png");
+		color = glm::vec4{ 0.2f, 0.2f, 1.0f, 1.0f };
+		abilitySprite.setColor(color);
+		abilitySprite.setScale(originalScale);
+		this->gameObject->getComponent<SpriteComponent>()->setSprite(abilitySprite);
+		break;
+	case 3:
+		//Speed
+		abilitySprite = RocketBall::gameInstance->mySpriteAtlas->get("gray.png");
+		color = glm::vec4{ 1.0f, 0.2f, 1.0f, 1.0f };
+		abilitySprite.setColor(color);
+		abilitySprite.setScale(originalScale);
+		this->gameObject->getComponent<SpriteComponent>()->setSprite(abilitySprite);
+		break;
+	case 4:
+		//Dash Boost
+		abilitySprite = RocketBall::gameInstance->mySpriteAtlas->get("gray.png");
+		color = glm::vec4{ 1.0f, 1.0f, 0.0f, 1.0f };
+		abilitySprite.setColor(color);
+		abilitySprite.setScale(originalScale);
+		this->gameObject->getComponent<SpriteComponent>()->setSprite(abilitySprite);
+		break;
+	case 5:
+		//Dash Extra
+		abilitySprite = RocketBall::gameInstance->mySpriteAtlas->get("gray.png");
+		color = glm::vec4{ 0.2f, 1.0f, 1.0f, 1.0f };
+		abilitySprite.setColor(color);
+		abilitySprite.setScale(originalScale);
+		this->gameObject->getComponent<SpriteComponent>()->setSprite(abilitySprite);
+		break;
+	}
+}
+
+void AbilityComponent::ProvideAbility(PhysicsComponent *PhysComp) {
+	switch (indexer)
+	{
+	case 0:
+		//Boost Power
+		PhysComp->getGameObject()->getComponent<PlayerController>()->rechargeBoost(0.25f);
+		break;
+	case 1:
+		//Large Boost
+		PhysComp->getGameObject()->getComponent<PlayerController>()->rechargeBoost(1.0f);
+		break;
+	case 2:
+		//Gravity
+		PhysComp->getGameObject()->getComponent<PlayerController>()->gravityPowerUp();
+		break;
+	case 3:
+		//Speed
+		PhysComp->getGameObject()->getComponent<PlayerController>()->speedPowerUp();
+		break;
+	case 4:
+		//Dash boost
+		PhysComp->getGameObject()->getComponent<PlayerController>()->dashPowerUp();
+		break;
+	case 5:
+		//Dash Extra
+		PhysComp->getGameObject()->getComponent<PlayerController>()->dashPowerUp();
+		break;
+	}
+	readyBox(false);
+}
+
+void AbilityComponent::readyBox(bool ready) {
+
+	sre::Sprite _sprite = this->getGameObject()->getComponent<SpriteComponent>()->getSprite();
+
+	if (!ready) {
+		hasProvidedAbility = true;
+		_sprite.setColor({ color.x, color.y, color.z, 0 });
+		this->getGameObject()->getComponent<SpriteComponent>()->setSprite(_sprite);
+	}
+	else {
+		hasProvidedAbility = false;
+		SelectAbilityType();
+		_sprite.setColor({ color.x, color.y, color.z, 1 });
+		this->getGameObject()->getComponent<SpriteComponent>()->setSprite(_sprite);
 	}
 }
 
@@ -54,81 +177,13 @@ void AbilityComponent::DestroyAbillityBox(GameObject * gameObject) {
 	delete gameObject;
 }
 
-void AbilityComponent::onCollisionStart(PhysicsComponent *PhysComp) {
-	if (PhysComp->getGameObject()->name == "Player_1" ||
-		PhysComp->getGameObject()->name == "Player_2" &&
-		!provideAbility) {
-		provideAbility = true;
-		std::cout << PhysComp->getGameObject()->name + " collected an ability" << std::endl;
-		SelectAndProvide(PhysComp);
-	}
-}
 
-void AbilityComponent::onCollisionEnd(PhysicsComponent* PhysComp) {
 
-}
-
+/*
 void AbilityComponent::setCollisionFilter(uint16 categoryBits) {
 	b2Filter filter = this->getGameObject()->getComponent<PhysicsComponent>()->fixture->GetFilterData();
 	filter.categoryBits = categoryBits;
 	this->getGameObject()->getComponent<PhysicsComponent>()->fixture->SetFilterData(filter);
 }
 
-void AbilityComponent::setSpriteInvis(bool setInvis) {
-	glm::vec4 color = this->getGameObject()->getComponent<SpriteComponent>()->getSprite().getColor();
-	sre::Sprite _sprite = this->getGameObject()->getComponent<SpriteComponent>()->getSprite();
-
-	if (setInvis) {
-		_sprite.setColor({ color.x, color.y, color.z, 0 });
-		this->getGameObject()->getComponent<SpriteComponent>()->setSprite(_sprite);
-	}
-	else {
-		_sprite.setColor({ color.x, color.y, color.z, 1 });
-		this->getGameObject()->getComponent<SpriteComponent>()->setSprite(_sprite);
-	}
-}
-
-void AbilityComponent::SelectAndProvide(PhysicsComponent *PhysComp) {
-
-	setSpriteInvis(true);
-	setCollisionFilter(RocketBall::gameInstance->ABILITYBOXUSED);
-	affectedObject = PhysComp;
-
-	indexer = rand() % 4;
-	abilityDuration = 3.0f;
-
-	/*switch (indexer)
-	{
-	case 0:
-		std::cout << "Ability 1: Lower Gravity!" << std::endl;
-		initialGravity = affectedObject->body->GetGravityScale();
-		affectedObject->body->SetGravityScale(PhysComp->body->GetGravityScale()*0.5);
-		abilityDuration = 3.0f;
-		break;
-	case 1:
-		std::cout << "Ability 2: Faster!" << std::endl;
-		InitialmaxSpeed = affectedObject->getGameObject()->getComponent<PlayerController>()->maxSpeed;
-		Initialacceleration = affectedObject->getGameObject()->getComponent<PlayerController>()->acceleration;
-		affectedObject->getGameObject()->getComponent<PlayerController>()->maxSpeed = InitialmaxSpeed * 2;
-		affectedObject->getGameObject()->getComponent<PlayerController>()->acceleration = Initialacceleration * 2;
-		abilityDuration = 2.0f;
-		break;
-	case 2:
-		std::cout << "Ability 3: Better Dash!" << std::endl;
-		InitialdashSpeed = affectedObject->getGameObject()->getComponent<PlayerController>()->dashSpeed;
-		InitialdashDuration = affectedObject->getGameObject()->getComponent<PlayerController>()->dashDuration;
-		affectedObject->getGameObject()->getComponent<PlayerController>()->dashSpeed = InitialdashSpeed * 2;
-		affectedObject->getGameObject()->getComponent<PlayerController>()->dashDuration = InitialdashDuration * 2;
-		abilityDuration = 3.0f;
-		break;
-	case 3:
-		std::cout << "Ability 3: Moaaar Dash!" << std::endl;
-		InitialAirDashesAvailable = affectedObject->getGameObject()->getComponent<PlayerController>()->airDashesAvailable;
-		affectedObject->getGameObject()->getComponent<PlayerController>()->airDashesAvailable = InitialAirDashesAvailable + 2;
-		abilityDuration = 3.0f;
-		break;
-	}*/
-
-	totalTime = 0;
-
-}
+*/

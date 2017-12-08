@@ -12,6 +12,7 @@
 class PhysicsComponent;
 
 enum class GameState {
+	InitializeGame,
 	Ready,
 	Running,
 	RoundComplete,
@@ -35,6 +36,8 @@ public:
 
 	void RenderSliders();
 
+	bool gameModeClassic;
+
 	static const glm::vec2 windowSize;
 
 	float timeScale = 1.0f;
@@ -55,6 +58,8 @@ public:
 
 	void nextRound();
 
+	glm::vec2 goalSizes{ 0.7, 2.0f };
+
 	virtual void BeginContact(b2Contact *contact) override;
 	virtual void EndContact(b2Contact *contact) override;
 
@@ -63,6 +68,9 @@ public:
 	const float getPhysicsScale();
 
 	static RocketBall* gameInstance;
+
+	std::shared_ptr<GameObject> AbiBox_0, AbiBox_1, AbiBox_2, AbiBox_3, AbiBox_4;
+
 	void setGameState(GameState newState);
 	GameState getGameState();
 
@@ -73,14 +81,16 @@ private:
 	std::shared_ptr<GameObject> soccerBall, soccerBallInner;
 	std::shared_ptr<GameObject> player1;
 	std::shared_ptr<GameObject> player2;
-	std::shared_ptr<GameObject> abilityBoxes;
 	std::shared_ptr<PhysicsComponent> OuterBallPhyiscs, InnerBallPhysics;
 	b2Vec2 b2P1Origin, b2P2Origin, b2sbOuterOrigin, b2sbInnerOrigin;
 	glm::vec2 P1Origin, P2Origin, sbOuterOrigin, sbInnerOrigin;
 
-
 	SDL_Joystick * joy1;
 	SDL_Joystick * joy2;
+
+	//GAME SETTINGS
+	bool displayGameParameters = true;
+	int goalsToScore = 5;
 
 	//Ball
 	float ballRestitution = 0.6f;
@@ -97,7 +107,6 @@ private:
 	float playerAngularDamping = 0.01f;
 
 	//Playfield
-	glm::vec2 goalSizes{ 0.7, 2.0f };
 	SetPlayfield setPlayField;
 
 	sre::SDLRenderer r;
@@ -119,8 +128,6 @@ private:
 
 	std::shared_ptr<GameCamera> camera;
 
-	void createAbilityBox(std::string name, sre::Sprite sprite, std::shared_ptr<GameObject> obj, glm::vec2 pos, glm::vec2 scale, glm::vec2 colBuffer, const float phyScale);
-
 	void update(float time);
 
 	void render();
@@ -133,7 +140,7 @@ private:
 
 	BackgroundComponent background_Layer_1;
 
-	GameState gameState = GameState::Ready;
+	GameState gameState = GameState::InitializeGame;
 
 	friend class PhysicsComponent;
 

@@ -376,7 +376,6 @@ float32 PlayerController::ReportFixture(b2Fixture *fixture, const b2Vec2 &point,
 	if (objName == "grass" || objName == "OuterBall" || objName == "Player_1" || objName == "Player_2") 
 	{
 		resetJumps();
-		cout << "GROUNDED" << std::endl;
 		isGrounded = true;
 	}
 	return 0; // terminate raycast

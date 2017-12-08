@@ -3,6 +3,7 @@
 #include "GameObject.hpp"
 #include "sre/RenderPass.hpp"
 #include "PhysicsComponent.hpp"
+#include "SetPlayfield.h"
 #include "SpriteComponent.hpp"
 #include "BallComponent.h"
 #include "AbilityComponent.h"
@@ -48,6 +49,8 @@ RocketBall::RocketBall()
 
 void RocketBall::initGame() {
 
+	displayGameParameters = true;
+
 	//Joystick init
 	//cout << "number of joysticks " << SDL_NumJoysticks();
 
@@ -87,14 +90,13 @@ void RocketBall::initGame() {
 		background_Layer_1.init("skybackdrop.png", -windowSize.x*0.5f, -windowSize.y*0.5f, true);
 	}
 
+	gameModeClassic = false;
+
 	//Set size for the goals
 	setPlayField.setGoalSizes(goalSizes);
 	//Init playing field
 	setPlayField.createPlayField(mySpriteAtlas);
-
-	for (int i = 0; i < 5; i++) {
-		//createAbilityBox("ability_" + i, mySpriteAtlas->get("gray.png"), createGameObject(), { 1 * i,1 * i }, { 0.5,0.5 }, { 0,0 }, physicsScale);
-	}
+	setPlayField.readyAbilityBoxes(false);
 
 #pragma region Dynamic Elements
 	//Spawn Player1
@@ -106,7 +108,7 @@ void RocketBall::initGame() {
 	auto player1Sprite = mySpriteAtlas->get("BlackCarCropped.png");
 	player1Sprite.setScale(glm::vec2(0.2f, 0.2f));
 	spriteComp->setSprite(player1Sprite);
-	P1Origin = glm::vec2(windowSize.x * 0.2, -windowSize.y * 0.2 + (player1Sprite.getSpriteSize().y * 0.5f));
+	P1Origin = glm::vec2(windowSize.x * 0.375, -windowSize.y * 0.2 + (player1Sprite.getSpriteSize().y * 0.5f));
 	player1->setPosition(P1Origin);
 	auto physComp = player1->addComponent<PhysicsComponent>();
 	physComp->initCarCollider(glm::vec2(0.3f, 0.07f), player1->getPosition() / physicsScale, playerFriction, playerDensity, playerLinearDamping, playerAngularDamping);
@@ -120,7 +122,7 @@ void RocketBall::initGame() {
 	player2Sprite.setFlip(glm::vec2(-1, 0));
 	player2Sprite.setScale(glm::vec2(0.2f, 0.2f));
 	spriteComp->setSprite(player2Sprite);
-	P2Origin = glm::vec2(-windowSize.x * 0.2, -windowSize.y * 0.2 + (player2Sprite.getSpriteSize().y * 0.5f));
+	P2Origin = glm::vec2(-windowSize.x * 0.375, -windowSize.y * 0.2 + (player2Sprite.getSpriteSize().y * 0.5f));
 	player2->setPosition(P2Origin);
 	physComp = player2->addComponent<PhysicsComponent>();
 	physComp->initCarCollider(glm::vec2(0.3f, 0.07f), player2->getPosition() / physicsScale, playerFriction, playerDensity, playerLinearDamping, playerAngularDamping);
@@ -131,6 +133,7 @@ void RocketBall::initGame() {
 	spriteComp = soccerBall->addComponent<SpriteComponent>();
 	auto soccerBallSprite = mySpriteAtlas->get("SoccerBall.png");
 	soccerBallSprite.setScale(glm::vec2(0.4f, 0.4f));
+	soccerBallSprite.setOrderInBatch(10);
 	spriteComp->setSprite(soccerBallSprite);
 	soccerBall->setPosition(glm::vec2(0, windowSize.y * 0.3f));
 	OuterBallPhyiscs = soccerBall->addComponent<PhysicsComponent>();
@@ -155,24 +158,9 @@ void RocketBall::initGame() {
 #pragma endregion
 
 	//SET GAME STATE
-	gameState = GameState::Ready;
+	//gameState = GameState::Ready;
+	gameState = GameState::InitializeGame;
 }
-
-#pragma endregion
-void RocketBall::createAbilityBox(std::string name, sre::Sprite sprite, std::shared_ptr<GameObject> obj, glm::vec2 pos, glm::vec2 scale, glm::vec2 colBuffer, const float phyScale) {
-	auto abilityBox = sprite;
-	abilityBox.setScale({ scale.x, scale.y });
-	auto abilityBox_obj = obj;
-	abilityBox_obj->name = name;
-	auto abilityBoxSpriteComp = abilityBox_obj->addComponent<SpriteComponent>();
-	abilityBox_obj->setPosition(pos);
-	glm::vec2 scaleCol{ (abilityBox.getSpriteSize().x * abilityBox.getScale().x / 2) + colBuffer.x, (abilityBox.getSpriteSize().y * abilityBox.getScale().y / 2) + colBuffer.y };
-	abilityBoxSpriteComp->setSprite(abilityBox);
-	auto abilityBox_physics = abilityBox_obj->addComponent<PhysicsComponent>();
-	abilityBox_physics->initBox(b2_dynamicBody, scaleCol / phyScale, { abilityBox_obj->getPosition().x / phyScale, abilityBox_obj->getPosition().y / phyScale }, 0, ABILITYBOX, ABILITYBOX | BOUNDARY | PLAYER);
-	auto abilityBoxBehaviour = abilityBox_obj->addComponent<AbilityComponent>();
-}
-
 
 void RocketBall::nextRound() {
 	player1->setPosition(P1Origin);
@@ -183,7 +171,7 @@ void RocketBall::nextRound() {
 
 	player2->setPosition(P2Origin);
 	bodPos = P2Origin / physicsScale;
-	player2->getComponent<PhysicsComponent>()->body->SetTransform(b2Vec2(bodPos.x, bodPos.y),  0);
+	player2->getComponent<PhysicsComponent>()->body->SetTransform(b2Vec2(bodPos.x, bodPos.y), 0);
 	player2->getComponent<PhysicsComponent>()->setLinearVelocity({ 0,0 });
 	player2->getComponent<PlayerController>()->resetInputs();
 
@@ -197,6 +185,8 @@ void RocketBall::nextRound() {
 	soccerBallInner->getComponent<PhysicsComponent>()->setLinearVelocity({ 0,0 });
 	soccerBallInner->getComponent<PhysicsComponent>()->body->SetAngularVelocity(0);
 	soccerBallInner->getComponent<BallComponent>()->engageSlowmotion = false;
+
+	//setPlayField.readyAbilityBoxes(true);
 }
 
 void RocketBall::initPhysics()
@@ -218,16 +208,19 @@ const float RocketBall::getPhysicsScale() {
 
 /// Core Update
 void RocketBall::update(float time) {
-	if (gameState == GameState::Running || gameState == GameState::RoundComplete) {
+	if (gameState == GameState::Running || gameState == GameState::RoundComplete || gameState == GameState::GameOver) {
 		updatePhysics(time);
 	}
 	for (int i = 0; i < sceneObjects.size(); i++) {
 		sceneObjects[i]->update(time);
 	}
-
-
 	InnerBallPhysics->body->SetTransform(OuterBallPhyiscs->body->GetPosition(), OuterBallPhyiscs->body->GetAngle());
 	soccerBallInner->setPosition(soccerBall->getPosition());
+
+	if (player1Goals == goalsToScore || player2Goals == goalsToScore) {
+		gameState = GameState::GameOver;
+	}
+
 }
 
 GameState RocketBall::getGameState() {
@@ -270,6 +263,8 @@ void RocketBall::render() {
 		world->DrawDebugData();
 		rp.drawLines(debugDraw.getLines());
 		debugDraw.clear();
+	}
+	if (displayGameParameters) {
 		RenderSliders();
 	}
 }
@@ -352,25 +347,33 @@ void RocketBall::onKey(SDL_Event &event) {
 				world->SetDebugDraw(nullptr);
 			}
 			break;
-		case SDLK_r:
-			initGame();
+		case SDLK_g:
+			displayGameParameters = !displayGameParameters;
 			break;
 		case SDLK_SPACE:
 			if (gameState == GameState::GameOver) {
-				initGame();
-				gameState = GameState::Ready;
+				nextRound();
+				soccerBallInner->getComponent<BallComponent>()->goalAchieved = false;
+				player1Goals = 0;
+				player2Goals = 0;
+				displayGameParameters = true;
+				gameState = GameState::InitializeGame;
 			}
 			else if (gameState == GameState::Ready) {
 				gameState = GameState::Running;
 				player1->getComponent<PhysicsComponent>()->body->SetAwake(true);
 				player2->getComponent<PhysicsComponent>()->body->SetAwake(true);
 				soccerBall->getComponent<PhysicsComponent>()->body->SetAwake(true);
-				cout << "Game runing" << std::endl;
+				setPlayField.readyAbilityBoxes(true);
 			}
 			else if (gameState == GameState::RoundComplete) {
 				soccerBallInner->getComponent<BallComponent>()->goalAchieved = false;
 				nextRound();
 				gameState = GameState::Ready;
+			}
+			else if (gameState == GameState::InitializeGame) {
+				gameState = GameState::Ready;
+				displayGameParameters = false;
 			}
 			break;
 		}
@@ -449,14 +452,19 @@ void RocketBall::UpdateWithNewPhysics()
 void RocketBall::RenderSliders()
 {
 	bool open = true;
-	ImGui::Begin("#TestLabel", &open, ImVec2(500, 100), 0, ImGuiWindowFlags_NoTitleBar);
+	ImGui::Begin("#GAME SETTINGS", &open, ImVec2(500, 100), 0.7f, ImGuiWindowFlags_NoTitleBar);
+	ImGui::LabelText("", "GAME MODE");
+	ImGui::SetNextWindowPos(ImVec2(500, 50));
+	ImGui::Checkbox(": Classic GameMode", &gameModeClassic);
+	ImGui::SliderInt(": Goals to Win", &goalsToScore, 1, 10);
 
 	ImGui::LabelText("Variables", "BALL SETTINGS");
 	ImGui::SetNextWindowPos(ImVec2(500, 100));
 	ImGui::SliderFloat(": B_Restitution", &ballRestitution, 0.0f, 1.0f);
 	ImGui::SliderFloat(": B_Friction", &ballFriction, 0.0f, 1.0f);
 	ImGui::SliderFloat(": B_Density: ", &ballDensity, 0.01f, 1.0f);
-	ImGui::LabelText("Variables", "PKAYER SETTINGS");
+
+	ImGui::LabelText("Variables", "PLAYER SETTINGS");
 	ImGui::SetNextWindowPos(ImVec2(500, 100));
 	ImGui::SliderFloat(": P_Restitution", &playerRestitution, 0.0f, 1.0f);
 	ImGui::SliderFloat(": P_Friction", &playerFriction, 0.0f, 1.0f);
