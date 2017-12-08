@@ -38,13 +38,9 @@ public:
 	void endDash();
 
 	float angleBetweenVectors(glm::vec2 vec1, glm::vec2 vec2);
-
-
-	//float maxSpeed = 5.0f;
-	//float acceleration = 1.0f;
-	//float dashSpeed = 15.0f;
-	//float dashDuration = 0.15f;
-	//int airDashesAvailable = 1;
+	
+	//SetDirection
+	void setFacingDirection(bool _facingRight);
 
 	//Raycasting
 	virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point,
@@ -77,13 +73,23 @@ private:
 	std::shared_ptr<PhysicsComponent> playerPhysics;
 
 	//Player car Settings
-	//const float acceleration = 1.0f;
 	const float maxSpeed = 5.0f;
-	const float maxSpeedWhenBoosting = 15.0f;
-	const float acceleration = 500.0f;
-	const float dashSpeed = 0.5f;
+	const float acceleration = 50.0f;
+	const float dashSpeed = 0.4f;
 	const float dashDuration = 0.07f;
-	const float boostSpeed = 1.5f;
+
+	//BoostSetting
+	const float maxSpeedWhenBoosting = 10.0f;
+	const float bostAccaleration = 1.1f;
+	const float boostBurnPerSecond = 0.2;
+	const float maxBoost = 1.0f;
+
+	//boost variables
+	float currBoost = 1.0f;
+
+
+	//On right or left?
+	bool facingRight = false;
 
 	//UPDATE THINGS
 	float nextFixedUpdate = 0.0f;

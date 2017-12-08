@@ -1,12 +1,10 @@
 PlayerController (LUKA):
 PRIORITY 1:
-	Limited Boost,
 	Boost Recharging,
 	Flip when dash,
-	New sprites,
 	PlayerColors,
 	delayed rotation,
-	add second player support,
+	fix forward/backward dynamic
 
 	
 PRIORITY 2:
@@ -22,6 +20,7 @@ PRIORITY 1:
 	Spawning,
 	Respawning,
 	Refreshing boost,
+	PS: maybe add an infinet boost powerup,
 	
 Game management (MARTIN):
 PRIORITY 1:

@@ -1,17 +1,26 @@
 {"frames": [
 
 {
-	"filename": "BlackCarCropped.png",
-	"frame": {"x":0,"y":0,"w":319,"h":103},
+	"filename": "car1.png",
+	"frame": {"x":0,"y":0,"w":275,"h":85},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":319,"h":103},
-	"sourceSize": {"w":319,"h":103},
+	"spriteSourceSize": {"x":0,"y":0,"w":275,"h":85},
+	"sourceSize": {"w":275,"h":85},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "car2.png",
+	"frame": {"x":0,"y":85,"w":275,"h":85},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":275,"h":85},
+	"sourceSize": {"w":275,"h":85},
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
 	"filename": "Grass.png",
-	"frame": {"x":256,"y":128,"w":256,"h":256},
+	"frame": {"x":256,"y":213,"w":256,"h":256},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
@@ -20,7 +29,7 @@
 },
 {
 	"filename": "gray.png",
-	"frame": {"x":319,"y":0,"w":128,"h":128},
+	"frame": {"x":275,"y":85,"w":128,"h":128},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
@@ -29,7 +38,7 @@
 },
 {
 	"filename": "SoccerBall.png",
-	"frame": {"x":0,"y":128,"w":256,"h":256},
+	"frame": {"x":0,"y":213,"w":256,"h":256},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
@@ -43,6 +52,6 @@
 	"format": "RGBA8888",
 	"size": {"w":512,"h":512},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:77d4851877ec9ed1f0cc1710e16d6af2:35ff99603d412bf85985542d02204256:abc763de9f831949696569c25140e526$"
+	"smartupdate": "$TexturePacker:SmartUpdate:051936f4acd912a7017093d1664697bc:a9c9b0e78af9baf7ce51c01ada0da74c:abc763de9f831949696569c25140e526$"
 }
 }

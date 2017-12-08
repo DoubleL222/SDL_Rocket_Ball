@@ -101,10 +101,11 @@ void RocketBall::initGame() {
 
 	player1 = createGameObject();
 	player1->name = "Player_1";
-	//player1->addComponent<PlayerController>();
+	std::shared_ptr<PlayerController> pc = player1->addComponent<PlayerController>();
+	pc->setFacingDirection(false);
 	auto spriteComp = player1->addComponent<SpriteComponent>();
-	auto player1Sprite = mySpriteAtlas->get("BlackCarCropped.png");
-	player1Sprite.setScale(glm::vec2(0.2f, 0.2f));
+	auto player1Sprite = mySpriteAtlas->get("car2.png");
+	player1Sprite.setScale(glm::vec2(0.3f, 0.3f));
 	spriteComp->setSprite(player1Sprite);
 	P1Origin = glm::vec2(windowSize.x * 0.2, -windowSize.y * 0.2 + (player1Sprite.getSpriteSize().y * 0.5f));
 	player1->setPosition(P1Origin);
@@ -114,11 +115,12 @@ void RocketBall::initGame() {
 	//Spawn Player2
 	player2 = createGameObject();
 	player2->name = "Player_2";
-	player2->addComponent<PlayerController>();
+	pc = player2->addComponent<PlayerController>();
+	pc->setFacingDirection(true);
 	spriteComp = player2->addComponent<SpriteComponent>();
-	auto player2Sprite = mySpriteAtlas->get("BlackCarCropped.png");
+	auto player2Sprite = mySpriteAtlas->get("car1.png");
 	player2Sprite.setFlip(glm::vec2(-1, 0));
-	player2Sprite.setScale(glm::vec2(0.2f, 0.2f));
+	player2Sprite.setScale(glm::vec2(0.3f, 0.3f));
 	spriteComp->setSprite(player2Sprite);
 	P2Origin = glm::vec2(-windowSize.x * 0.2, -windowSize.y * 0.2 + (player2Sprite.getSpriteSize().y * 0.5f));
 	player2->setPosition(P2Origin);
@@ -130,11 +132,11 @@ void RocketBall::initGame() {
 	soccerBall->name = "OuterBall";
 	spriteComp = soccerBall->addComponent<SpriteComponent>();
 	auto soccerBallSprite = mySpriteAtlas->get("SoccerBall.png");
-	soccerBallSprite.setScale(glm::vec2(0.4f, 0.4f));
+	soccerBallSprite.setScale(glm::vec2(0.35f, 0.35f));
 	spriteComp->setSprite(soccerBallSprite);
 	soccerBall->setPosition(glm::vec2(0, windowSize.y * 0.3f));
 	OuterBallPhyiscs = soccerBall->addComponent<PhysicsComponent>();
-	OuterBallPhyiscs->initCircle(b2BodyType::b2_dynamicBody, 50 / physicsScale, soccerBall->getPosition() / physicsScale, ballDensity, ballFriction, ballRestitution, ballLinearDamping, ballAngularDamping, false, SOCCERBALL, BOUNDARY | PLAYER | SOCCERBALL);
+	OuterBallPhyiscs->initCircle(b2BodyType::b2_dynamicBody, 41 / physicsScale, soccerBall->getPosition() / physicsScale, ballDensity, ballFriction, ballRestitution, ballLinearDamping, ballAngularDamping, false, SOCCERBALL, BOUNDARY | PLAYER | SOCCERBALL);
 	b2sbOuterOrigin = OuterBallPhyiscs->body->GetPosition();
 	sbOuterOrigin = soccerBall->getPosition();
 
