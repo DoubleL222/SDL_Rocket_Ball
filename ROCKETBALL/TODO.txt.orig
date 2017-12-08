@@ -17,10 +17,16 @@ PRIORITY 2:
 Powerups & Boost (MARTIN):
 PRIORITY 1:
 	Sprites,
+<<<<<<< HEAD
+	Spawning,
+	Respawning,
+	Refreshing boost,
+	PS: maybe add an infinet boost powerup,
+=======
 	Spawning, (DONE)
 	Respawning, (DONE)
 	Refreshing boost, (DONE)
-	PS: maybe add an infinet boost powerup,
+>>>>>>> origin/NewMartinBranch
 	
 Game management (MARTIN):
 PRIORITY 1:

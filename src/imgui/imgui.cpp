@@ -4129,7 +4129,7 @@ bool ImGui::Begin(const char* name, bool* p_open, ImGuiWindowFlags flags)
     if (flags & ImGuiWindowFlags_NoInputs)
         flags |= ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize;
 
-    // Find or create
+    // Find or create      
     bool window_is_new = false;
     ImGuiWindow* window = FindWindowByName(name);
     if (!window)

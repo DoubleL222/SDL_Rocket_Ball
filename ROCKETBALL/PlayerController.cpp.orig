@@ -10,29 +10,13 @@
 
 using namespace std;
 
-PlayerController::PlayerController(GameObject *gameObject) : Component(gameObject) {
-
+PlayerController::PlayerController(GameObject *gameObject) : Component(gameObject)
+{
 
 }
 
 bool PlayerController::onJoyInput(SDL_Event &event)
 {
-<<<<<<< HEAD
-
-//	movementVector = glm::vec2(0,0);
-	if (event.type == SDL_JOYAXISMOTION)
-	{
-		int axisIndex = (int)(event.jaxis.axis);
-		if (axisIndex == 0) 
-		{
-			float newX = (float)(event.jaxis.value) / (float)(32767);
-
-			//SENSITIVITY
-			/*if (abs(newX) <= 0.0f) 
-			{
-				facingVector.x = 0;
-=======
-	//	movementVector = glm::vec2(0,0);
 	if (RocketBall::gameInstance->getGameState() == GameState::Running) {
 		if (event.type == SDL_JOYAXISMOTION)
 		{
@@ -40,101 +24,79 @@ bool PlayerController::onJoyInput(SDL_Event &event)
 			if (axisIndex == 0)
 			{
 				float newX = (float)(event.jaxis.value) / (float)(32767);
-
 				//SENSITIVITY
-				if (abs(newX) <= 0.2f)
+				if (abs(newX) < 0.1f) 
 				{
-					movementVector.x = 0;
-				}
-				else
-				{
-					movementVector.x = newX;
+					newX = 0;
 				}
 
->>>>>>> origin/NewMartinBranch
+				//SETTING PROPER DIRECTION
+				if (!facingRight)
+				{
+					newX = -newX;
+				}
+				facingVector.x = newX;
 			}
 			else if (axisIndex == 1)
 			{
-<<<<<<< HEAD
-				facingVector.x = newX;
-			}*/
-			facingVector.x = newX;
-			
-=======
 				float newY = -(float)(event.jaxis.value) / (float)(32767);
-
 				//SENSITIVITY
-				if (abs(newY) <= 0.2f)
+				if (abs(newY) < 0.1f)
 				{
-					movementVector.y = 0;
+					newY = 0;
 				}
-				else
+
+				//SETTING PROPER DIRECTION
+				if (!facingRight)
 				{
-					movementVector.y = newY;
+					newY = -newY;
 				}
+				facingVector.y = newY;
 			}
->>>>>>> origin/NewMartinBranch
+			if (axisIndex == 5) 
+			{
+				float newVal = Remap(event.jaxis.value, -32768, 32767, 0, 1);
+
+				//SETTING PROPER DIRECTION
+				if (!facingRight) 
+				{
+					newVal = -newVal;
+				}
+				movementVector.x = newVal;
+			}
+			if (axisIndex == 2)
+			{
+				float newVal = Remap(event.jaxis.value, -32768, 32767, 0, 1);
+
+				//SETTING PROPER DIRECTION
+				if (!facingRight)
+				{
+					newVal = -newVal;
+				}
+				movementVector.x = -newVal;
+			}
 		}
 		if (event.type == SDL_JOYBUTTONDOWN)
 		{
-<<<<<<< HEAD
-			float newY = - (float)(event.jaxis.value) / (float)(32767);
-
-			//SENSITIVITY
-			/*if (abs(newY) <= 0.2f)
-			{
-				facingVector.y = 0;
-			}
-			else
-			{
-				facingVector.y = newY;
-			}*/
-			facingVector.y = newY;
-		}
-		float angle = glm::angle(glm::vec2(1, 0), facingVector);
-		angle = angleBetweenVectors(glm::vec2(1, 0), facingVector);
-		angle = glm::degrees(angle);
-		if (axisIndex == 5) 
-		{
-			float newVal = Remap(event.jaxis.value, -32768, 32767, 0, 1);
-			movementVector.x = newVal;
-		}
-		if (axisIndex == 2)
-		{
-			float newVal = Remap(event.jaxis.value, -32768, 32767, 0, 1);
-			movementVector.x = -newVal;
-=======
+			//cout << "Joy Button: " << (int)(event.jbutton.button) << std::endl;
 			if (event.jbutton.button == 0)
 			{
 				jump();
 			}
->>>>>>> origin/NewMartinBranch
+			if (event.jbutton.button == 1) 
+			{
+				isBoosting = true;
+			}
+		}
+		else if (event.type == SDL_JOYBUTTONUP) 
+		{
+			if (event.jbutton.button == 1)
+			{
+				isBoosting = false;
+			}
 		}
 		return false;
 	}
-<<<<<<< HEAD
-	if (event.type == SDL_JOYBUTTONDOWN)
-	{
-		//cout << "Joy Button: " << (int)(event.jbutton.button) << std::endl;
-		if (event.jbutton.button == 0)
-		{
-			jump();
-		}
-		if (event.jbutton.button == 1) 
-		{
-			isBoosting = true;
-		}
-	}
-	else if (event.type == SDL_JOYBUTTONUP) 
-	{
-		if (event.jbutton.button == 1)
-		{
-			isBoosting = false;
-		}
-	}
-	return false;
-=======
->>>>>>> origin/NewMartinBranch
 }
 
 float PlayerController::Remap(float value, float from1, float to1, float from2, float to2)
@@ -189,25 +151,17 @@ bool PlayerController::onKey(SDL_Event &event) {
 	return false;
 }
 
-<<<<<<< HEAD
 void PlayerController::update(float deltaTime)
 {
 	timePassed += deltaTime;
-=======
-void PlayerController::resetInputs() {
-	movementVector.x = 0;
-	movementVector.y = 0;
-	resetJumps();
-}
 
-void PlayerController::update(float deltaTime) {
->>>>>>> origin/NewMartinBranch
+
 	// raycast ignores any shape in the starting point
 	if (playerPhysics == nullptr)
 	{
 		playerPhysics = gameObject->getComponent<PhysicsComponent>();
 	}
-	if (playerSprite == nullptr) 
+	if (playerSprite == nullptr)
 	{
 		playerSprite = gameObject->getComponent<SpriteComponent>();
 	}
@@ -215,7 +169,7 @@ void PlayerController::update(float deltaTime) {
 
 	auto from = playerPhysics->body->GetWorldCenter();
 	//radius = playerPhysics->radius;
-	
+
 	//cout << "0: UPDATE" <<std::endl;
 
 	glm::vec2 currentVelocity = playerPhysics->getLinearVelocity();
@@ -236,7 +190,7 @@ void PlayerController::update(float deltaTime) {
 
 
 	//FIXED UPDATE
-	
+
 	//if (timePassed > nextFixedUpdate) {
 	//	nextFixedUpdate += updateFrequency;
 	//	//cout << "1: FIXED UPDATE" << std::endl;
@@ -246,7 +200,7 @@ void PlayerController::update(float deltaTime) {
 	//		//cout << "2: APPLYING GRAVITY" << std::endl;
 	//		if (currentVelocity.y > -1.0f) 
 	//		{
-				
+
 	//			//playerPhysics->setLinearVelocity(glm::vec2(currentVelocity.x, currentVelocity.y - 5));
 	//		}
 	//	}
@@ -261,7 +215,11 @@ void PlayerController::update(float deltaTime) {
 	//}
 
 	//Rotate player
-	float targetRotation = angleBetweenVectors(glm::vec2(1, 0), facingVector);
+	float targetRotation = 0.0f;
+	if (!(facingVector.x == 0 && facingVector.y == 0))
+	{
+		targetRotation = angleBetweenVectors(glm::vec2(1, 0), facingVector);
+	}
 	targetRotation = glm::degrees(targetRotation);
 
 	//cout << "Target: " << targetRotation << std::endl;
@@ -281,15 +239,14 @@ void PlayerController::update(float deltaTime) {
 			float currentX = currentVelocity.x;
 
 			//If player presses the opposite direction set horizontal speed to 0
-			if ((currentVelocity.x < 0 && movementVector.x>0) || (currentVelocity.x > 0 && movementVector.x < 0))
-			{
-				currentX = 0;
-				playerPhysics->setLinearVelocity(glm::vec2(currentX, currentVelocity.y));
-			}
+			//if ((currentVelocity.x < 0 && movementVector.x>0) || (currentVelocity.x > 0 && movementVector.x < 0))
+			//{
+			//	currentX = 0;
+			//	playerPhysics->setLinearVelocity(glm::vec2(currentX, currentVelocity.y));
+			//}
 			//If Speed is more than maxSpeed
-			//cout << "curr velocity x: " << currentVelocity.x <<"; y:" << currentVelocity.y << std::endl;
 			float currentSpeed = glm::length(currentVelocity);
-			//cout << "curr speed: " << currentSpeed << std::endl;
+			//cout << "0. curr speed: " << currentSpeed << std::endl;
 			if (currentSpeed > maxSpeed && !isBoosting)
 			{
 				playerPhysics->setLinearVelocity((maxSpeed / currentSpeed) * currentVelocity);
@@ -297,9 +254,7 @@ void PlayerController::update(float deltaTime) {
 			//IF not, increase speed
 			else
 			{
-				//currentX += movementVector.x*acceleration;
 				playerPhysics->addForce(glm::vec2(movementVector.x * acceleration * deltaTime, 0));
-				//playerPhysics->setLinearVelocity(glm::vec2(movementVector.x * maxSpeed, currentVelocity.y));
 			}
 		}
 		else
@@ -309,18 +264,28 @@ void PlayerController::update(float deltaTime) {
 	}
 
 	//Boosting player
-	if (isBoosting) 
+	if (isBoosting && currBoost > 0.0f) 
 	{
+		currBoost -= boostBurnPerSecond*deltaTime;
 		currentVelocity = playerPhysics->getLinearVelocity();
 		float currentSpeed = glm::length(currentVelocity);
-		//cout << "curr speed: " << currentSpeed << std::endl;
+		//cout << "1. curr BOOST speed: " << currentSpeed << std::endl;
 		if (glm::length(currentVelocity) > maxSpeedWhenBoosting) 
 		{
 			playerPhysics->setLinearVelocity((maxSpeedWhenBoosting / currentSpeed) * currentVelocity);
 		}
 		else 
 		{
-			playerPhysics->addForce(glm::vec2(glm::rotate(glm::vec2(1, 0), glm::radians(rotation)))* boostSpeed);
+			//Adjusting for direction
+			if (facingRight)
+			{
+				playerPhysics->addForce(glm::vec2(glm::rotate(glm::vec2(1, 0), glm::radians(rotation)))* bostAccaleration);
+			}
+			else 
+			{
+				playerPhysics->addForce(glm::vec2(glm::rotate(glm::vec2(-1, 0), glm::radians(rotation)))* bostAccaleration);
+			}
+			
 		}
 	}
 
@@ -343,6 +308,11 @@ float PlayerController::angleBetweenVectors(glm::vec2 vec1, glm::vec2 vec2)
 	float det = vec1.x*vec2.y + vec1.y*vec2.x;
 	float angle = atan2(det, dot);
 	return angle;
+}
+
+void PlayerController::setFacingDirection(bool _facingRight)
+{
+	facingRight = _facingRight;
 }
 
 void PlayerController::applyMovement()
@@ -383,12 +353,8 @@ void PlayerController::setRotation(float _rot)
 
 void PlayerController::jump()
 {
-<<<<<<< HEAD
 	bool verticalJump = false;
-	if (!isGrounded) 
-=======
 	if (!isGrounded)
->>>>>>> origin/NewMartinBranch
 	{
 		//IF player has already dashed mid jump
 		if (airDashCounter >= airDashesAvailable)
@@ -408,44 +374,43 @@ void PlayerController::jump()
 	//glm::vec2 currentVelocity = playerPhysics->getLinearVelocity();
 	//
 	inDash = true;
-<<<<<<< HEAD
 	cout << "facing vector: x: " << facingVector.x << "; y:" << facingVector.y << std::endl;
-	
+
 	//Check if direction vecor is zero, apply vertical jump
 
 	glm::vec2 moveNormalized = glm::normalize(facingVector);
-	if(verticalJump)
-=======
-	dashCounter = 0;
-	cout << "moveVector: x: " << movementVector.x << "; y:" << movementVector.y << std::endl;
-
-	//Check if direction vecor is zero, apply vertical jump
-	bool fakeJump = false;
-	if (movementVector.y == 0 && movementVector.x == 0)
+	//Adjusting for direction
+	if (!facingRight)
 	{
-		fakeJump = true;
-		movementVector.y = 1;
+		moveNormalized = -moveNormalized;
 	}
-	playerPhysics->setLinearVelocity(movementVector*dashSpeed);
-	if (fakeJump)
->>>>>>> origin/NewMartinBranch
+	if(verticalJump || (facingVector.x==0 && facingVector.y==0))
 	{
 		moveNormalized = glm::vec2(0, 1);
 	}
-	//playerPhysics->body->ApplyForce(b2Vec2(moveNormalized.x*dashSpeed, moveNormalized.y*dashSpeed), b2Vec2(0.2, -0.1), true);
+
+	//Set Y speed to 0
+	if (airDashCounter > 0) 
+	{
+		playerPhysics->setLinearVelocity(glm::vec2(playerPhysics->getLinearVelocity().x, 0));
+	}
+
 	playerPhysics->addImpulse(moveNormalized*dashSpeed);
-	//void ApplyForce(const b2Vec2& force, const b2Vec2& point);
-	//playerPhysics->setLinearVelocity(moveNormalized*dashSpeed);
-	//playerPhysics->addImpulse(glm::vec2(0.0f, 5.0f));
+
+}
+
+void PlayerController::resetInputs()
+{
+	movementVector = glm::vec2(0.0f, 0.0f);
+	facingVector = glm::vec2(0.0f, 0.0f);
+	rotation = 0.0f;
+	currBoost = maxBoost;
+	isBoosting = false;
 }
 
 void PlayerController::endDash()
 {
-<<<<<<< HEAD
 	//playerPhysics->setLinearVelocity(glm::vec2(0,0));
-=======
-	playerPhysics->setLinearVelocity(glm::vec2(0, 0));
->>>>>>> origin/NewMartinBranch
 }
 
 void PlayerController::onCollisionStart(PhysicsComponent *comp) {
@@ -456,21 +421,37 @@ void PlayerController::onCollisionEnd(PhysicsComponent *comp) {
 
 }
 
+void PlayerController::rechargeBoost(float _val)
+{
+}
+
+void PlayerController::gravityPowerUp()
+{
+}
+
+void PlayerController::speedPowerUp()
+{
+}
+
+void PlayerController::dashPowerUp()
+{
+}
+
+void PlayerController::dashCountPowerUp()
+{
+}
+
 float32 PlayerController::ReportFixture(b2Fixture *fixture, const b2Vec2 &point, const b2Vec2 &normal, float32 fraction) {
 	string objName = ((GameObject*)fixture->GetBody()->GetUserData())->name;
-	//std::cout << "Obj HIT: " << objName << std::endl;
-	if (objName == "Floor" || objName == "Ball" || objName == "Player1" || objName == "Player2") 
+	if (objName == "grass" || objName == "OuterBall" || objName == "Player_1" || objName == "Player_2") 
 	{
 		resetJumps();
+<<<<<<< HEAD
+		//cout << "GROUNDED" << std::endl;
+=======
+>>>>>>> origin/NewMartinBranch
 		isGrounded = true;
 	}
-	/*if (objName == "LeftWall" || objName == "RightWall") 
-	{
-		isNextToWall = true;
-		std::cout << "STOP HORIZONTAL " << std::endl;
-		stopHorizontalMovement();
-	}*/
-	//cout << "3: Raycast HIT" << std::endl;
 	return 0; // terminate raycast
 }
 
