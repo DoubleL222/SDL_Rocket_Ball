@@ -124,15 +124,19 @@ bool PlayerController::onKey(SDL_Event &event) {
 			}
 			if (event.key.keysym.sym == SDLK_DOWN)
 			{
-				movementVector.y = -1;
+				rotatingDown = true;
 			}
 			else if (event.key.keysym.sym == SDLK_UP)
 			{
-				movementVector.y = 1;
+				rotatingUp = true;
 			}
 			if (event.key.keysym.sym == SDLK_RSHIFT) 
 			{
 				isBoosting = true;
+			}
+			if (event.key.keysym.sym == SDLK_r)
+			{
+				playerPhysics->body->SetAwake(true);
 			}
 		}
 		else if (event.type == SDL_KEYUP)
@@ -145,9 +149,13 @@ bool PlayerController::onKey(SDL_Event &event) {
 			{
 				movementVector.x = 0;
 			}
-			if (event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_DOWN)
+			if (event.key.keysym.sym == SDLK_DOWN)
 			{
-				movementVector.y = 0;
+				rotatingDown = false;
+			}
+			else if (event.key.keysym.sym == SDLK_UP)
+			{
+				rotatingUp = false;
 			}
 			if (event.key.keysym.sym == SDLK_RSHIFT)
 			{
@@ -224,16 +232,38 @@ void PlayerController::update(float deltaTime)
 
 	//Rotate player
 	float targetRotation = 0.0f;
+	//ROTATE WITH KEYBOARD
+	if (rotatingUp) 
+	{
+		float rotationSpeed = 3.5f;
+		if (facingRight)
+		{
+			rotationSpeed = -rotationSpeed;
+		}
+		facingVector = glm::rotate(glm::vec2(1, 0), glm::radians(rotation - rotationSpeed));
+	}
+	else if (rotatingDown) 
+	{
+		float rotationSpeed = 3.5f;
+		if (facingRight) 
+		{
+			rotationSpeed = -rotationSpeed;
+		}
+		facingVector = glm::rotate(glm::vec2(1, 0), glm::radians(rotation + rotationSpeed));
+	}
+
 	if (!(facingVector.x == 0 && facingVector.y == 0))
 	{
 		targetRotation = angleBetweenVectors(glm::vec2(1, 0), facingVector);
 	}
+
 	targetRotation = glm::degrees(targetRotation);
 
 	//cout << "Target: " << targetRotation << std::endl;
-	if (rotation != targetRotation && !isGrounded) 
+	if (rotation != targetRotation && !isGrounded && !inDash) 
 	{
-		setRotation(targetRotation);
+		setDelayedRotation(targetRotation);
+		//setRotation(targetRotation);
 	}
 	if(isGrounded)
 	{
@@ -253,7 +283,7 @@ void PlayerController::update(float deltaTime)
 			//	playerPhysics->setLinearVelocity(glm::vec2(currentX, currentVelocity.y));
 			//}
 			//If Speed is more than maxSpeed
-			float currentSpeed = glm::length(currentVelocity);
+			float currentSpeed = currentVelocity.x;
 			//cout << "0. curr speed: " << currentSpeed << std::endl;
 			if (currentSpeed > maxSpeed && !isBoosting)
 			{
@@ -297,7 +327,6 @@ void PlayerController::update(float deltaTime)
 			{
 				playerPhysics->addForce(glm::vec2(glm::rotate(glm::vec2(-1, 0), glm::radians(rotation)))* bostAccaleration);
 			}
-			
 		}
 	}
 
@@ -305,17 +334,24 @@ void PlayerController::update(float deltaTime)
 	if (inDash)
 	{
 		dashCounter += deltaTime;
-		if (dashCounter >= dashDuration)
+		if (facingRight) 
+		{
+			setRotation(rotation - rotationPerSecond*deltaTime);
+		}
+		else 
+		{
+			setRotation(rotation + rotationPerSecond*deltaTime);
+		}
+		
+		//Fcout << "inDash; " << dashCounter << " "<<deltaTime<<std::endl;
+		if (dashCounter > dashDuration)
 		{
 			inDash = false;
 			endDash();
 		}
 	}
-
-
-
 	//// BOOST GUI MARTIN DO HERE THE THING 
-	cout << "boost amount: " << currBoost <<std::endl;
+	//cout << "boost amount: " << currBoost <<std::endl;
 }
 
 float PlayerController::angleBetweenVectors(glm::vec2 vec1, glm::vec2 vec2)
@@ -362,11 +398,59 @@ void PlayerController::stopHorizontalMovement()
 
 void PlayerController::setRotation(float _rot)
 {
+	_rot = fmod(_rot, 360.0f);
+	if (_rot < 0)
+	{
+		_rot += 360;
+	}
+	//cout << "Rotation: " << _rot << std::endl;
 	rotation = _rot;
 	//gameObject->setRotation(rotation);
 	playerPhysics->body->SetTransform(playerPhysics->body->GetPosition(), glm::radians(rotation));
 }
 
+void PlayerController::setDelayedRotation(float _rot)
+{
+	_rot = fmod(_rot, 360.0f);
+	if (_rot < 0)
+	{
+		_rot += 360;
+	}
+
+	//cout << "Rotation: " << _rot << std::endl;
+	rotation = clerp(rotation, _rot, 0.2f);
+	//gameObject->setRotation(rotation);
+	playerPhysics->body->SetTransform(playerPhysics->body->GetPosition(), glm::radians(rotation));
+}
+
+float PlayerController::lerp(float a, float b, float f)
+{
+	return a + f * (b - a);
+}
+
+float PlayerController::clerp(float start, float end, float value) 
+{
+	float min = 0.0f;
+	float max = 360.0f;
+	float half = abs((max - min) / 2.0f);//half the distance between min and max
+	float retval = 0.0f;
+	float diff = 0.0f;
+
+	if ((end - start) < -half)
+	{
+		diff = ((max - start) + end) * value;
+		retval = start + diff;
+	}
+	else if ((end - start) > half)
+	{
+		diff = -((max - end) + start) * value;
+		retval = start + diff;
+	}
+	else retval = start + (end - start) * value;
+
+	// Debug.Log("Start: "  + start + "   End: " + end + "  Value: " + value + "  Half: " + half + "  Diff: " + diff + "  Retval: " + retval);
+	return retval;
+}
 void PlayerController::jump()
 {
 	bool verticalJump = false;
@@ -380,16 +464,18 @@ void PlayerController::jump()
 		else
 		{
 			airDashCounter++;
+			inDash = true;
+			dashCounter = 0;
 		}
 	}
 	else 
 	{
-		dashCounter = 0;
 		verticalJump = true;
+		inDash = false;
 	}
 	//glm::vec2 currentVelocity = playerPhysics->getLinearVelocity();
 	//
-	inDash = true;
+
 	cout << "facing vector: x: " << facingVector.x << "; y:" << facingVector.y << std::endl;
 
 	//Check if direction vecor is zero, apply vertical jump
@@ -403,6 +489,7 @@ void PlayerController::jump()
 	if(verticalJump || (facingVector.x==0 && facingVector.y==0))
 	{
 		moveNormalized = glm::vec2(0, 1);
+		inDash = false;
 	}
 
 	//Set Y speed to 0
@@ -422,11 +509,13 @@ void PlayerController::resetInputs()
 	rotation = 0.0f;
 	currBoost = maxBoost;
 	isBoosting = false;
+	rotatingDown = false;
+	rotatingUp = false;
 }
 
 void PlayerController::endDash()
 {
-	//playerPhysics->setLinearVelocity(glm::vec2(0,0));
+	inDash = false;
 }
 
 void PlayerController::onCollisionStart(PhysicsComponent *comp) {
@@ -468,7 +557,9 @@ float32 PlayerController::ReportFixture(b2Fixture *fixture, const b2Vec2 &point,
 	{
 		resetJumps();
 		//cout << "GROUNDED" << std::endl;
+		//facingVector = glm::vec2(0, 0);
 		isGrounded = true;
+		inDash = false;
 	}
 	return 0; // terminate raycast
 }

@@ -90,7 +90,7 @@ void RocketBall::initGame() {
 		background_Layer_1.init("skybackdrop.png", -windowSize.x*0.5f, -windowSize.y*0.5f, true);
 	}
 
-	gameModeClassic = false;
+	gameModeClassic = true;
 
 	//Set size for the goals
 	setPlayField.setGoalSizes(goalSizes);

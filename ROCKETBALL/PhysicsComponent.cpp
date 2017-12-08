@@ -156,6 +156,7 @@ void PhysicsComponent::initCarCollider(glm::vec2 size, glm::vec2 center, float _
 	// do init
 	shapeType = b2Shape::Type::e_polygon;
 	b2BodyDef bd;
+	bd.allowSleep = false;
 	bd.type = b2BodyType::b2_dynamicBody;
 	rbType = b2BodyType::b2_dynamicBody;
 	bd.position = b2Vec2(center.x, center.y);

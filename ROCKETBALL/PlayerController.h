@@ -29,7 +29,13 @@ public:
 
 	void setRotation(float _rot);
 
+	void setDelayedRotation(float _rot);
+
+	float lerp(float a, float b, float f);
+
 	bool onKey(SDL_Event &event) override;
+
+	float clerp(float start, float end, float value);
 
 	void jump();
 
@@ -38,7 +44,7 @@ public:
 	void endDash();
 
 	float angleBetweenVectors(glm::vec2 vec1, glm::vec2 vec2);
-	
+
 	//SetDirection
 	void setFacingDirection(bool _facingRight);
 
@@ -76,7 +82,8 @@ private:
 	const float maxSpeed = 5.0f;
 	const float acceleration = 50.0f;
 	const float dashSpeed = 0.4f;
-	const float dashDuration = 0.07f;
+	const float dashDuration = 0.5f;
+	const float rotationPerSecond = 360.0f*(1.0f/dashDuration);
 
 	//BoostSetting
 	const float maxSpeedWhenBoosting = 10.0f;
@@ -98,7 +105,7 @@ private:
 	int airDashesAvailable = 1;
 	int airDashCounter = 0;
 
-	int dashCounter = 0;
+	float dashCounter = 0;
 	
 	bool inDash = false;
 
@@ -115,4 +122,9 @@ private:
 
 	bool movingForward = false;
 	bool movingBack = false;
+
+	//Keyboard rotations
+	bool rotatingDown = false;
+	bool rotatingUp = false;
+
 };

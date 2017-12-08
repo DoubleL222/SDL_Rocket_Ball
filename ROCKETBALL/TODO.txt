@@ -1,9 +1,5 @@
 PlayerController (LUKA):
 PRIORITY 1:
-	Boost Recharging,
-	Flip when dash,
-	PlayerColors,
-	delayed rotation,
 	fix forward/backward dynamic
 
 	
@@ -17,16 +13,16 @@ PRIORITY 2:
 Powerups & Boost (MARTIN):
 PRIORITY 1:
 	Sprites,
-	Spawning, (DONE)
-	Respawning, (DONE)
-	Refreshing boost, (DONE)
+	Spawning,
+	Respawning,
+	Refreshing boost,
 	PS: maybe add an infinet boost powerup,
 	
 Game management (MARTIN):
 PRIORITY 1:
-	Reset on goal, (DONE)
-	10 goals restart game, (DONE)
-	Respawn all bosts on goal, (DONE)
+	Reset on goal,
+	10 goals restart game,
+	Respawn all bosts on goal,
 	
 Sound:
 	boost sound,
