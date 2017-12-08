@@ -21,7 +21,6 @@ void AbilityComponent::update(float deltaTime) {
 		totalTime += deltaTime;
 
 		if (totalTime >= cooldown) {
-			totalTime = 0;
 			readyBox(true);
 		}
 	}
@@ -156,6 +155,7 @@ void AbilityComponent::ProvideAbility(PhysicsComponent *PhysComp) {
 void AbilityComponent::readyBox(bool ready) {
 
 	sre::Sprite _sprite = this->getGameObject()->getComponent<SpriteComponent>()->getSprite();
+	totalTime = 0;
 
 	if (!ready) {
 		hasProvidedAbility = true;
