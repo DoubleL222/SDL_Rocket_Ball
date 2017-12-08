@@ -267,6 +267,10 @@ void PlayerController::update(float deltaTime)
 	if (isBoosting && currBoost > 0.0f) 
 	{
 		currBoost -= boostBurnPerSecond*deltaTime;
+		if (currBoost < 0) 
+		{
+			currBoost = 0;
+		}
 		currentVelocity = playerPhysics->getLinearVelocity();
 		float currentSpeed = glm::length(currentVelocity);
 		//cout << "1. curr BOOST speed: " << currentSpeed << std::endl;
@@ -300,6 +304,10 @@ void PlayerController::update(float deltaTime)
 		}
 	}
 
+
+
+	//// BOOST GUI MARTIN DO HERE THE THING 
+	cout << "boost amount: " << currBoost <<std::endl;
 }
 
 float PlayerController::angleBetweenVectors(glm::vec2 vec1, glm::vec2 vec2)
@@ -423,6 +431,11 @@ void PlayerController::onCollisionEnd(PhysicsComponent *comp) {
 
 void PlayerController::rechargeBoost(float _val)
 {
+	currBoost += _val;
+	if (currBoost > maxBoost) 
+	{
+		currBoost = maxBoost;
+	}
 }
 
 void PlayerController::gravityPowerUp()

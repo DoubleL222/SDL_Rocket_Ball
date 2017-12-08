@@ -81,7 +81,7 @@ private:
 	//BoostSetting
 	const float maxSpeedWhenBoosting = 10.0f;
 	const float bostAccaleration = 1.1f;
-	const float boostBurnPerSecond = 0.2;
+	const float boostBurnPerSecond = 0.5;
 	const float maxBoost = 1.0f;
 
 	//boost variables
