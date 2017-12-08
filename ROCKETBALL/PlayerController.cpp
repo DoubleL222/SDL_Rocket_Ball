@@ -130,6 +130,10 @@ bool PlayerController::onKey(SDL_Event &event) {
 			{
 				movementVector.y = 1;
 			}
+			if (event.key.keysym.sym == SDLK_RSHIFT) 
+			{
+				isBoosting = true;
+			}
 		}
 		else if (event.type == SDL_KEYUP)
 		{
@@ -144,6 +148,10 @@ bool PlayerController::onKey(SDL_Event &event) {
 			if (event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_DOWN)
 			{
 				movementVector.y = 0;
+			}
+			if (event.key.keysym.sym == SDLK_RSHIFT)
+			{
+				isBoosting = false;
 			}
 		}
 	}
