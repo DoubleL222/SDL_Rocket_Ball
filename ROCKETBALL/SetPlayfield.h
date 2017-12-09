@@ -16,6 +16,4 @@ public:
 	void setGoalSizes(glm::vec2 _goalSizes);
 	void readyAbilityBoxes(bool readyTheBox);
 	bool playFieldInit = false;
-	void updateGoalScale();
-	void updateWallScale();
 };
