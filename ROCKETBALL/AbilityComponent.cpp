@@ -65,7 +65,7 @@ void AbilityComponent::SelectAbilityType() {
 		}
 	}
 	else {
-		indexer = rand() % 6;
+		indexer = rand() % 7;
 	}
 
 	switch (indexer)
@@ -118,6 +118,14 @@ void AbilityComponent::SelectAbilityType() {
 		abilitySprite.setScale(originalScale);
 		this->gameObject->getComponent<SpriteComponent>()->setSprite(abilitySprite);
 		break;
+	case 6:
+		//Infinite Boost
+		abilitySprite = RocketBall::gameInstance->mySpriteAtlas->get("gray.png");
+		color = glm::vec4{ 0.2f, 0.2f, 0.2f, 1.0f };
+		abilitySprite.setColor(color);
+		abilitySprite.setScale(originalScale);
+		this->gameObject->getComponent<SpriteComponent>()->setSprite(abilitySprite);
+		break;
 	}
 }
 
@@ -147,6 +155,10 @@ void AbilityComponent::ProvideAbility(PhysicsComponent *PhysComp) {
 	case 5:
 		//Dash Extra
 		PhysComp->getGameObject()->getComponent<PlayerController>()->dashPowerUp();
+		break;
+	case 6:
+		//Dash Extra
+		//PhysComp->getGameObject()->getComponent<PlayerController>()->infiniteBoostPowerUp();
 		break;
 	}
 	readyBox(false);
