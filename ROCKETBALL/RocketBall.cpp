@@ -10,12 +10,19 @@
 #include "PlayerController.h"
 #include "sre/profiler.hpp"
 #include "SDL_mixer.h"
+#include <windows.h>
 #include <iostream>
+#pragma comment(lib, "user32.lib") 
 
 using namespace std;
 using namespace sre;
 
-const glm::vec2 RocketBall::windowSize(1600, 900); // some size for the window
+#ifdef _WIN32
+const glm::vec2 RocketBall::windowSize(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+#else
+const glm::vec2 RocketBall::windowSize(1600, 900);
+#   error "Unknown compiler"
+#endif
 
 RocketBall* RocketBall::gameInstance = nullptr;
 
