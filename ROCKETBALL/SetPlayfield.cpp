@@ -14,6 +14,7 @@ using namespace std;
 void SetPlayfield::setGoalSizes(glm::vec2 _goalSizes) {
 	goalSize = _goalSizes;
 	grassColBuffer = 20.0f;
+	playFieldInit = true;
 }
 
 void SetPlayfield::createPlayField(std::shared_ptr<sre::SpriteAtlas> _mySpriteAtlas) {
@@ -51,9 +52,9 @@ void SetPlayfield::createPlayField(std::shared_ptr<sre::SpriteAtlas> _mySpriteAt
 		_mySpriteAtlas->get("gray.png"),
 		{ -1,  ((_mySpriteAtlas->get("goalMain.png").getSpriteSize().y)) - grassColBuffer },
 		{ goalSize },
+		RocketBall::gameInstance->botYBoxSize,
 		{ 0,0 },
 		{ RocketBall::gameInstance->player1Color.x, RocketBall::gameInstance->player1Color.y, RocketBall::gameInstance->player1Color.z, RocketBall::gameInstance->player1Color.w },
-		RocketBall::gameInstance->getPhysicsScale(),
 		RocketBall::gameInstance->BOUNDARY,
 		0xFFFF
 	);
@@ -65,9 +66,9 @@ void SetPlayfield::createPlayField(std::shared_ptr<sre::SpriteAtlas> _mySpriteAt
 		_mySpriteAtlas->get("gray.png"),
 		{ 1,  ((_mySpriteAtlas->get("goalMain.png").getSpriteSize().y)) - grassColBuffer },
 		{ goalSize },
+		RocketBall::gameInstance->botYBoxSize,
 		{ 0,0 },
 		{ RocketBall::gameInstance->player2Color.x, RocketBall::gameInstance->player2Color.y, RocketBall::gameInstance->player2Color.z, RocketBall::gameInstance->player2Color.w },
-		RocketBall::gameInstance->getPhysicsScale(),
 		RocketBall::gameInstance->BOUNDARY,
 		0xFFFF
 	);
@@ -162,12 +163,6 @@ void SetPlayfield::createPlayField(std::shared_ptr<sre::SpriteAtlas> _mySpriteAt
 		/*CategoryBits:*/RocketBall::gameInstance->BOUNDARY,
 		/*MaskBits:*/0xFFFF
 	);
-
-
-	//Platforms
-	if (usePlatforms) {
-
-	}
 }
 
 void SetPlayfield::createStaticBox(std::string name, sre::Sprite sprite, glm::vec2 pos, glm::vec2 customScale, glm::vec2 colBuffer, float _rotation, float phyScale, uint16 categoryBits, uint16 maskBits) {
@@ -188,65 +183,90 @@ void SetPlayfield::createStaticBox(std::string name, sre::Sprite sprite, glm::ve
 }
 
 
-void SetPlayfield::createWallAndGoals(std::string name, sre::Sprite Goalsprite, sre::Sprite Wallsprite, glm::vec2 pos, glm::vec2 customScale, glm::vec2 colBuffer, glm::vec4 playerColor, float phyScale, uint16 categoryBits, uint16 maskBits) {
+void SetPlayfield::createWallAndGoals(std::string name, sre::Sprite Goalsprite, sre::Sprite Wallsprite, glm::vec2 pos, glm::vec2 customScaleGoal, float botYScale, glm::vec2 colBuffer, glm::vec4 playerColor, uint16 categoryBits, uint16 maskBits) {
 	float wallScaleX, wallScaleY;
 
 	auto goalBox = Goalsprite;
-	auto staticBox = Wallsprite;
+	auto staticBox_1 = Wallsprite;
+	auto staticBox_2 = Wallsprite;
+
 
 	auto goalBox_obj = RocketBall::gameInstance->createGameObject();
-	auto staticBox_obj = RocketBall::gameInstance->createGameObject();
-	auto boundingColliderRight_obj = RocketBall::gameInstance->createGameObject();
-	auto boundingColliderLeft_obj = RocketBall::gameInstance->createGameObject();
+	auto staticBox_obj_1 = RocketBall::gameInstance->createGameObject();
+	auto staticBox_obj_2 = RocketBall::gameInstance->createGameObject();
 
 	goalBox_obj->name = name;
-	staticBox_obj->name = "Wall";
-	boundingColliderRight_obj->name = "BoundingColliderRight";
-	boundingColliderLeft_obj->name = "BoundingColliderLeft";
+	staticBox_obj_1->name = "Wall1";
+	staticBox_obj_2->name = "Wall2";
 
 	auto goalBoxSpriteComp = goalBox_obj->addComponent<SpriteComponent>();
-	auto staticBoxSpriteComp = staticBox_obj->addComponent<SpriteComponent>();
+	auto staticBoxSpriteComp_1 = staticBox_obj_1->addComponent<SpriteComponent>();
+	auto staticBoxSpriteComp_2 = staticBox_obj_2->addComponent<SpriteComponent>();
+
 	if (name == "Goal_2")
 		goalBox.setFlip(glm::vec2(-1, 0));
+
 	goalBox.setColor({ playerColor.x, playerColor.y, playerColor.z, 0.5 });
-	goalBox.setScale({ customScale });
+	goalBox.setScale({ customScaleGoal });
 	wallScaleX = goalBox.getScale().x;
 	wallScaleY = goalBox.getScale().y * 4;
-	staticBox.setScale({ wallScaleX, wallScaleY });
-
-	boundingColliderRight_obj->setPosition({ RocketBall::gameInstance->windowSize.x * 0.5f, 0.0f });
-	boundingColliderLeft_obj->setPosition({ -RocketBall::gameInstance->windowSize.x * 0.5f, 0.0f });
-	auto boundingColRight_Physics = boundingColliderRight_obj->addComponent<PhysicsComponent>();
-	auto boundingColLeft_Physics = boundingColliderLeft_obj->addComponent<PhysicsComponent>();
-
-	boundingColRight_Physics->initBox(b2BodyType::b2_staticBody, { 0,RocketBall::gameInstance->windowSize.y / phyScale }, boundingColliderRight_obj->getPosition() / phyScale, 0.0f, categoryBits, maskBits);
-	boundingColLeft_Physics->initBox(b2BodyType::b2_staticBody, { 0,RocketBall::gameInstance->windowSize.y / phyScale }, boundingColliderLeft_obj->getPosition() / phyScale, 0.0f, categoryBits, maskBits);
+	staticBox_1.setScale({ wallScaleX, wallScaleY });
+	staticBox_2.setScale({ wallScaleX, botYScale });
 
 	goalBoxSpriteComp->setSprite(goalBox);
-	staticBoxSpriteComp->setSprite(staticBox);
+	staticBoxSpriteComp_1->setSprite(staticBox_1);
+	staticBoxSpriteComp_2->setSprite(staticBox_2);
 
-	goalBox_obj->setPosition(
-	{ pos.x * (((RocketBall::gameInstance->windowSize.x *0.5f)) - (Goalsprite.getSpriteSize().x * 0.5f)*customScale.x),
-	  pos.y + (-(RocketBall::gameInstance->windowSize.y * 0.5f) + (Goalsprite.getSpriteSize().x * 0.5f)*customScale.y) }
+	staticBox_obj_2->setPosition(
+	{ pos.x * (((RocketBall::gameInstance->windowSize.x *0.5f)) - (Wallsprite.getSpriteSize().x * 0.5f)*wallScaleX),
+		pos.y + (-(RocketBall::gameInstance->windowSize.y * 0.5f) + (Goalsprite.getSpriteSize().y * 0.5f)*botYScale) }
 	);
 
-	staticBox_obj->setPosition(
+	goalBox_obj->setPosition(
+	{ staticBox_obj_2->getPosition().x,
+		staticBox_obj_2->getPosition().y + ((Wallsprite.getSpriteSize().y *0.5)* botYScale) + ((Goalsprite.getSpriteSize().y *0.5)* customScaleGoal.y) }
+	);
+
+	//2.5 accounts for scaling
+	staticBox_obj_1->setPosition(
 	{ goalBox_obj->getPosition().x,
-	  goalBox_obj->getPosition().y + (Goalsprite.getSpriteSize().y)* customScale.y * 2.5 }
+	  goalBox_obj->getPosition().y + (Goalsprite.getSpriteSize().y) * customScaleGoal.y * 2.5 }
 	);
 
 	glm::vec2 scaleCol_Goal{
 		(goalBox.getSpriteSize().x * goalBox.getScale().x / 2) + colBuffer.x,
 		(goalBox.getSpriteSize().y * goalBox.getScale().y / 2) + colBuffer.y };
-	glm::vec2 scaleCol_staticBox{
-		(staticBox.getSpriteSize().x * staticBox.getScale().x / 2) + colBuffer.x,
-		(staticBox.getSpriteSize().y * staticBox.getScale().y / 2) + colBuffer.y };
+	glm::vec2 scaleCol_staticBox_1{
+		(staticBox_1.getSpriteSize().x * staticBox_1.getScale().x / 2) + colBuffer.x,
+		(staticBox_1.getSpriteSize().y * staticBox_1.getScale().y / 2) + colBuffer.y };
+	glm::vec2 scaleCol_staticBox_2{
+		(staticBox_2.getSpriteSize().x * staticBox_2.getScale().x / 2) + colBuffer.x,
+		(staticBox_2.getSpriteSize().y * staticBox_2.getScale().y / 2) + colBuffer.y };
+
+
+	float phyScale = RocketBall::gameInstance->getPhysicsScale();
 
 	auto goalBoxPhysicsComp = goalBox_obj->addComponent<PhysicsComponent>();
 	goalBoxPhysicsComp->initBox(b2BodyType::b2_staticBody, scaleCol_Goal / phyScale, goalBox_obj->getPosition() / phyScale, 0.0f, categoryBits, maskBits);
 	goalBoxPhysicsComp->setSensor(true);
-	auto staticBoxPhysicsComp = staticBox_obj->addComponent<PhysicsComponent>();
-	staticBoxPhysicsComp->initBox(b2BodyType::b2_staticBody, scaleCol_staticBox / phyScale, staticBox_obj->getPosition() / phyScale, 0.0f, categoryBits, maskBits);
+	auto staticBoxPhysicsComp_1 = staticBox_obj_1->addComponent<PhysicsComponent>();
+	staticBoxPhysicsComp_1->initBox(b2BodyType::b2_staticBody, scaleCol_staticBox_1 / phyScale, staticBox_obj_1->getPosition() / phyScale, 0.0f, categoryBits, maskBits);
+	auto staticBoxPhysicsComp_2 = staticBox_obj_2->addComponent<PhysicsComponent>();
+	staticBoxPhysicsComp_2->initBox(b2BodyType::b2_staticBody, scaleCol_staticBox_2 / phyScale, staticBox_obj_2->getPosition() / phyScale, 0.0f, categoryBits, maskBits);
+
+	//Bounding Colliders
+	auto boundingColliderRight_obj = RocketBall::gameInstance->createGameObject();
+	auto boundingColliderLeft_obj = RocketBall::gameInstance->createGameObject();
+	boundingColliderRight_obj->name = "BoundingColliderRight";
+	boundingColliderLeft_obj->name = "BoundingColliderLeft";
+	boundingColliderRight_obj->setPosition({ RocketBall::gameInstance->windowSize.x * 0.5f, 0.0f });
+	boundingColliderLeft_obj->setPosition({ -RocketBall::gameInstance->windowSize.x * 0.5f, 0.0f });
+	auto boundingColRight_Physics = boundingColliderRight_obj->addComponent<PhysicsComponent>();
+	auto boundingColLeft_Physics = boundingColliderLeft_obj->addComponent<PhysicsComponent>();
+	boundingColRight_Physics->initBox(b2BodyType::b2_staticBody, { 0,RocketBall::gameInstance->windowSize.y / phyScale }, boundingColliderRight_obj->getPosition() / phyScale, 0.0f, categoryBits, maskBits);
+	boundingColLeft_Physics->initBox(b2BodyType::b2_staticBody, { 0,RocketBall::gameInstance->windowSize.y / phyScale }, boundingColliderLeft_obj->getPosition() / phyScale, 0.0f, categoryBits, maskBits);
+
+
 }
 
 

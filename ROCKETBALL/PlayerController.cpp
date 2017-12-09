@@ -25,7 +25,7 @@ PlayerController::PlayerController(GameObject *gameObject) : Component(gameObjec
 
 		boostDisplay->name = this->getGameObject()->name + "_BoostDisplay";
 		boostBox.setScale({ 1,0.4 });
-		boostBox.setOrderInBatch(1);
+		boostBox.setOrderInBatch(11);
 		boostSpriteComp->setSprite(boostBox);
 		boostDisplay->setPosition({
 			-RocketBall::gameInstance->windowSize.x * 0.5f + 22.5f,
@@ -34,7 +34,7 @@ PlayerController::PlayerController(GameObject *gameObject) : Component(gameObjec
 
 		boostBorder->name = "boostboxborder";
 		boostBorderBox.setScale({ 1,0.4 });
-		boostBorderBox.setOrderInBatch(0);
+		boostBorderBox.setOrderInBatch(10);
 		boostBorderSpriteComp->setSprite(boostBorderBox);
 		boostBorder->setPosition({ (-RocketBall::gameInstance->windowSize.x * 0.5f) + (boostBorderBox.getSpriteSize().x*0.5) + 20.0f,
 			(-RocketBall::gameInstance->windowSize.y * 0.5f) + ((RocketBall::gameInstance->mySpriteAtlas->get("Grass.png").getSpriteSize().y * 0.5f) * 0.5f) - 20.0f });

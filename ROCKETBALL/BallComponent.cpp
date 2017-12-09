@@ -53,7 +53,7 @@ void BallComponent::onCollisionStart(PhysicsComponent *PhysComp) {
 		ballPhysics->getGameObject()->setPosition({ initialPosition });
 		RocketBall::gameInstance->setGameState(GameState::RoundComplete);
 		std::cout << "GOAAAAAAAAL!" << std::endl;
-		RocketBall::gameInstance->setText(2);
+		RocketBall::gameInstance->setTextAndPlaySound(2);
 		goalAchieved = true;
 	}
 
@@ -65,7 +65,7 @@ void BallComponent::onCollisionStart(PhysicsComponent *PhysComp) {
 		ballPhysics->getGameObject()->setPosition({ initialPosition });
 		RocketBall::gameInstance->setGameState(GameState::RoundComplete);
 		std::cout << "GOAAAAAAAAL!" << std::endl;
-		RocketBall::gameInstance->setText(2);
+		RocketBall::gameInstance->setTextAndPlaySound(2);
 		goalAchieved = true;
 	}
 }

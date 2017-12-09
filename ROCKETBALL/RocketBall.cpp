@@ -9,6 +9,7 @@
 #include "AbilityComponent.h"
 #include "PlayerController.h"
 #include "sre/profiler.hpp"
+#include "SDL_mixer.h"
 #include <iostream>
 
 using namespace std;
@@ -25,6 +26,11 @@ RocketBall::RocketBall()
 	r.setWindowSize(windowSize);
 
 	r.init(SDL_INIT_EVERYTHING, SDL_WINDOW_OPENGL);
+
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 4, 4096) == 1) {
+		cout << "Error in creating audio" << endl;
+		return;
+	}
 
 	initGame();
 
@@ -90,6 +96,15 @@ void RocketBall::initGame() {
 		background_Layer_1.init("skybackdrop.png", -windowSize.x*0.5f, -windowSize.y*0.5f, true);
 	}
 
+	music = Mix_LoadMUS("music.ogg");
+	gameOverSound = Mix_LoadWAV("gameOverSound.ogg");
+	goalSound = Mix_LoadWAV("goalSound.ogg");
+	readySound = Mix_LoadWAV("readySound.ogg");
+	goSound = Mix_LoadWAV("goSound.ogg");
+
+	if (music != nullptr)
+		Mix_PlayMusic(music, -1);
+
 	textHolder = createGameObject();
 	textHolder->name = "Text_Holder";
 	auto textHolderSpriteComp = textHolder->addComponent<SpriteComponent>();
@@ -105,15 +120,15 @@ void RocketBall::initGame() {
 
 	//Set gamemode before initilizing the playingfield
 	gameModeClassic = false;
-	//Set size for the goals
-	setPlayField.setGoalSizes(goalSizes);
-	//Init playing field
-	setPlayField.createPlayField(mySpriteAtlas);
-	setPlayField.readyAbilityBoxes(false);
-
+	if (!setPlayField.playFieldInit) {
+		//Set size for the goals
+		setPlayField.setGoalSizes(goalSizes);
+		//Init playing field
+		setPlayField.createPlayField(mySpriteAtlas);
+		setPlayField.readyAbilityBoxes(false);
+	}
 #pragma region Dynamic Elements
 	//Spawn Player1
-
 	player1 = createGameObject();
 	player1->name = "Player_1";
 	std::shared_ptr<PlayerController> pc = player1->addComponent<PlayerController>();
@@ -150,7 +165,7 @@ void RocketBall::initGame() {
 	soccerBallSprite.setScale(glm::vec2(0.35f, 0.35f));
 	soccerBallSprite.setOrderInBatch(10);
 	spriteComp->setSprite(soccerBallSprite);
-	soccerBall->setPosition(glm::vec2(0, windowSize.y * 0.3f));
+	soccerBall->setPosition(glm::vec2(0, windowSize.y * 0.1f));
 	OuterBallPhyiscs = soccerBall->addComponent<PhysicsComponent>();
 	OuterBallPhyiscs->initCircle(b2BodyType::b2_dynamicBody, 41 / physicsScale, soccerBall->getPosition() / physicsScale, ballDensity, ballFriction, ballRestitution, ballLinearDamping, ballAngularDamping, false, SOCCERBALL, BOUNDARY | PLAYER | SOCCERBALL);
 	b2sbOuterOrigin = OuterBallPhyiscs->body->GetPosition();
@@ -177,7 +192,7 @@ void RocketBall::initGame() {
 	gameState = GameState::InitializeGame;
 }
 
-void RocketBall::setText(int switchIndex) {
+void RocketBall::setTextAndPlaySound(int switchIndex) {
 	switch (switchIndex) {
 	case 0:
 		//Invis
@@ -186,20 +201,41 @@ void RocketBall::setText(int switchIndex) {
 		break;
 	case 1:
 		//ready
+		if (readySound != nullptr)
+			Mix_PlayChannel(-1, readySound, 0);
+		else {
+			cout << "couldnt find sound" << endl;
+		}
+
 		readyText.setColor({ 0.2f, 0.8f, 0.2f, 1.0f });
 		textHolder->getComponent<SpriteComponent>()->setSprite(readyText);
 		break;
 	case 2:
 		//Goal
+		if (goalSound != nullptr)
+			Mix_PlayChannel(-1, goalSound, 0);
+		else {
+			cout << "couldnt find sound" << endl;
+		}
 		goalText.setColor({ 0.2f, 0.8f, 0.2f, 1.0f });
 		textHolder->getComponent<SpriteComponent>()->setSprite(goalText);
 		break;
 	case 3:
 		//GameOver
+		if (gameOverSound != nullptr)
+			Mix_PlayChannel(-1, gameOverSound, 0);
+		else {
+			cout << "couldnt find sound" << endl;
+		}
 		gameOverText.setColor({ 0.3f, 0.3f, 0.3f, 1.0f });
 		textHolder->getComponent<SpriteComponent>()->setSprite(gameOverText);
 	case 4:
 		//Go!
+		if (goSound != nullptr)
+			Mix_PlayChannel(-1, goSound, 0);
+		else {
+			cout << "couldnt find sound" << endl;
+		}
 		goText.setColor({ 0.2f, 0.8f, 0.2f, 1.0f });
 		textHolder->getComponent<SpriteComponent>()->setSprite(goText);
 		beginGame = true;
@@ -267,11 +303,10 @@ void RocketBall::update(float time) {
 
 	if (beginGame && gameState != GameState::Ready) {
 		beginGameTime += time;
-		cout << beginGameTime << endl;
 		if (beginGameTime > 2.0f) {
 			beginGame = false;
 			beginGameTime = 0;
-			setText(0);
+			setTextAndPlaySound(0);
 		}
 	}
 
@@ -413,7 +448,7 @@ void RocketBall::onKey(SDL_Event &event) {
 				player1Goals = 0;
 				player2Goals = 0;
 				displayGameParameters = true;
-				setText(3);
+				setTextAndPlaySound(3);
 				gameState = GameState::InitializeGame;
 			}
 			else if (gameState == GameState::Ready) {
@@ -423,18 +458,18 @@ void RocketBall::onKey(SDL_Event &event) {
 				soccerBall->getComponent<PhysicsComponent>()->body->SetAwake(true);
 				setPlayField.readyAbilityBoxes(true);
 				beginGame = true;
-				setText(4);
+				setTextAndPlaySound(4);
 			}
 			else if (gameState == GameState::RoundComplete) {
 				soccerBallInner->getComponent<BallComponent>()->goalAchieved = false;
 				nextRound();
 				gameState = GameState::Ready;
-				setText(1);
+				setTextAndPlaySound(1);
 			}
 			else if (gameState == GameState::InitializeGame) {
 				gameState = GameState::Ready;
 				displayGameParameters = false;
-				setText(1);
+				setTextAndPlaySound(1);
 			}
 			break;
 		}
