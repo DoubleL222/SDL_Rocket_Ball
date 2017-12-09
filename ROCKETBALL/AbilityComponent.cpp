@@ -134,19 +134,19 @@ void AbilityComponent::ProvideAbility(PhysicsComponent *PhysComp) {
 		break;
 	case 2:
 		//Gravity
-		PhysComp->getGameObject()->getComponent<PlayerController>()->gravityPowerUp();
+		PhysComp->getGameObject()->getComponent<PlayerController>()->gravityPowerUp(true);
 		break;
 	case 3:
 		//Speed
-		PhysComp->getGameObject()->getComponent<PlayerController>()->speedPowerUp();
+		PhysComp->getGameObject()->getComponent<PlayerController>()->speedPowerUp(true);
 		break;
 	case 4:
 		//Dash boost
-		PhysComp->getGameObject()->getComponent<PlayerController>()->dashPowerUp();
+		PhysComp->getGameObject()->getComponent<PlayerController>()->dashPowerUp(true);
 		break;
 	case 5:
 		//Dash Extra
-		PhysComp->getGameObject()->getComponent<PlayerController>()->dashPowerUp();
+		PhysComp->getGameObject()->getComponent<PlayerController>()->dashPowerUp(true);
 		break;
 	}
 	readyBox(false);

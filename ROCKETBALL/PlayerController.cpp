@@ -9,9 +9,17 @@
 #include <glm\gtx\vector_angle.hpp>
 
 using namespace std;
-
 PlayerController::PlayerController(GameObject *gameObject) : Component(gameObject)
 {
+	//SETUP POWERUP COUNTER MAP
+	powerupTimers;
+
+	for (int iter = ENUM_POWERUPS::SpeedIncrease; iter != ENUM_POWERUPS::SpeedIncrease; iter++)
+	{
+		ENUM_POWERUPS curr = static_cast<ENUM_POWERUPS>(iter);
+		powerupTimers.insert(std::pair<ENUM_POWERUPS, float>(curr, 0.0f));
+	}
+
 	boostBox = RocketBall::gameInstance->mySpriteAtlas->get("boostMain.png");
 	boostDisplay = RocketBall::gameInstance->createGameObject();
 
@@ -420,9 +428,12 @@ void PlayerController::update(float deltaTime)
 	}
 
 	//Boosting player
-	if (isBoosting && currBoost > 0.0f)
+	if (isBoosting && (currBoost > 0.0f ||infiniteBoost))
 	{
-		currBoost -= boostBurnPerSecond*deltaTime;
+		if (!infiniteBoost) 
+		{
+			currBoost -= boostBurnPerSecond*deltaTime;
+		}
 		if (currBoost < 0)
 		{
 			currBoost = 0;
@@ -474,6 +485,32 @@ void PlayerController::update(float deltaTime)
 	boostSprite.setScale({ currBoost, 0.4 });
 	//boostSprite.setColor({ currBoost, 0.0f, 0.0f,1.0f });
 	boostDisplay->getComponent<SpriteComponent>()->setSprite(boostSprite);
+
+
+	//////////////////// CHECK FOR POWERUPS
+	for (std::map<ENUM_POWERUPS, float>::iterator it = powerupTimers.begin(); it != powerupTimers.end(); ++it) 
+	{
+		if (it->second > 0) 
+		{
+			it->second += deltaTime;
+		}
+
+		if (it->second > powerupDuration) 
+		{
+			it->second = 0;
+			switch (it->first)
+			{
+			case ENUM_POWERUPS::DashCountIncrease:
+				dashCountPowerUp(false);
+			break;
+			case ENUM_POWERUPS::SpeedIncrease:
+				dashCountPowerUp(false);
+				break;
+			default:
+				break;
+			}
+		}
+	}
 }
 
 float PlayerController::angleBetweenVectors(glm::vec2 vec1, glm::vec2 vec2)
@@ -665,20 +702,80 @@ void PlayerController::rechargeBoost(float _val)
 	}
 }
 
-void PlayerController::gravityPowerUp()
+void PlayerController::gravityPowerUp(bool _enable)
 {
+	if (_enable)
+	{
+		playerPhysics->body->SetGravityScale(playerPhysics->body->GetGravityScale()*0.5f);
+		powerupTimers[ENUM_POWERUPS::GravityMod] = 0.01f;
+	}
+	else
+	{
+		playerPhysics->body->SetGravityScale(playerPhysics->body->GetGravityScale()/0.5f);
+	}
+
 }
 
-void PlayerController::speedPowerUp()
+void PlayerController::speedPowerUp(bool _enable)
 {
+	if (_enable)
+	{
+		maxSpeed*=1.5f;
+		acceleration *= 1.5f;
+		bostAccaleration *= 1.5f;
+		maxSpeedWhenBoosting *= 1.5f;
+		powerupTimers[ENUM_POWERUPS::SpeedIncrease] = 0.01f;
+	}
+	else
+	{
+		maxSpeed /= 1.5f;
+		acceleration /= 1.5f;
+		bostAccaleration /= 1.5f;
+		maxSpeedWhenBoosting /= 1.5f;
+	}
 }
 
-void PlayerController::dashPowerUp()
+void PlayerController::dashPowerUp(bool _enable)
 {
+	if (_enable)
+	{
+		dashSpeed *= 2;
+		dashDuration *= 2;
+		powerupTimers[ENUM_POWERUPS::DashSpeedIncrease] = 0.01f;
+	}
+	else
+	{
+		dashSpeed /= 2;
+		dashDuration /= 2;
+	}
 }
 
-void PlayerController::dashCountPowerUp()
+void PlayerController::dashCountPowerUp(bool _enable)
 {
+	if (_enable) 
+	{
+		airDashesAvailable = 2;
+		powerupTimers[ENUM_POWERUPS::DashCountIncrease] = 0.01f;
+	}
+	else
+	{
+		airDashesAvailable = 1;
+	}
+
+}
+
+void PlayerController::infiniteBoostPowerUp(bool _enable)
+{
+	if (_enable)
+	{
+		infiniteBoost = true;
+		rechargeBoost(1);
+		powerupTimers[ENUM_POWERUPS::InfiniteBoost] = 0.01f;
+	}
+	else
+	{
+		infiniteBoost = false;
+	}
 }
 
 float32 PlayerController::ReportFixture(b2Fixture *fixture, const b2Vec2 &point, const b2Vec2 &normal, float32 fraction) {

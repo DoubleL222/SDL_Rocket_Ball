@@ -60,10 +60,11 @@ public:
 	void rechargeBoost(float _val);
 
 	//POWERUP SETTING FUNCTIONS
-	void gravityPowerUp();
-	void speedPowerUp();
-	void dashPowerUp();
-	void dashCountPowerUp();
+	void gravityPowerUp(bool _enable);
+	void speedPowerUp(bool _enable);
+	void dashPowerUp(bool _enable);
+	void dashCountPowerUp(bool _enable);
+	void infiniteBoostPowerUp(bool _enable);
 
 
 	glm::vec2 movementVector = glm::vec2(0, 0);
@@ -71,7 +72,14 @@ public:
 
 private:
 
-
+	enum ENUM_POWERUPS
+	{
+		SpeedIncrease = 0,
+		GravityMod = 1,
+		DashSpeedIncrease = 2,
+		InfiniteBoost = 3,
+		DashCountIncrease = 4
+	};
 
 	sre::Sprite playerSprite_1;
 
@@ -84,24 +92,28 @@ private:
 	
 	
 	//Player car Settings
-	const float maxSpeed = 5.0f;
-	const float acceleration = 10.0f;
-	const float dashSpeed = 0.4f;
-	const float dashDuration = 0.5f;
+	float maxSpeed = 5.0f;
+	float acceleration = 10.0f;
+	float dashSpeed = 0.4f;
+	float dashDuration = 0.5f;
 	const float rotationPerSecond = 360.0f*(1.0f/dashDuration);
 
 	//BoostSetting
-	const float maxSpeedWhenBoosting = 10.0f;
-	const float bostAccaleration = 600.0f;
+	float maxSpeedWhenBoosting = 10.0f;
+	float bostAccaleration = 600.0f;
 	const float boostBurnPerSecond = 0.5;
 	const float maxBoost = 1.0f;
 
 	//boost variables
 	float currBoost = 1.0f;
 
-
 	//On right or left?
 	bool facingRight = false;
+
+	//POWERUP MAP
+	std::map<ENUM_POWERUPS, float> powerupTimers;
+	float powerupDuration = 5.0f;
+	bool infiniteBoost = false;
 
 	//UPDATE THINGS
 	float nextFixedUpdate = 0.0f;
