@@ -25,6 +25,7 @@ PlayerController::PlayerController(GameObject *gameObject) : Component(gameObjec
 
 		boostDisplay->name = this->getGameObject()->name + "_BoostDisplay";
 		boostBox.setScale({ 1,0.4 });
+		boostBox.setColor(RocketBall::gameInstance->player1Color);
 		boostBox.setOrderInBatch(11);
 		boostSpriteComp->setSprite(boostBox);
 		boostDisplay->setPosition({
@@ -45,6 +46,7 @@ PlayerController::PlayerController(GameObject *gameObject) : Component(gameObjec
 		boostDisplay->name = this->getGameObject()->name + "_BoostDisplay";
 		boostBox.setScale({ 1,0.4 });
 		boostBox.setOrderInBatch(1);
+		boostBox.setColor(RocketBall::gameInstance->player2Color);
 		boostSpriteComp->setSprite(boostBox);
 		boostDisplay->setPosition({
 			RocketBall::gameInstance->windowSize.x * 0.5f - 22.5f,
@@ -470,7 +472,7 @@ void PlayerController::update(float deltaTime)
 	}
 	//boost sprite
 	boostSprite.setScale({ currBoost, 0.4 });
-	boostSprite.setColor({ currBoost, 0.0f, 0.0f,1.0f });
+	//boostSprite.setColor({ currBoost, 0.0f, 0.0f,1.0f });
 	boostDisplay->getComponent<SpriteComponent>()->setSprite(boostSprite);
 }
 
