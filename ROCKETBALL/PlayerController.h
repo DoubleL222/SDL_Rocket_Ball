@@ -38,7 +38,7 @@ public:
 	void endDash();
 
 	float angleBetweenVectors(glm::vec2 vec1, glm::vec2 vec2);
-	
+
 	//SetDirection
 	void setFacingDirection(bool _facingRight);
 
@@ -65,13 +65,18 @@ public:
 
 private:
 
-	
+
 
 	sre::Sprite playerSprite_1;
 
 	std::shared_ptr<SpriteComponent> playerSprite;
 	std::shared_ptr<PhysicsComponent> playerPhysics;
 
+	std::shared_ptr<GameObject> boostDisplay, boostBorder;
+	sre::Sprite boostBox, boostBorderBox;
+	sre::Sprite& boostSprite = boostBox;
+	
+	
 	//Player car Settings
 	const float maxSpeed = 5.0f;
 	const float acceleration = 50.0f;
@@ -99,7 +104,7 @@ private:
 	int airDashCounter = 0;
 
 	int dashCounter = 0;
-	
+
 	bool inDash = false;
 
 	bool isNextToWall = false;

@@ -75,6 +75,8 @@ public:
 
 	std::shared_ptr<GameObject> AbiBox_0, AbiBox_1, AbiBox_2, AbiBox_3, AbiBox_4;
 
+	void setText(int switchIndex);
+
 	void setGameState(GameState newState);
 	GameState getGameState();
 
@@ -83,14 +85,18 @@ public:
 private:
 
 	std::shared_ptr<GameObject> soccerBall, soccerBallInner;
-	std::shared_ptr<GameObject> player1;
-	std::shared_ptr<GameObject> player2;
+	std::shared_ptr<GameObject> player1, player2;
+	std::shared_ptr<GameObject> textHolder;
+	sre::Sprite goalText, readyText, gameOverText, goText;
 	std::shared_ptr<PhysicsComponent> OuterBallPhyiscs, InnerBallPhysics;
 	b2Vec2 b2P1Origin, b2P2Origin, b2sbOuterOrigin, b2sbInnerOrigin;
 	glm::vec2 P1Origin, P2Origin, sbOuterOrigin, sbInnerOrigin;
 
 	SDL_Joystick * joy1;
 	SDL_Joystick * joy2;
+
+	bool beginGame;
+	float beginGameTime = 0;
 
 	//GAME SETTINGS
 	bool displayGameParameters = true;
@@ -143,6 +149,7 @@ private:
 	std::vector<std::shared_ptr<GameObject>> sceneObjects;
 
 	BackgroundComponent background_Layer_1;
+
 
 	GameState gameState = GameState::InitializeGame;
 

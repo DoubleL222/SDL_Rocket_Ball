@@ -12,7 +12,53 @@ using namespace std;
 
 PlayerController::PlayerController(GameObject *gameObject) : Component(gameObject)
 {
+	boostBox = RocketBall::gameInstance->mySpriteAtlas->get("boostMain.png");
+	boostDisplay = RocketBall::gameInstance->createGameObject();
 
+	boostBorderBox = RocketBall::gameInstance->mySpriteAtlas->get("boostBorderBackground.png");
+	boostBorder = RocketBall::gameInstance->createGameObject();
+
+	auto boostSpriteComp = boostDisplay->addComponent<SpriteComponent>();
+	auto boostBorderSpriteComp = boostBorder->addComponent<SpriteComponent>();
+
+	if (this->getGameObject()->name == "Player_2") {
+
+		boostDisplay->name = this->getGameObject()->name + "_BoostDisplay";
+		boostBox.setScale({ 1,0.4 });
+		boostBox.setOrderInBatch(1);
+		boostSpriteComp->setSprite(boostBox);
+		boostDisplay->setPosition({
+			-RocketBall::gameInstance->windowSize.x * 0.5f + 22.5f,
+			(-RocketBall::gameInstance->windowSize.y * 0.5f) + ((RocketBall::gameInstance->mySpriteAtlas->get("Grass.png").getSpriteSize().y * 0.5f) * 0.5f) - 20.0f });
+		boostDisplay->setRotation(0);
+
+		boostBorder->name = "boostboxborder";
+		boostBorderBox.setScale({ 1,0.4 });
+		boostBorderBox.setOrderInBatch(0);
+		boostBorderSpriteComp->setSprite(boostBorderBox);
+		boostBorder->setPosition({ (-RocketBall::gameInstance->windowSize.x * 0.5f) + (boostBorderBox.getSpriteSize().x*0.5) + 20.0f,
+			(-RocketBall::gameInstance->windowSize.y * 0.5f) + ((RocketBall::gameInstance->mySpriteAtlas->get("Grass.png").getSpriteSize().y * 0.5f) * 0.5f) - 20.0f });
+
+	}
+	else {
+
+		boostDisplay->name = this->getGameObject()->name + "_BoostDisplay";
+		boostBox.setScale({ 1,0.4 });
+		boostBox.setOrderInBatch(1);
+		boostSpriteComp->setSprite(boostBox);
+		boostDisplay->setPosition({
+			RocketBall::gameInstance->windowSize.x * 0.5f - 22.5f,
+			(-RocketBall::gameInstance->windowSize.y * 0.5f) + ((RocketBall::gameInstance->mySpriteAtlas->get("Grass.png").getSpriteSize().y * 0.5f) * 0.5f) - 20.0f });
+		boostDisplay->setRotation(180);
+
+		boostBorder->name = "boostboxborder";
+		boostBorderBox.setScale({ 1,0.4 });
+		boostBorderBox.setOrderInBatch(0);
+		boostBorderSpriteComp->setSprite(boostBorderBox);
+		boostBorder->setPosition({ (RocketBall::gameInstance->windowSize.x * 0.5f) - (boostBorderBox.getSpriteSize().x*0.5) - 20.0f,
+			(-RocketBall::gameInstance->windowSize.y * 0.5f) + ((RocketBall::gameInstance->mySpriteAtlas->get("Grass.png").getSpriteSize().y * 0.5f) * 0.5f) - 20.0f });
+
+	}
 }
 
 bool PlayerController::onJoyInput(SDL_Event &event)
@@ -25,7 +71,7 @@ bool PlayerController::onJoyInput(SDL_Event &event)
 			{
 				float newX = (float)(event.jaxis.value) / (float)(32767);
 				//SENSITIVITY
-				if (abs(newX) < 0.1f) 
+				if (abs(newX) < 0.1f)
 				{
 					newX = 0;
 				}
@@ -53,12 +99,12 @@ bool PlayerController::onJoyInput(SDL_Event &event)
 				}
 				facingVector.y = newY;
 			}
-			if (axisIndex == 5) 
+			if (axisIndex == 5)
 			{
 				float newVal = Remap(event.jaxis.value, -32768, 32767, 0, 1);
 
 				//SETTING PROPER DIRECTION
-				if (!facingRight) 
+				if (!facingRight)
 				{
 					newVal = -newVal;
 				}
@@ -83,12 +129,12 @@ bool PlayerController::onJoyInput(SDL_Event &event)
 			{
 				jump();
 			}
-			if (event.jbutton.button == 1) 
+			if (event.jbutton.button == 1)
 			{
 				isBoosting = true;
 			}
 		}
-		else if (event.type == SDL_JOYBUTTONUP) 
+		else if (event.type == SDL_JOYBUTTONUP)
 		{
 			if (event.jbutton.button == 1)
 			{
@@ -130,7 +176,7 @@ bool PlayerController::onKey(SDL_Event &event) {
 			{
 				movementVector.y = 1;
 			}
-			if (event.key.keysym.sym == SDLK_RSHIFT) 
+			if (event.key.keysym.sym == SDLK_RSHIFT)
 			{
 				isBoosting = true;
 			}
@@ -231,11 +277,11 @@ void PlayerController::update(float deltaTime)
 	targetRotation = glm::degrees(targetRotation);
 
 	//cout << "Target: " << targetRotation << std::endl;
-	if (rotation != targetRotation && !isGrounded) 
+	if (rotation != targetRotation && !isGrounded)
 	{
 		setRotation(targetRotation);
 	}
-	if(isGrounded)
+	if (isGrounded)
 	{
 		setRotation(0);
 	}
@@ -272,32 +318,32 @@ void PlayerController::update(float deltaTime)
 	}
 
 	//Boosting player
-	if (isBoosting && currBoost > 0.0f) 
+	if (isBoosting && currBoost > 0.0f)
 	{
 		currBoost -= boostBurnPerSecond*deltaTime;
-		if (currBoost < 0) 
+		if (currBoost < 0)
 		{
 			currBoost = 0;
 		}
 		currentVelocity = playerPhysics->getLinearVelocity();
 		float currentSpeed = glm::length(currentVelocity);
 		//cout << "1. curr BOOST speed: " << currentSpeed << std::endl;
-		if (glm::length(currentVelocity) > maxSpeedWhenBoosting) 
+		if (glm::length(currentVelocity) > maxSpeedWhenBoosting)
 		{
 			playerPhysics->setLinearVelocity((maxSpeedWhenBoosting / currentSpeed) * currentVelocity);
 		}
-		else 
+		else
 		{
 			//Adjusting for direction
 			if (facingRight)
 			{
 				playerPhysics->addForce(glm::vec2(glm::rotate(glm::vec2(1, 0), glm::radians(rotation)))* bostAccaleration);
 			}
-			else 
+			else
 			{
 				playerPhysics->addForce(glm::vec2(glm::rotate(glm::vec2(-1, 0), glm::radians(rotation)))* bostAccaleration);
 			}
-			
+
 		}
 	}
 
@@ -312,10 +358,10 @@ void PlayerController::update(float deltaTime)
 		}
 	}
 
-
-
-	//// BOOST GUI MARTIN DO HERE THE THING 
-	cout << "boost amount: " << currBoost <<std::endl;
+	//boost sprite
+	boostSprite.setScale({ currBoost, 0.4 });
+	boostSprite.setColor({ currBoost, 0.0f, 0.0f,1.0f });
+	boostDisplay->getComponent<SpriteComponent>()->setSprite(boostSprite);
 }
 
 float PlayerController::angleBetweenVectors(glm::vec2 vec1, glm::vec2 vec2)
@@ -336,7 +382,7 @@ void PlayerController::applyMovement()
 
 }
 
-void PlayerController::stopFalling() 
+void PlayerController::stopFalling()
 {
 	if (playerPhysics == nullptr)
 	{
@@ -356,7 +402,7 @@ void PlayerController::stopHorizontalMovement()
 		playerPhysics = gameObject->getComponent<PhysicsComponent>();
 	}
 	glm::vec2 currentVelocity = playerPhysics->getLinearVelocity();
-	
+
 	playerPhysics->setLinearVelocity(glm::vec2(0, currentVelocity.y));
 }
 
@@ -382,7 +428,7 @@ void PlayerController::jump()
 			airDashCounter++;
 		}
 	}
-	else 
+	else
 	{
 		dashCounter = 0;
 		verticalJump = true;
@@ -400,13 +446,13 @@ void PlayerController::jump()
 	{
 		moveNormalized = -moveNormalized;
 	}
-	if(verticalJump || (facingVector.x==0 && facingVector.y==0))
+	if (verticalJump || (facingVector.x == 0 && facingVector.y == 0))
 	{
 		moveNormalized = glm::vec2(0, 1);
 	}
 
 	//Set Y speed to 0
-	if (airDashCounter > 0) 
+	if (airDashCounter > 0)
 	{
 		playerPhysics->setLinearVelocity(glm::vec2(playerPhysics->getLinearVelocity().x, 0));
 	}
@@ -440,7 +486,7 @@ void PlayerController::onCollisionEnd(PhysicsComponent *comp) {
 void PlayerController::rechargeBoost(float _val)
 {
 	currBoost += _val;
-	if (currBoost > maxBoost) 
+	if (currBoost > maxBoost)
 	{
 		currBoost = maxBoost;
 	}
@@ -464,7 +510,7 @@ void PlayerController::dashCountPowerUp()
 
 float32 PlayerController::ReportFixture(b2Fixture *fixture, const b2Vec2 &point, const b2Vec2 &normal, float32 fraction) {
 	string objName = ((GameObject*)fixture->GetBody()->GetUserData())->name;
-	if (objName == "grass" || objName == "OuterBall" || objName == "Player_1" || objName == "Player_2") 
+	if (objName == "grass" || objName == "OuterBall" || objName == "Player_1" || objName == "Player_2")
 	{
 		resetJumps();
 		//cout << "GROUNDED" << std::endl;
@@ -486,4 +532,3 @@ void PlayerController::resetJumps()
 {
 	airDashCounter = 0;
 }
-

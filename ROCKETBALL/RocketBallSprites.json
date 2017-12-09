@@ -1,26 +1,89 @@
 {"frames": [
 
 {
-	"filename": "car1.png",
-	"frame": {"x":0,"y":0,"w":275,"h":85},
+	"filename": "boostBorder.png",
+	"frame": {"x":1,"y":105,"w":384,"h":128},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":275,"h":85},
+	"spriteSourceSize": {"x":0,"y":0,"w":384,"h":128},
+	"sourceSize": {"w":384,"h":128},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "boostBorderBackground.png",
+	"frame": {"x":1,"y":235,"w":384,"h":128},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":384,"h":128},
+	"sourceSize": {"w":384,"h":128},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "boostMain.png",
+	"frame": {"x":1,"y":365,"w":378,"h":122},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":3,"y":3,"w":378,"h":122},
+	"sourceSize": {"w":384,"h":128},
+	"pivot": {"x":0.0,"y":0.5}
+},
+{
+	"filename": "car1.png",
+	"frame": {"x":939,"y":1,"w":272,"h":82},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":2,"y":3,"w":272,"h":82},
 	"sourceSize": {"w":275,"h":85},
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
 	"filename": "car2.png",
-	"frame": {"x":0,"y":85,"w":275,"h":85},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":275,"h":85},
+	"frame": {"x":387,"y":105,"w":272,"h":85},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":2,"y":0,"w":272,"h":85},
 	"sourceSize": {"w":275,"h":85},
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
+	"filename": "gameOver.png",
+	"frame": {"x":474,"y":108,"w":368,"h":222},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":72,"y":17,"w":368,"h":222},
+	"sourceSize": {"w":512,"h":256},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "getReady.png",
+	"frame": {"x":1,"y":1,"w":475,"h":102},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":17,"y":72,"w":475,"h":102},
+	"sourceSize": {"w":512,"h":256},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "goal.png",
+	"frame": {"x":478,"y":1,"w":459,"h":105},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":27,"y":67,"w":459,"h":105},
+	"sourceSize": {"w":512,"h":256},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "goalMain.png",
+	"frame": {"x":844,"y":275,"w":128,"h":128},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
+	"sourceSize": {"w":128,"h":128},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
 	"filename": "Grass.png",
-	"frame": {"x":256,"y":213,"w":256,"h":256},
+	"frame": {"x":381,"y":441,"w":256,"h":256},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
@@ -29,7 +92,7 @@
 },
 {
 	"filename": "gray.png",
-	"frame": {"x":275,"y":85,"w":128,"h":128},
+	"frame": {"x":774,"y":405,"w":128,"h":128},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
@@ -37,12 +100,30 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
+	"filename": "ready.png",
+	"frame": {"x":474,"y":332,"w":298,"h":107},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":106,"y":71,"w":298,"h":107},
+	"sourceSize": {"w":512,"h":256},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
 	"filename": "SoccerBall.png",
-	"frame": {"x":0,"y":213,"w":256,"h":256},
+	"frame": {"x":1,"y":699,"w":256,"h":256},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
 	"sourceSize": {"w":256,"h":256},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "wall.png",
+	"frame": {"x":639,"y":441,"w":128,"h":128},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
+	"sourceSize": {"w":128,"h":128},
 	"pivot": {"x":0.5,"y":0.5}
 }],
 "meta": {
@@ -50,8 +131,8 @@
 	"version": "1.0",
 	"image": "RocketBallSprites.png",
 	"format": "RGBA8888",
-	"size": {"w":512,"h":512},
+	"size": {"w":1024,"h":1024},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:051936f4acd912a7017093d1664697bc:a9c9b0e78af9baf7ce51c01ada0da74c:abc763de9f831949696569c25140e526$"
+	"smartupdate": "$TexturePacker:SmartUpdate:26f5b49838b31c3ed391c788cc46d997:8bd1dae439d6ebe7e30fd05b3e25b021:abc763de9f831949696569c25140e526$"
 }
 }
