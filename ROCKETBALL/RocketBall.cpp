@@ -106,19 +106,20 @@ void RocketBall::initGame() {
 	gameModeClassic = true;
 
 	music = Mix_LoadMUS("music.ogg");
-	gameOverSound = Mix_LoadWAV("gameOverSound.ogg");
+	winnerSound = Mix_LoadWAV("gameOverSound.ogg"); //needs sound change
 	goalSound = Mix_LoadWAV("goalSound.ogg");
 	readySound = Mix_LoadWAV("readySound.ogg");
 	goSound = Mix_LoadWAV("goSound.ogg");
 
 	if (music != nullptr)
 		Mix_PlayMusic(music, -1);
+	Mix_VolumeMusic(64); //0 to 128 ( MIX_MAX_VOLUME ) 
 
 	textHolder = createGameObject();
 	textHolder->name = "Text_Holder";
 	auto textHolderSpriteComp = textHolder->addComponent<SpriteComponent>();
 	goalText = mySpriteAtlas->get("goal.png");
-	gameOverText = mySpriteAtlas->get("gameOver.png");
+	winnerText = mySpriteAtlas->get("gameOver.png"); //needs text change
 	readyText = mySpriteAtlas->get("ready.png");
 	goText = mySpriteAtlas->get("getReady.png");
 	goalText.setColor({ 0.2f, 0.8f, 0.2f, 0.0f });
@@ -126,6 +127,7 @@ void RocketBall::initGame() {
 	textHolderSpriteComp->setSprite(goalText);
 	textHolder->setPosition({ 0, windowSize.y * 0.25f });
 	beginGame = false;
+	gameOverBool = false;
 
 	//Set gamemode before initilizing the playingfield
 	gameModeClassic = true;
@@ -231,13 +233,24 @@ void RocketBall::setTextAndPlaySound(int switchIndex) {
 		break;
 	case 3:
 		//GameOver
-		if (gameOverSound != nullptr)
-			Mix_PlayChannel(-1, gameOverSound, 0);
+		gameOverBool = true;
+		if (winnerSound != nullptr)
+			Mix_PlayChannel(-1, winnerSound, 0);
 		else {
 			cout << "couldnt find sound" << endl;
 		}
-		gameOverText.setColor({ 0.3f, 0.3f, 0.3f, 1.0f });
-		textHolder->getComponent<SpriteComponent>()->setSprite(gameOverText);
+
+		Mix_VolumeMusic(32); //half original volume
+
+		if (player1Goals > player2Goals) {
+
+			winnerText.setColor(player1Color);
+		}
+		else {
+			winnerText.setColor(player2Color);
+		}
+		textHolder->getComponent<SpriteComponent>()->setSprite(winnerText);
+		break;
 	case 4:
 		//Go!
 		if (goSound != nullptr)
@@ -248,6 +261,7 @@ void RocketBall::setTextAndPlaySound(int switchIndex) {
 		goText.setColor({ 0.2f, 0.8f, 0.2f, 1.0f });
 		textHolder->getComponent<SpriteComponent>()->setSprite(goText);
 		beginGame = true;
+		break;
 	}
 }
 
@@ -306,11 +320,12 @@ void RocketBall::update(float time) {
 	InnerBallPhysics->body->SetTransform(OuterBallPhyiscs->body->GetPosition(), OuterBallPhyiscs->body->GetAngle());
 	soccerBallInner->setPosition(soccerBall->getPosition());
 
-	if (player1Goals == goalsToScore || player2Goals == goalsToScore) {
+	if ((player1Goals == goalsToScore || player2Goals == goalsToScore) && !gameOverBool) {
 		gameState = GameState::GameOver;
+		setTextAndPlaySound(3);
 	}
 
-	if (beginGame && gameState != GameState::Ready) {
+	if (beginGame && gameState != GameState::Ready && gameState != GameState::GameOver) {
 		beginGameTime += time;
 		if (beginGameTime > 2.0f) {
 			beginGame = false;
@@ -417,7 +432,7 @@ void RocketBall::EndContact(b2Contact *contact) {
 #pragma region Handle_Inputs
 void RocketBall::onJoyInput(SDL_Event &event)
 {
-	if (event.type == SDL_JOYBUTTONDOWN) 
+	if (event.type == SDL_JOYBUTTONDOWN)
 	{
 		if (gameState == GameState::GameOver) {
 			nextRound();
@@ -425,7 +440,7 @@ void RocketBall::onJoyInput(SDL_Event &event)
 			player1Goals = 0;
 			player2Goals = 0;
 			displayGameParameters = true;
-			setTextAndPlaySound(3);
+			setTextAndPlaySound(0);
 			gameState = GameState::InitializeGame;
 			return;
 		}
@@ -436,6 +451,7 @@ void RocketBall::onJoyInput(SDL_Event &event)
 			soccerBall->getComponent<PhysicsComponent>()->body->SetAwake(true);
 			setPlayField.readyAbilityBoxes(true);
 			beginGame = true;
+			Mix_VolumeMusic(64);
 			setTextAndPlaySound(4);
 			return;
 		}
@@ -493,7 +509,7 @@ void RocketBall::onKey(SDL_Event &event) {
 				player1Goals = 0;
 				player2Goals = 0;
 				displayGameParameters = true;
-				setTextAndPlaySound(3);
+				setTextAndPlaySound(0);
 				gameState = GameState::InitializeGame;
 			}
 			else if (gameState == GameState::Ready) {
@@ -514,6 +530,7 @@ void RocketBall::onKey(SDL_Event &event) {
 			else if (gameState == GameState::InitializeGame) {
 				gameState = GameState::Ready;
 				displayGameParameters = false;
+				gameOverBool = false;
 				setTextAndPlaySound(1);
 			}
 			break;
