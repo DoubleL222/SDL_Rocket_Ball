@@ -91,7 +91,20 @@ void RocketBall::initGame() {
 	}
 
 	gameModeClassic = true;
+	textHolder->name = "Text_Holder";
+	auto textHolderSpriteComp = textHolder->addComponent<SpriteComponent>();
+	goalText = mySpriteAtlas->get("goal.png");
+	gameOverText = mySpriteAtlas->get("gameOver.png");
+	readyText = mySpriteAtlas->get("ready.png");
+	goText = mySpriteAtlas->get("getReady.png");
+	goalText.setColor({ 0.2f, 0.8f, 0.2f, 0.0f });
+	goalText.setScale({ 1,1 });
+	textHolderSpriteComp->setSprite(goalText);
+	textHolder->setPosition({ 0, windowSize.y * 0.25f });
+	beginGame = false;
 
+	//Set gamemode before initilizing the playingfield
+	gameModeClassic = false;
 	//Set size for the goals
 	setPlayField.setGoalSizes(goalSizes);
 	//Init playing field
@@ -164,6 +177,35 @@ void RocketBall::initGame() {
 	gameState = GameState::InitializeGame;
 }
 
+void RocketBall::setText(int switchIndex) {
+	switch (switchIndex) {
+	case 0:
+		//Invis
+		readyText.setColor({ 0.2f, 0.8f, 0.2f, 0.0f });
+		textHolder->getComponent<SpriteComponent>()->setSprite(readyText);
+		break;
+	case 1:
+		//ready
+		readyText.setColor({ 0.2f, 0.8f, 0.2f, 1.0f });
+		textHolder->getComponent<SpriteComponent>()->setSprite(readyText);
+		break;
+	case 2:
+		//Goal
+		goalText.setColor({ 0.2f, 0.8f, 0.2f, 1.0f });
+		textHolder->getComponent<SpriteComponent>()->setSprite(goalText);
+		break;
+	case 3:
+		//GameOver
+		gameOverText.setColor({ 0.3f, 0.3f, 0.3f, 1.0f });
+		textHolder->getComponent<SpriteComponent>()->setSprite(gameOverText);
+	case 4:
+		//Go!
+		goText.setColor({ 0.2f, 0.8f, 0.2f, 1.0f });
+		textHolder->getComponent<SpriteComponent>()->setSprite(goText);
+		beginGame = true;
+	}
+}
+
 void RocketBall::nextRound() {
 	player1->setPosition(P1Origin);
 	glm::vec2 bodPos = P1Origin / physicsScale;
@@ -223,6 +265,16 @@ void RocketBall::update(float time) {
 		gameState = GameState::GameOver;
 	}
 
+	if (beginGame && gameState != GameState::Ready) {
+		beginGameTime += time;
+		cout << beginGameTime << endl;
+		if (beginGameTime > 2.0f) {
+			beginGame = false;
+			beginGameTime = 0;
+			setText(0);
+		}
+	}
+
 }
 
 GameState RocketBall::getGameState() {
@@ -240,6 +292,8 @@ void RocketBall::render() {
 
 	//Render the background Layer_1
 	background_Layer_1.renderBackground(rp, +pos.x*0.8f);
+
+
 
 	auto spriteBatchBuilder = SpriteBatch::create();
 	for (auto & go : sceneObjects) {
@@ -359,6 +413,7 @@ void RocketBall::onKey(SDL_Event &event) {
 				player1Goals = 0;
 				player2Goals = 0;
 				displayGameParameters = true;
+				setText(3);
 				gameState = GameState::InitializeGame;
 			}
 			else if (gameState == GameState::Ready) {
@@ -367,15 +422,19 @@ void RocketBall::onKey(SDL_Event &event) {
 				player2->getComponent<PhysicsComponent>()->body->SetAwake(true);
 				soccerBall->getComponent<PhysicsComponent>()->body->SetAwake(true);
 				setPlayField.readyAbilityBoxes(true);
+				beginGame = true;
+				setText(4);
 			}
 			else if (gameState == GameState::RoundComplete) {
 				soccerBallInner->getComponent<BallComponent>()->goalAchieved = false;
 				nextRound();
 				gameState = GameState::Ready;
+				setText(1);
 			}
 			else if (gameState == GameState::InitializeGame) {
 				gameState = GameState::Ready;
 				displayGameParameters = false;
+				setText(1);
 			}
 			break;
 		}
@@ -407,8 +466,6 @@ void RocketBall::deregisterPhysicsComponent(PhysicsComponent *r) {
 		assert(false); // cannot find physics object
 	}
 }
-
-
 
 void RocketBall::updatePhysics(float deltaTime)
 {
@@ -478,7 +535,7 @@ void RocketBall::RenderSliders()
 
 void RocketBall::applyForcesToPlayersAfterGoal()
 {
-	
+
 }
 
 #pragma endregion

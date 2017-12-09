@@ -18,32 +18,6 @@ void SetPlayfield::setGoalSizes(glm::vec2 _goalSizes) {
 
 void SetPlayfield::createPlayField(std::shared_ptr<sre::SpriteAtlas> _mySpriteAtlas) {
 
-	//Left Corner Box
-	createStaticBox(
-		/*Obj Name:*/ "CornerBoxLeft",
-		/*Sprite:*/_mySpriteAtlas->get("gray.png"),
-		/*Position:*/{ -RocketBall::gameInstance->windowSize.x *0.5 , RocketBall::gameInstance->windowSize.y *0.5 },
-		/*Scale:*/{ 3,3 },
-		/*Collider Buffer:*/{ 0,0 },
-		/*Rotation*/45.0f,
-		/*Physics Scale:*/ RocketBall::gameInstance->getPhysicsScale(),
-		/*CategoryBits:*/RocketBall::gameInstance->BOUNDARY,
-		/*MaskBits:*/0xFFFF
-	);
-
-	//Right Corner Box
-	createStaticBox(
-		/*Obj Name:*/ "CornerBoxRight",
-		/*Sprite:*/_mySpriteAtlas->get("gray.png"),
-		/*Position:*/{ RocketBall::gameInstance->windowSize.x *0.5 , RocketBall::gameInstance->windowSize.y *0.5 },
-		/*Scale:*/{ 3,3 },
-		/*Collider Buffer:*/{ 0,0 },
-		/*Rotation*/45.0f,
-		/*Physics Scale:*/ RocketBall::gameInstance->getPhysicsScale(),
-		/*CategoryBits:*/RocketBall::gameInstance->BOUNDARY,
-		/*MaskBits:*/0xFFFF
-	);
-
 	//Floor
 	createStaticBox(
 		/*Name:*/ "grass",
@@ -73,9 +47,9 @@ void SetPlayfield::createPlayField(std::shared_ptr<sre::SpriteAtlas> _mySpriteAt
 	//Left wall and goal
 	createWallAndGoals(
 		"Goal_1",
+		_mySpriteAtlas->get("goalMain.png"),
 		_mySpriteAtlas->get("gray.png"),
-		_mySpriteAtlas->get("gray.png"),
-		{ -1,  ((_mySpriteAtlas->get("gray.png").getSpriteSize().y)) - grassColBuffer },
+		{ -1,  ((_mySpriteAtlas->get("goalMain.png").getSpriteSize().y)) - grassColBuffer },
 		{ goalSize },
 		{ 0,0 },
 		{ RocketBall::gameInstance->player1Color.x, RocketBall::gameInstance->player1Color.y, RocketBall::gameInstance->player1Color.z, RocketBall::gameInstance->player1Color.w },
@@ -87,9 +61,9 @@ void SetPlayfield::createPlayField(std::shared_ptr<sre::SpriteAtlas> _mySpriteAt
 	//Right wall and goal
 	createWallAndGoals(
 		"Goal_2",
+		_mySpriteAtlas->get("goalMain.png"),
 		_mySpriteAtlas->get("gray.png"),
-		_mySpriteAtlas->get("gray.png"),
-		{ 1,  ((_mySpriteAtlas->get("gray.png").getSpriteSize().y)) - grassColBuffer },
+		{ 1,  ((_mySpriteAtlas->get("goalMain.png").getSpriteSize().y)) - grassColBuffer },
 		{ goalSize },
 		{ 0,0 },
 		{ RocketBall::gameInstance->player2Color.x, RocketBall::gameInstance->player2Color.y, RocketBall::gameInstance->player2Color.z, RocketBall::gameInstance->player2Color.w },
@@ -161,6 +135,35 @@ void SetPlayfield::createPlayField(std::shared_ptr<sre::SpriteAtlas> _mySpriteAt
 		/*Is large boost?*/false,
 		/*Cooldown*/5.0f
 	);
+
+
+	//Left Corner Box
+	createStaticBox(
+		/*Obj Name:*/ "CornerBoxLeft",
+		/*Sprite:*/_mySpriteAtlas->get("gray.png"),
+		/*Position:*/{ -RocketBall::gameInstance->windowSize.x *0.5 , RocketBall::gameInstance->windowSize.y *0.5 },
+		/*Scale:*/{ 3,3 },
+		/*Collider Buffer:*/{ 0,0 },
+		/*Rotation*/135.0f,
+		/*Physics Scale:*/ RocketBall::gameInstance->getPhysicsScale(),
+		/*CategoryBits:*/RocketBall::gameInstance->BOUNDARY,
+		/*MaskBits:*/0xFFFF
+	);
+
+	//Right Corner Box
+	createStaticBox(
+		/*Obj Name:*/ "CornerBoxRight",
+		/*Sprite:*/_mySpriteAtlas->get("gray.png"),
+		/*Position:*/{ RocketBall::gameInstance->windowSize.x *0.5 , RocketBall::gameInstance->windowSize.y *0.5 },
+		/*Scale:*/{ 3,3 },
+		/*Collider Buffer:*/{ 0,0 },
+		/*Rotation*/45.0f,
+		/*Physics Scale:*/ RocketBall::gameInstance->getPhysicsScale(),
+		/*CategoryBits:*/RocketBall::gameInstance->BOUNDARY,
+		/*MaskBits:*/0xFFFF
+	);
+
+
 	//Platforms
 	if (usePlatforms) {
 
@@ -203,6 +206,8 @@ void SetPlayfield::createWallAndGoals(std::string name, sre::Sprite Goalsprite, 
 
 	auto goalBoxSpriteComp = goalBox_obj->addComponent<SpriteComponent>();
 	auto staticBoxSpriteComp = staticBox_obj->addComponent<SpriteComponent>();
+	if (name == "Goal_2")
+		goalBox.setFlip(glm::vec2(-1, 0));
 	goalBox.setColor({ playerColor.x, playerColor.y, playerColor.z, 0.5 });
 	goalBox.setScale({ customScale });
 	wallScaleX = goalBox.getScale().x;
@@ -251,7 +256,7 @@ void SetPlayfield::createAbilityBox(std::string name, sre::Sprite sprite, std::s
 	abilityBox_obj->name = name;
 	auto abilityBoxSpriteComp = abilityBox_obj->addComponent<SpriteComponent>();
 
-	if (isLargeBoost)
+	if (isLargeBoost && RocketBall::gameInstance->gameModeClassic)
 		abilityBox.setScale({ scale.x * 1.25, scale.y * 1.25 });
 	else
 		abilityBox.setScale({ scale });
