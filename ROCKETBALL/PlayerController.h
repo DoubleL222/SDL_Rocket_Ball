@@ -85,14 +85,14 @@ private:
 	
 	//Player car Settings
 	const float maxSpeed = 5.0f;
-	const float acceleration = 50.0f;
+	const float acceleration = 10.0f;
 	const float dashSpeed = 0.4f;
 	const float dashDuration = 0.5f;
 	const float rotationPerSecond = 360.0f*(1.0f/dashDuration);
 
 	//BoostSetting
 	const float maxSpeedWhenBoosting = 10.0f;
-	const float bostAccaleration = 1.1f;
+	const float bostAccaleration = 600.0f;
 	const float boostBurnPerSecond = 0.5;
 	const float maxBoost = 1.0f;
 
@@ -112,6 +112,7 @@ private:
 
 	float dashCounter = 0;
 
+	bool dashingForward = true;
 	bool inDash = false;
 
 	bool isNextToWall = false;

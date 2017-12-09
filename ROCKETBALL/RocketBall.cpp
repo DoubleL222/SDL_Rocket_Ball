@@ -91,6 +91,8 @@ void RocketBall::initGame() {
 	}
 
 	gameModeClassic = true;
+
+	textHolder = createGameObject();
 	textHolder->name = "Text_Holder";
 	auto textHolderSpriteComp = textHolder->addComponent<SpriteComponent>();
 	goalText = mySpriteAtlas->get("goal.png");
@@ -104,7 +106,7 @@ void RocketBall::initGame() {
 	beginGame = false;
 
 	//Set gamemode before initilizing the playingfield
-	gameModeClassic = false;
+	gameModeClassic = true;
 	//Set size for the goals
 	setPlayField.setGoalSizes(goalSizes);
 	//Init playing field
@@ -267,7 +269,7 @@ void RocketBall::update(float time) {
 
 	if (beginGame && gameState != GameState::Ready) {
 		beginGameTime += time;
-		cout << beginGameTime << endl;
+		//cout << beginGameTime << endl;
 		if (beginGameTime > 2.0f) {
 			beginGame = false;
 			beginGameTime = 0;

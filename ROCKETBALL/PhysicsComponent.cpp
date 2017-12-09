@@ -114,7 +114,7 @@ void PhysicsComponent::initBox(b2BodyType type, glm::vec2 size, glm::vec2 center
 	polygon = new b2PolygonShape();
 	polygon->SetAsBox(size.x, size.y, { 0,0 }, 0);
 	b2FixtureDef fxD;
-	fxD.friction = 1.0f;
+	fxD.friction = 0.5f;
 	fxD.shape = polygon;
 	fxD.density = density;
 
@@ -139,7 +139,7 @@ void PhysicsComponent::initBox(b2BodyType type, glm::vec2 size, glm::vec2 center
 	polygon = new b2PolygonShape();
 	polygon->SetAsBox(size.x, size.y, { 0,0 }, 0);
 	b2FixtureDef fxD;
-	fxD.friction = 0.6f;
+	fxD.friction = 1.0f;
 	fxD.shape = polygon;
 	fxD.density = density;
 	fxD.filter.categoryBits = categoryBits;

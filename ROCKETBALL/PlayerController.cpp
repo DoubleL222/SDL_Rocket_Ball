@@ -102,11 +102,19 @@ bool PlayerController::onJoyInput(SDL_Event &event)
 			if (axisIndex == 5)
 			{
 				float newVal = Remap(event.jaxis.value, -32768, 32767, 0, 1);
-
 				//SETTING PROPER DIRECTION
 				if (!facingRight)
 				{
 					newVal = -newVal;
+				}
+				cout << "Joystix indx: 1; Val: " << newVal << " curr movement vector: "<< movementVector.x << std::endl;
+				if ((newVal <= 0 && movementVector.x >0) || (newVal >= 0 && movementVector.x <0))
+				{
+					if (abs(newVal) < abs(movementVector.x))
+					{
+						cout << "Returning" << std::endl;
+						return false;
+					}
 				}
 				movementVector.x = newVal;
 			}
@@ -115,11 +123,20 @@ bool PlayerController::onJoyInput(SDL_Event &event)
 				float newVal = Remap(event.jaxis.value, -32768, 32767, 0, 1);
 
 				//SETTING PROPER DIRECTION
-				if (!facingRight)
+				if (facingRight)
 				{
 					newVal = -newVal;
 				}
-				movementVector.x = -newVal;
+				cout << "Joystix indx: 2; Val: " << newVal << " curr movement vector: " << movementVector.x << std::endl;
+				if ((newVal <= 0 && movementVector.x >0) || (newVal >= 0 && movementVector.x <0))
+				{
+					if (abs(newVal) < abs(movementVector.x)) 
+					{
+						cout << "Returning" << std::endl;
+						return false;
+					}
+				}
+				movementVector.x = newVal;
 			}
 		}
 		if (event.type == SDL_JOYBUTTONDOWN)
@@ -317,11 +334,11 @@ void PlayerController::update(float deltaTime)
 	}
 
 	//Moving player
+	//currentVelocity = playerPhysics->getLinearVelocity();
 	if (isGrounded) {
+		
 		if (movementVector.x != 0)
 		{
-			float currentX = currentVelocity.x;
-
 			//If player presses the opposite direction set horizontal speed to 0
 			//if ((currentVelocity.x < 0 && movementVector.x>0) || (currentVelocity.x > 0 && movementVector.x < 0))
 			//{
@@ -338,8 +355,11 @@ void PlayerController::update(float deltaTime)
 			//IF not, increase speed
 			else
 			{
-				playerPhysics->addForce(glm::vec2(movementVector.x * acceleration * deltaTime, 0));
+				//cout << "IS APPLYING FORCE" << std::endl;
+				playerPhysics->setLinearVelocity(glm::vec2(currentSpeed + movementVector.x * acceleration * deltaTime, currentVelocity.y));
+				//playerPhysics->addForce(glm::vec2(movementVector.x * acceleration * deltaTime, 0));
 			}
+			
 		}
 		else
 		{
@@ -367,11 +387,11 @@ void PlayerController::update(float deltaTime)
 			//Adjusting for direction
 			if (facingRight)
 			{
-				playerPhysics->addForce(glm::vec2(glm::rotate(glm::vec2(1, 0), glm::radians(rotation)))* bostAccaleration);
+				playerPhysics->addForce(glm::vec2(glm::rotate(glm::vec2(1, 0), glm::radians(rotation)))* bostAccaleration *deltaTime);
 			}
 			else
 			{
-				playerPhysics->addForce(glm::vec2(glm::rotate(glm::vec2(-1, 0), glm::radians(rotation)))* bostAccaleration);
+				playerPhysics->addForce(glm::vec2(glm::rotate(glm::vec2(-1, 0), glm::radians(rotation)))* bostAccaleration*deltaTime);
 			}
 		}
 	}
@@ -380,15 +400,17 @@ void PlayerController::update(float deltaTime)
 	if (inDash)
 	{
 		dashCounter += deltaTime;
+		float rotationChange = rotationPerSecond*deltaTime;
 		if (facingRight) 
 		{
-			setRotation(rotation - rotationPerSecond*deltaTime);
+			rotationChange = -rotationChange;
+			
 		}
-		else 
+		if (!dashingForward) 
 		{
-			setRotation(rotation + rotationPerSecond*deltaTime);
+			rotationChange = -rotationChange;
 		}
-		
+		setRotation(rotation + rotationChange);
 		//Fcout << "inDash; " << dashCounter << " "<<deltaTime<<std::endl;
 		if (dashCounter > dashDuration)
 		{
@@ -514,6 +536,14 @@ void PlayerController::jump()
 			airDashCounter++;
 			inDash = true;
 			dashCounter = 0;
+			if (facingVector.x > 0) 
+			{
+				dashingForward = true;
+			}
+			else if(facingVector.x<0)
+			{
+				dashingForward = false;
+			}
 		}
 	}
 	else

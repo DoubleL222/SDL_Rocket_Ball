@@ -29,7 +29,13 @@ public:
 
 	void setRotation(float _rot);
 
+	void setDelayedRotation(float _rot);
+
+	float lerp(float a, float b, float f);
+
 	bool onKey(SDL_Event &event) override;
+
+	float clerp(float start, float end, float value);
 
 	void jump();
 
@@ -37,16 +43,10 @@ public:
 
 	void endDash();
 
-<<<<<<< HEAD
 	float angleBetweenVectors(glm::vec2 vec1, glm::vec2 vec2);
-=======
 
-	float maxSpeed = 5.0f;
-	float acceleration = 1.0f;
-	float dashSpeed = 15.0f;
-	float dashDuration = 0.15f;
-	int airDashesAvailable = 1;
->>>>>>> origin/NewMartinBranch
+	//SetDirection
+	void setFacingDirection(bool _facingRight);
 
 	//Raycasting
 	virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point,
@@ -56,43 +56,62 @@ public:
 
 	void onCollisionEnd(PhysicsComponent *comp) override;
 
+	//PICKIN UP BOOST (BETWWEN 0 and 1)
+	void rechargeBoost(float _val);
+
+	//POWERUP SETTING FUNCTIONS
+	void gravityPowerUp();
+	void speedPowerUp();
+	void dashPowerUp();
+	void dashCountPowerUp();
+
 
 	glm::vec2 movementVector = glm::vec2(0, 0);
 	glm::vec2 facingVector = glm::vec2(0, 0);
 
 private:
 
-	
+
 
 	sre::Sprite playerSprite_1;
 
 	std::shared_ptr<SpriteComponent> playerSprite;
 	std::shared_ptr<PhysicsComponent> playerPhysics;
 
-<<<<<<< HEAD
+	std::shared_ptr<GameObject> boostDisplay, boostBorder;
+	sre::Sprite boostBox, boostBorderBox;
+	sre::Sprite& boostSprite = boostBox;
+	
+	
 	//Player car Settings
 	const float maxSpeed = 5.0f;
-	const float maxSpeedWhenBoosting = 15.0f;
-	const float acceleration = 500.0f;
-	const float dashSpeed = 0.5f;
-	const float dashDuration = 0.07f;
-	const float boostSpeed = 1.5f;
+	const float acceleration = 50.0f;
+	const float dashSpeed = 0.4f;
+	const float dashDuration = 0.5f;
+	const float rotationPerSecond = 360.0f*(1.0f/dashDuration);
+
+	//BoostSetting
+	const float maxSpeedWhenBoosting = 10.0f;
+	const float bostAccaleration = 1.1f;
+	const float boostBurnPerSecond = 0.5;
+	const float maxBoost = 1.0f;
+
+	//boost variables
+	float currBoost = 1.0f;
+
+
+	//On right or left?
+	bool facingRight = false;
 
 	//UPDATE THINGS
 	float nextFixedUpdate = 0.0f;
 	float updateFrequency = 1.0f / 20.0f;
-=======
-	//const float maxSpeed = 5.0f;
-	//const float acceleration = 1.0f;
-	//const float dashSpeed = 15.0f;
-	//const float dashDuration = 0.15f;
->>>>>>> origin/NewMartinBranch
 
-	//int airDashesAvailable = 1;
+	int airDashesAvailable = 1;
 	int airDashCounter = 0;
 
-	int dashCounter = 0;
-	
+	float dashCounter = 0;
+
 	bool inDash = false;
 
 	bool isNextToWall = false;
@@ -108,4 +127,9 @@ private:
 
 	bool movingForward = false;
 	bool movingBack = false;
+
+	//Keyboard rotations
+	bool rotatingDown = false;
+	bool rotatingUp = false;
+
 };

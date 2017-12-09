@@ -1,7 +1,5 @@
 PlayerController (LUKA):
 PRIORITY 1:
-	fix forward/backward dynamic
-
 	
 PRIORITY 2:
     Remove powerups from player,
