@@ -7,6 +7,7 @@
 #include "GameObject.hpp"
 #include "SetPlayfield.h"
 #include "GameCamera.h"
+#include "SDL_mixer.h"
 #include <vector>
 
 class PhysicsComponent;
@@ -48,8 +49,8 @@ public:
 
 	int player1Goals = 0;
 	int player2Goals = 0;
-	glm::vec4 player1Color{ 1.0f, 0.2f, 0.2f, 1.0f };
-	glm::vec4 player2Color{ 0.2f, 0.2f, 1.0f, 1.0f };
+	glm::vec4 player2Color{ 1.0f, 0.2f, 0.2f, 1.0f };
+	glm::vec4 player1Color{ 0.2f, 0.2f, 1.0f, 1.0f };
 
 	//Collision Filtering
 	enum _entityCategory {
@@ -62,7 +63,8 @@ public:
 
 	void nextRound();
 
-	glm::vec2 goalSizes{ 0.7, 2.0f };
+	glm::vec2 goalSizes{ 0.8, 2};
+	float botYBoxSize = 0.5;
 
 	virtual void BeginContact(b2Contact *contact) override;
 	virtual void EndContact(b2Contact *contact) override;
@@ -75,7 +77,7 @@ public:
 
 	std::shared_ptr<GameObject> AbiBox_0, AbiBox_1, AbiBox_2, AbiBox_3, AbiBox_4;
 
-	void setText(int switchIndex);
+	void setTextAndPlaySound(int switchIndex);
 
 	void setGameState(GameState newState);
 	GameState getGameState();
@@ -91,6 +93,9 @@ private:
 	std::shared_ptr<PhysicsComponent> OuterBallPhyiscs, InnerBallPhysics;
 	b2Vec2 b2P1Origin, b2P2Origin, b2sbOuterOrigin, b2sbInnerOrigin;
 	glm::vec2 P1Origin, P2Origin, sbOuterOrigin, sbInnerOrigin;
+
+	Mix_Chunk *goalSound, *readySound, *goSound, *gameOverSound;
+	Mix_Music *music;
 
 	SDL_Joystick * joy1;
 	SDL_Joystick * joy2;
@@ -120,8 +125,6 @@ private:
 	SetPlayfield setPlayField;
 
 	sre::SDLRenderer r;
-
-	bool usePlatforms = false;
 
 	void initGame();
 

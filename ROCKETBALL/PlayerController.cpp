@@ -25,7 +25,7 @@ PlayerController::PlayerController(GameObject *gameObject) : Component(gameObjec
 
 		boostDisplay->name = this->getGameObject()->name + "_BoostDisplay";
 		boostBox.setScale({ 1,0.4 });
-		boostBox.setOrderInBatch(1);
+		boostBox.setOrderInBatch(11);
 		boostSpriteComp->setSprite(boostBox);
 		boostDisplay->setPosition({
 			-RocketBall::gameInstance->windowSize.x * 0.5f + 22.5f,
@@ -34,7 +34,7 @@ PlayerController::PlayerController(GameObject *gameObject) : Component(gameObjec
 
 		boostBorder->name = "boostboxborder";
 		boostBorderBox.setScale({ 1,0.4 });
-		boostBorderBox.setOrderInBatch(0);
+		boostBorderBox.setOrderInBatch(10);
 		boostBorderSpriteComp->setSprite(boostBorderBox);
 		boostBorder->setPosition({ (-RocketBall::gameInstance->windowSize.x * 0.5f) + (boostBorderBox.getSpriteSize().x*0.5) + 20.0f,
 			(-RocketBall::gameInstance->windowSize.y * 0.5f) + ((RocketBall::gameInstance->mySpriteAtlas->get("Grass.png").getSpriteSize().y * 0.5f) * 0.5f) - 20.0f });
@@ -173,56 +173,106 @@ bool PlayerController::onKey(SDL_Event &event) {
 	if (RocketBall::gameInstance->getGameState() == GameState::Running) {
 		if (event.type == SDL_KEYDOWN)
 		{
-			if (event.key.keysym.sym == SDLK_RIGHT)
-			{
-				movementVector.x = 1;
+			if (facingRight) {
+				if (event.key.keysym.sym == SDLK_RIGHT)
+				{
+					movementVector.x = 1;
+				}
+				else if (event.key.keysym.sym == SDLK_LEFT)
+				{
+					movementVector.x = -1;
+				}
+				if (event.key.keysym.sym == SDLK_RCTRL)
+				{
+					jump();
+				}
+				if (event.key.keysym.sym == SDLK_DOWN)
+				{
+					rotatingDown = true;
+				}
+				else if (event.key.keysym.sym == SDLK_UP)
+				{
+					rotatingUp = true;
+				}
+				if (event.key.keysym.sym == SDLK_RSHIFT)
+				{
+					isBoosting = true;
+				}
 			}
-			else if (event.key.keysym.sym == SDLK_LEFT)
+			else 
 			{
-				movementVector.x = -1;
-			}
-			if (event.key.keysym.sym == SDLK_SPACE)
-			{
-				jump();
-			}
-			if (event.key.keysym.sym == SDLK_DOWN)
-			{
-				rotatingDown = true;
-			}
-			else if (event.key.keysym.sym == SDLK_UP)
-			{
-				rotatingUp = true;
-			}
-			if (event.key.keysym.sym == SDLK_RSHIFT)
-			{
-				isBoosting = true;
-			}
-			if (event.key.keysym.sym == SDLK_r)
-			{
-				playerPhysics->body->SetAwake(true);
+				if (event.key.keysym.sym == SDLK_a)
+				{
+					movementVector.x = 1;
+				}
+				else if (event.key.keysym.sym == SDLK_d)
+				{
+					movementVector.x = -1;
+				}
+				if (event.key.keysym.sym == SDLK_LCTRL)
+				{
+					jump();
+				}
+				if (event.key.keysym.sym == SDLK_s)
+				{
+					rotatingDown = true;
+				}
+				else if (event.key.keysym.sym == SDLK_w)
+				{
+					rotatingUp = true;
+				}
+				if (event.key.keysym.sym == SDLK_LSHIFT)
+				{
+					isBoosting = true;
+				}
 			}
 		}
 		else if (event.type == SDL_KEYUP)
 		{
-			if (event.key.keysym.sym == SDLK_RIGHT && movementVector.x > 0)
-			{
-				movementVector.x = 0;
+			if (facingRight) {
+				if (event.key.keysym.sym == SDLK_RIGHT && movementVector.x > 0)
+				{
+					movementVector.x = 0;
+				}
+				if (event.key.keysym.sym == SDLK_LEFT && movementVector.x < 0)
+				{
+					movementVector.x = 0;
+				}
+				if (event.key.keysym.sym == SDLK_DOWN)
+				{
+					rotatingDown = false;
+				}
+				else if (event.key.keysym.sym == SDLK_UP)
+				{
+					rotatingUp = false;
+				}
+				if (event.key.keysym.sym == SDLK_RSHIFT)
+				{
+					isBoosting = false;
+				}
 			}
-			if (event.key.keysym.sym == SDLK_LEFT && movementVector.x < 0)
+			else 
 			{
-				movementVector.x = 0;
-			}
-			if (event.key.keysym.sym == SDLK_DOWN)
-			{
-				rotatingDown = false;
-			}
-			else if (event.key.keysym.sym == SDLK_UP)
-			{
-				rotatingUp = false;
-			}
-			if (event.key.keysym.sym == SDLK_RSHIFT)
-			{
-				isBoosting = false;
+				if (event.key.keysym.sym == SDLK_a && movementVector.x > 0)
+				{
+					movementVector.x = 0;
+				}
+				if (event.key.keysym.sym == SDLK_d && movementVector.x < 0)
+				{
+					movementVector.x = 0;
+				}
+				if (event.key.keysym.sym == SDLK_s)
+				{
+					rotatingDown = false;
+				}
+				else if (event.key.keysym.sym == SDLK_w)
+				{
+					rotatingUp = false;
+				}
+				if (event.key.keysym.sym == SDLK_LSHIFT)
+				{
+					isBoosting = false;
+				}
 			}
 		}
 	}
@@ -631,7 +681,7 @@ void PlayerController::dashCountPowerUp()
 
 float32 PlayerController::ReportFixture(b2Fixture *fixture, const b2Vec2 &point, const b2Vec2 &normal, float32 fraction) {
 	string objName = ((GameObject*)fixture->GetBody()->GetUserData())->name;
-	if (objName == "grass" || objName == "OuterBall" || objName == "Player_1" || objName == "Player_2")
+	if (objName == "grass" || objName == "OuterBall" || objName == "Player_1" || objName == "Player_2" || objName == "Wall2")
 	{
 		resetJumps();
 		//cout << "GROUNDED" << std::endl;

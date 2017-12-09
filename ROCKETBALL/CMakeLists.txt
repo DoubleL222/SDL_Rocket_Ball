@@ -21,8 +21,8 @@ add_executable(RocketBall ${RocketFiles})
 target_link_libraries(RocketBall ${all_libs})
 
 # copy files to dest
-file(COPY skybackdrop.png RocketBallSprites.json RocketBallSprites.png DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
-file(COPY skybackdrop.png RocketBallSprites.json RocketBallSprites.png DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release)
+file(COPY skybackdrop.png RocketBallSprites.json RocketBallSprites.png music.ogg goalSound.ogg readySound.ogg gameOverSound.ogg goSound.ogg DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
+file(COPY skybackdrop.png RocketBallSprites.json RocketBallSprites.png music.ogg goalSound.ogg readySound.ogg gameOverSound.ogg goSound.ogg DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release)
 
 IF (WIN32)
     # Copy dll files to ${CMAKE_CURRENT_BINARY_DIR}/Debug
