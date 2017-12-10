@@ -106,7 +106,7 @@ void RocketBall::initGame() {
 	gameModeClassic = true;
 
 	music = Mix_LoadMUS("music.ogg");
-	gameOverSound = Mix_LoadWAV("gameOverSound.ogg");
+	//gameOverSound = Mix_LoadWAV("gameOverSound.ogg");
 	goalSound = Mix_LoadWAV("goalSound.ogg");
 	readySound = Mix_LoadWAV("readySound.ogg");
 	goSound = Mix_LoadWAV("goSound.ogg");
@@ -149,7 +149,7 @@ void RocketBall::initGame() {
 	P1Origin = glm::vec2(windowSize.x * 0.375, -windowSize.y * 0.2 + (player1Sprite.getSpriteSize().y * 0.5f));
 	player1->setPosition(P1Origin);
 	auto physComp = player1->addComponent<PhysicsComponent>();
-	physComp->initCarCollider(glm::vec2(0.3f, 0.07f), player1->getPosition() / physicsScale, playerFriction, playerDensity, playerLinearDamping, playerAngularDamping);
+	physComp->initCarCollider(glm::vec2(0.35f, 0.1f), player1->getPosition() / physicsScale, playerFriction, playerDensity, playerLinearDamping, playerAngularDamping);
 
 	//Spawn Player2
 	player2 = createGameObject();
@@ -164,7 +164,7 @@ void RocketBall::initGame() {
 	P2Origin = glm::vec2(-windowSize.x * 0.375, -windowSize.y * 0.2 + (player2Sprite.getSpriteSize().y * 0.5f));
 	player2->setPosition(P2Origin);
 	physComp = player2->addComponent<PhysicsComponent>();
-	physComp->initCarCollider(glm::vec2(0.3f, 0.07f), player2->getPosition() / physicsScale, playerFriction, playerDensity, playerLinearDamping, playerAngularDamping);
+	physComp->initCarCollider(glm::vec2(0.35f, 0.1f), player2->getPosition() / physicsScale, playerFriction, playerDensity, playerLinearDamping, playerAngularDamping);
 
 	//Spawn (outer) Soccer Ball w/e sprite
 	soccerBall = createGameObject();

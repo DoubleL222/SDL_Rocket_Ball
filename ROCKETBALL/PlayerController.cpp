@@ -316,6 +316,14 @@ void PlayerController::update(float deltaTime)
 	//RAYCASTS
 	b2Vec2 to{ from.x + currentVelocity.x*0.1f,from.y + currentVelocity.y*0.1f };
 	b2Vec2 toGround{ from.x,from.y - 0.3f };
+	if (isGrounded) 
+	{
+		wasGrounded = true;
+	}
+	else 
+	{
+		wasGrounded = false;
+	}
 	isGrounded = false;
 	if (from != toGround) {
 		RocketBall::gameInstance->world->RayCast(this, from, toGround);
@@ -358,21 +366,21 @@ void PlayerController::update(float deltaTime)
 	//ROTATE WITH KEYBOARD
 	if (rotatingUp) 
 	{
-		float rotationSpeed = 3.5f;
+		float rotationSpeed = keyboardRotateSpeed;
 		if (facingRight)
 		{
 			rotationSpeed = -rotationSpeed;
 		}
-		facingVector = glm::rotate(glm::vec2(1, 0), glm::radians(rotation - rotationSpeed));
+		facingVector = glm::rotate(glm::vec2(1, 0), glm::radians(rotation - rotationSpeed*deltaTime));
 	}
 	else if (rotatingDown) 
 	{
-		float rotationSpeed = 3.5f;
+		float rotationSpeed = keyboardRotateSpeed;
 		if (facingRight) 
 		{
 			rotationSpeed = -rotationSpeed;
 		}
-		facingVector = glm::rotate(glm::vec2(1, 0), glm::radians(rotation + rotationSpeed));
+		facingVector = glm::rotate(glm::vec2(1, 0), glm::radians(rotation + rotationSpeed * deltaTime));
 	}
 
 	if (!(facingVector.x == 0 && facingVector.y == 0))
@@ -408,9 +416,10 @@ void PlayerController::update(float deltaTime)
 			//If Speed is more than maxSpeed
 			float currentSpeed = currentVelocity.x;
 			//cout << "0. curr speed: " << currentSpeed << std::endl;
-			if (currentSpeed > maxSpeed && !isBoosting)
+			if (abs(currentSpeed) > maxSpeed && !isBoosting)
 			{
-				playerPhysics->setLinearVelocity((maxSpeed / currentSpeed) * currentVelocity);
+				//IF CURRENT SPEED IS OVER MAX SPEED DON'T BOOST
+				//playerPhysics->setLinearVelocity((maxSpeed / currentSpeed) * currentVelocity);
 			}
 			//IF not, increase speed
 			else
@@ -495,7 +504,7 @@ void PlayerController::update(float deltaTime)
 			it->second += deltaTime;
 		}
 
-		if (it->second > powerupDuration) 
+		if (it->second >= powerupDuration) 
 		{
 			it->second = 0;
 			switch (it->first)
@@ -505,6 +514,15 @@ void PlayerController::update(float deltaTime)
 			break;
 			case ENUM_POWERUPS::SpeedIncrease:
 				dashCountPowerUp(false);
+				break;
+			case ENUM_POWERUPS::DashSpeedIncrease:
+				dashPowerUp(false);
+				break;
+			case ENUM_POWERUPS::InfiniteBoost:
+				infiniteBoostPowerUp(false);
+				break;
+			case ENUM_POWERUPS::GravityMod:
+				gravityPowerUp(false);
 				break;
 			default:
 				break;
@@ -674,10 +692,12 @@ void PlayerController::resetInputs()
 	movementVector = glm::vec2(0.0f, 0.0f);
 	facingVector = glm::vec2(0.0f, 0.0f);
 	rotation = 0.0f;
-	currBoost = maxBoost;
+	currBoost = maxBoost/4;
 	isBoosting = false;
 	rotatingDown = false;
 	rotatingUp = false;
+	if(!RocketBall::gameInstance->gameModeClassic)
+		DisableAllPowerups();
 }
 
 void PlayerController::endDash()
@@ -702,15 +722,47 @@ void PlayerController::rechargeBoost(float _val)
 	}
 }
 
+void PlayerController::DisableAllPowerups() 
+{
+	if(powerupTimers[ENUM_POWERUPS::GravityMod] > 0 && powerupTimers[ENUM_POWERUPS::GravityMod] <powerupDuration)
+	{
+		gravityPowerUp(false);
+	}
+
+	if (powerupTimers[ENUM_POWERUPS::SpeedIncrease] > 0 && powerupTimers[ENUM_POWERUPS::SpeedIncrease] <powerupDuration)
+	{
+		speedPowerUp(false);
+	}
+
+	if (powerupTimers[ENUM_POWERUPS::DashSpeedIncrease] > 0 && powerupTimers[ENUM_POWERUPS::DashSpeedIncrease] <powerupDuration)
+	{
+		dashPowerUp(false);
+	}
+	if (powerupTimers[ENUM_POWERUPS::DashCountIncrease] > 0 && powerupTimers[ENUM_POWERUPS::DashCountIncrease] <powerupDuration)
+	{
+		dashCountPowerUp(false);
+	}
+	if (powerupTimers[ENUM_POWERUPS::InfiniteBoost] > 0 && powerupTimers[ENUM_POWERUPS::InfiniteBoost] <powerupDuration)
+	{
+		infiniteBoostPowerUp(false);
+	}
+
+}
+
 void PlayerController::gravityPowerUp(bool _enable)
 {
 	if (_enable)
 	{
+		if (powerupTimers[ENUM_POWERUPS::GravityMod] != 0) 
+		{
+			return;
+		}
 		playerPhysics->body->SetGravityScale(playerPhysics->body->GetGravityScale()*0.5f);
 		powerupTimers[ENUM_POWERUPS::GravityMod] = 0.01f;
 	}
 	else
 	{
+		powerupTimers[ENUM_POWERUPS::GravityMod] = 0;
 		playerPhysics->body->SetGravityScale(playerPhysics->body->GetGravityScale()/0.5f);
 	}
 
@@ -720,6 +772,10 @@ void PlayerController::speedPowerUp(bool _enable)
 {
 	if (_enable)
 	{
+		if (powerupTimers[ENUM_POWERUPS::SpeedIncrease] != 0)
+		{
+			return;
+		}
 		maxSpeed*=1.5f;
 		acceleration *= 1.5f;
 		bostAccaleration *= 1.5f;
@@ -732,13 +788,19 @@ void PlayerController::speedPowerUp(bool _enable)
 		acceleration /= 1.5f;
 		bostAccaleration /= 1.5f;
 		maxSpeedWhenBoosting /= 1.5f;
+		powerupTimers[ENUM_POWERUPS::SpeedIncrease] = 0;
 	}
+
 }
 
 void PlayerController::dashPowerUp(bool _enable)
 {
 	if (_enable)
 	{
+		if (powerupTimers[ENUM_POWERUPS::DashSpeedIncrease] != 0)
+		{
+			return;
+		}
 		dashSpeed *= 2;
 		dashDuration *= 2;
 		powerupTimers[ENUM_POWERUPS::DashSpeedIncrease] = 0.01f;
@@ -747,6 +809,7 @@ void PlayerController::dashPowerUp(bool _enable)
 	{
 		dashSpeed /= 2;
 		dashDuration /= 2;
+		powerupTimers[ENUM_POWERUPS::DashSpeedIncrease] = 0;
 	}
 }
 
@@ -754,12 +817,17 @@ void PlayerController::dashCountPowerUp(bool _enable)
 {
 	if (_enable) 
 	{
+		if (powerupTimers[ENUM_POWERUPS::DashCountIncrease] != 0)
+		{
+			return;
+		}
 		airDashesAvailable = 2;
 		powerupTimers[ENUM_POWERUPS::DashCountIncrease] = 0.01f;
 	}
 	else
 	{
 		airDashesAvailable = 1;
+		powerupTimers[ENUM_POWERUPS::DashCountIncrease] = 0;
 	}
 
 }
@@ -775,6 +843,7 @@ void PlayerController::infiniteBoostPowerUp(bool _enable)
 	else
 	{
 		infiniteBoost = false;
+		powerupTimers[ENUM_POWERUPS::InfiniteBoost] = 0;
 	}
 }
 
@@ -782,6 +851,10 @@ float32 PlayerController::ReportFixture(b2Fixture *fixture, const b2Vec2 &point,
 	string objName = ((GameObject*)fixture->GetBody()->GetUserData())->name;
 	if (objName == "grass" || objName == "OuterBall" || objName == "Player_1" || objName == "Player_2" || objName == "Wall2")
 	{
+		if (!wasGrounded) 
+		{
+			facingVector = glm::vec2(0, 0);
+		}
 		resetJumps();
 		//cout << "GROUNDED" << std::endl;
 		//facingVector = glm::vec2(0, 0);

@@ -94,7 +94,7 @@ private:
 	b2Vec2 b2P1Origin, b2P2Origin, b2sbOuterOrigin, b2sbInnerOrigin;
 	glm::vec2 P1Origin, P2Origin, sbOuterOrigin, sbInnerOrigin;
 
-	Mix_Chunk *goalSound, *readySound, *goSound, *gameOverSound;
+	Mix_Chunk *goalSound = nullptr, *readySound=nullptr, *goSound=nullptr, *gameOverSound=nullptr;
 	Mix_Music *music;
 
 	SDL_Joystick * joy1;
@@ -108,11 +108,11 @@ private:
 	int goalsToScore = 5;
 
 	//Ball
-	float ballRestitution = 0.6f;
+	float ballRestitution = 0.8f;
 	float ballFriction = 0.5f;
 	float ballDensity = 0.04f;
-	float ballLinearDamping = 0.35f;
-	float ballAngularDamping = 0.8f;
+	float ballLinearDamping = 0.25f;
+	float ballAngularDamping = 0.3f;
 
 	//Players
 	float playerRestitution = 0.0f;

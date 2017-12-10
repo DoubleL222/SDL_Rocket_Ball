@@ -1,13 +1,9 @@
 PlayerController (LUKA):
 PRIORITY 1:
-	Powerup effects,
 	Simple animations,
-	BALANCING,
 Sound:
 	boost sound,
 	drive sound,
-BUGS:
-	Boost speed gets reset on jump
 
 Powerups & Boost (MARTIN):
 PRIORITY 1:

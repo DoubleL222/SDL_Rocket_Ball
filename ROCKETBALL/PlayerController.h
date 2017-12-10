@@ -59,6 +59,8 @@ public:
 	//PICKIN UP BOOST (BETWWEN 0 and 1)
 	void rechargeBoost(float _val);
 
+	void DisableAllPowerups();
+
 	//POWERUP SETTING FUNCTIONS
 	void gravityPowerUp(bool _enable);
 	void speedPowerUp(bool _enable);
@@ -92,20 +94,21 @@ private:
 	
 	
 	//Player car Settings
+	float keyboardRotateSpeed = 2000.0f;
 	float maxSpeed = 5.0f;
-	float acceleration = 10.0f;
-	float dashSpeed = 0.4f;
+	float acceleration = 11.0f;
+	float dashSpeed = 0.7f;
 	float dashDuration = 0.5f;
 	const float rotationPerSecond = 360.0f*(1.0f/dashDuration);
 
 	//BoostSetting
 	float maxSpeedWhenBoosting = 10.0f;
-	float bostAccaleration = 600.0f;
+	float bostAccaleration = 150.0f;
 	const float boostBurnPerSecond = 0.5;
 	const float maxBoost = 1.0f;
 
 	//boost variables
-	float currBoost = 1.0f;
+	float currBoost = 0.25f;
 
 	//On right or left?
 	bool facingRight = false;
@@ -129,6 +132,7 @@ private:
 
 	bool isNextToWall = false;
 	bool isGrounded = false;
+	bool wasGrounded = false;
 	float timePassed = 0.0f;
 	float rotation = 0.0f;
 	float size;
