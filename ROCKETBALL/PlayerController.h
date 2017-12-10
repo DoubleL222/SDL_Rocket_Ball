@@ -73,7 +73,7 @@ public:
 	glm::vec2 facingVector = glm::vec2(0, 0);
 
 private:
-
+	glm::vec4 _color;
 	enum ENUM_POWERUPS
 	{
 		SpeedIncrease = 0,

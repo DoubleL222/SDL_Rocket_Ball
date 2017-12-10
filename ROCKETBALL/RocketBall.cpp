@@ -103,10 +103,8 @@ void RocketBall::initGame() {
 		background_Layer_1.init("skybackdrop.png", -windowSize.x*0.5f, -windowSize.y*0.5f, true);
 	}
 
-	gameModeClassic = true;
-
 	music = Mix_LoadMUS("music.ogg");
-//	winnerSound = Mix_LoadWAV("gameOverSound.ogg");
+	winnerSound = Mix_LoadWAV("gameOverSound.ogg");
 	goalSound = Mix_LoadWAV("goalSound.ogg");
 	pickUpSound = Mix_LoadWAV("pickUpSound.ogg");
 	readySound = Mix_LoadWAV("readySound.ogg");
@@ -134,15 +132,20 @@ void RocketBall::initGame() {
 	gameOverBool = false;
 
 	//Set gamemode before initilizing the playingfield
-	gameModeClassic = false;
+	gameModeClassic = true;
+
+	goalSizes = glm::vec2{ 0.8, 2 }; //Determines the size of the goal
+	botYBoxSize = 1.0f; //Determines the position of the goal from the grass and up.
+
 	if (!setPlayField.playFieldInit) {
+		setPlayField.useFiveAbilityBoxes = false;
 		//Set size for the goals
 		setPlayField.setGoalSizes(goalSizes);
 		//Init playing field
 		setPlayField.createPlayField(mySpriteAtlas);
 		setPlayField.readyAbilityBoxes(false);
 	}
-#pragma region Dynamic Elements
+#pragma region Dynamic GameObjects
 	//Spawn Player1
 	player1 = createGameObject();
 	player1->name = "Player_1";
@@ -151,6 +154,7 @@ void RocketBall::initGame() {
 	auto spriteComp = player1->addComponent<SpriteComponent>();
 	auto player1Sprite = mySpriteAtlas->get("car1.png");
 	player1Sprite.setScale(glm::vec2(0.3f, 0.3f));
+	player1Sprite.setOrderInBatch(15);
 	spriteComp->setSprite(player1Sprite);
 	P1Origin = glm::vec2(windowSize.x * 0.375, -windowSize.y * 0.2 + (player1Sprite.getSpriteSize().y * 0.5f));
 	player1->setPosition(P1Origin);
@@ -166,6 +170,7 @@ void RocketBall::initGame() {
 	auto player2Sprite = mySpriteAtlas->get("car2.png");
 	player2Sprite.setFlip(glm::vec2(-1, 0));
 	player2Sprite.setScale(glm::vec2(0.3f, 0.3f));
+	player2Sprite.setOrderInBatch(15);
 	spriteComp->setSprite(player2Sprite);
 	P2Origin = glm::vec2(-windowSize.x * 0.375, -windowSize.y * 0.2 + (player2Sprite.getSpriteSize().y * 0.5f));
 	player2->setPosition(P2Origin);
@@ -203,7 +208,6 @@ void RocketBall::initGame() {
 #pragma endregion
 
 	//SET GAME STATE
-	//gameState = GameState::Ready;
 	gameState = GameState::InitializeGame;
 }
 

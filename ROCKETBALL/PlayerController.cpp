@@ -11,6 +11,13 @@
 using namespace std;
 PlayerController::PlayerController(GameObject *gameObject) : Component(gameObject)
 {
+	if (this->getGameObject()->name == "Player_1") {
+		_color = RocketBall::gameInstance->player2Color;
+	}
+	else {
+		_color = RocketBall::gameInstance->player1Color;
+	}
+
 #pragma region PlayerUI
 	powerupTimers;
 
@@ -360,11 +367,11 @@ void PlayerController::update(float deltaTime)
 	//RAYCASTS
 	b2Vec2 to{ from.x + currentVelocity.x*0.1f,from.y + currentVelocity.y*0.1f };
 	b2Vec2 toGround{ from.x,from.y - 0.3f };
-	if (isGrounded) 
+	if (isGrounded)
 	{
 		wasGrounded = true;
 	}
-	else 
+	else
 	{
 		wasGrounded = false;
 	}
@@ -481,9 +488,9 @@ void PlayerController::update(float deltaTime)
 	}
 
 	//Boosting player
-	if (isBoosting && (currBoost > 0.0f ||infiniteBoost))
+	if (isBoosting && (currBoost > 0.0f || infiniteBoost))
 	{
-		if (!infiniteBoost) 
+		if (!infiniteBoost)
 		{
 			currBoost -= boostBurnPerSecond*deltaTime;
 		}
@@ -541,31 +548,47 @@ void PlayerController::update(float deltaTime)
 
 
 	//////////////////// CHECK FOR POWERUPS
-	for (std::map<ENUM_POWERUPS, float>::iterator it = powerupTimers.begin(); it != powerupTimers.end(); ++it) 
+	if (this->getGameObject()->name == "Player_1") {
+		glm::vec4 _color = RocketBall::gameInstance->player1Color;
+	}
+	else {
+		glm::vec4 _color = RocketBall::gameInstance->player2Color;
+	}
+	for (std::map<ENUM_POWERUPS, float>::iterator it = powerupTimers.begin(); it != powerupTimers.end(); ++it)
 	{
-		if (it->second > 0) 
+		if (it->second > 0)
 		{
 			it->second += deltaTime;
 		}
 
-		if (it->second >= powerupDuration) 
+		if (it->second >= powerupDuration)
 		{
 			it->second = 0;
 			switch (it->first)
 			{
 			case ENUM_POWERUPS::DashCountIncrease:
+				dashExtraIcon.setColor({ 1,1,1,1 });
+				dashExtraObj->getComponent<SpriteComponent>()->setSprite(dashExtraIcon);
 				dashCountPowerUp(false);
-			break;
+				break;
 			case ENUM_POWERUPS::SpeedIncrease:
+				speedIcon.setColor({ 1,1,1,1 });
+				speedObj->getComponent<SpriteComponent>()->setSprite(speedIcon);
 				speedPowerUp(false);
 				break;
 			case ENUM_POWERUPS::DashSpeedIncrease:
+				dashBoostIcon.setColor({ 1,1,1,1 });
+				dashBoostObj->getComponent<SpriteComponent>()->setSprite(dashBoostIcon);
 				dashPowerUp(false);
 				break;
 			case ENUM_POWERUPS::InfiniteBoost:
+				dashInfiniteIcon.setColor({ 1,1,1,1 });
+				dashInfiniteObj->getComponent<SpriteComponent>()->setSprite(dashInfiniteIcon);
 				infiniteBoostPowerUp(false);
 				break;
 			case ENUM_POWERUPS::GravityMod:
+				gravityIcon.setColor({ 1,1,1,1 });
+				gravityObj->getComponent<SpriteComponent>()->setSprite(gravityIcon);
 				gravityPowerUp(false);
 				break;
 			default:
@@ -736,11 +759,11 @@ void PlayerController::resetInputs()
 	movementVector = glm::vec2(0.0f, 0.0f);
 	facingVector = glm::vec2(0.0f, 0.0f);
 	rotation = 0.0f;
-	currBoost = maxBoost/4;
+	currBoost = maxBoost / 4;
 	isBoosting = false;
 	rotatingDown = false;
 	rotatingUp = false;
-	if(!RocketBall::gameInstance->gameModeClassic)
+	if (!RocketBall::gameInstance->gameModeClassic)
 		DisableAllPowerups();
 }
 
@@ -766,9 +789,9 @@ void PlayerController::rechargeBoost(float _val)
 	}
 }
 
-void PlayerController::DisableAllPowerups() 
+void PlayerController::DisableAllPowerups()
 {
-	if(powerupTimers[ENUM_POWERUPS::GravityMod] > 0)
+	if (powerupTimers[ENUM_POWERUPS::GravityMod] > 0)
 	{
 		gravityPowerUp(false);
 	}
@@ -797,7 +820,9 @@ void PlayerController::gravityPowerUp(bool _enable)
 {
 	if (_enable)
 	{
-		if (powerupTimers[ENUM_POWERUPS::GravityMod] != 0) 
+		gravityIcon.setColor(_color);
+		gravityObj->getComponent<SpriteComponent>()->setSprite(gravityIcon);
+		if (powerupTimers[ENUM_POWERUPS::GravityMod] != 0)
 		{
 			return;
 		}
@@ -807,7 +832,7 @@ void PlayerController::gravityPowerUp(bool _enable)
 	else
 	{
 		powerupTimers[ENUM_POWERUPS::GravityMod] = 0;
-		playerPhysics->body->SetGravityScale(playerPhysics->body->GetGravityScale()/0.5f);
+		playerPhysics->body->SetGravityScale(playerPhysics->body->GetGravityScale() / 0.5f);
 	}
 
 }
@@ -816,11 +841,13 @@ void PlayerController::speedPowerUp(bool _enable)
 {
 	if (_enable)
 	{
+		speedIcon.setColor(_color);
+		speedObj->getComponent<SpriteComponent>()->setSprite(speedIcon);
 		if (powerupTimers[ENUM_POWERUPS::SpeedIncrease] != 0)
 		{
 			return;
 		}
-		maxSpeed*=1.2f;
+		maxSpeed *= 1.2f;
 		acceleration *= 1.2f;
 		bostAccaleration *= 1.1f;
 		maxSpeedWhenBoosting *= 1.1f;
@@ -842,6 +869,8 @@ void PlayerController::dashPowerUp(bool _enable)
 {
 	if (_enable)
 	{
+		dashBoostIcon.setColor(_color);
+		dashBoostObj->getComponent<SpriteComponent>()->setSprite(dashBoostIcon);
 		if (powerupTimers[ENUM_POWERUPS::DashSpeedIncrease] != 0)
 		{
 			return;
@@ -860,8 +889,10 @@ void PlayerController::dashPowerUp(bool _enable)
 
 void PlayerController::dashCountPowerUp(bool _enable)
 {
-	if (_enable) 
+	if (_enable)
 	{
+		dashExtraIcon.setColor(_color);
+		dashExtraObj->getComponent<SpriteComponent>()->setSprite(dashExtraIcon);
 		if (powerupTimers[ENUM_POWERUPS::DashCountIncrease] != 0)
 		{
 			return;
@@ -874,13 +905,14 @@ void PlayerController::dashCountPowerUp(bool _enable)
 		powerupTimers[ENUM_POWERUPS::DashCountIncrease] = 0;
 		airDashesAvailable = 1;
 	}
-
 }
 
 void PlayerController::infiniteBoostPowerUp(bool _enable)
 {
 	if (_enable)
 	{
+		dashInfiniteIcon.setColor(_color);
+		dashInfiniteObj->getComponent<SpriteComponent>()->setSprite(dashInfiniteIcon);
 		infiniteBoost = true;
 		rechargeBoost(1);
 		powerupTimers[ENUM_POWERUPS::InfiniteBoost] = 0.01f;
@@ -896,7 +928,7 @@ float32 PlayerController::ReportFixture(b2Fixture *fixture, const b2Vec2 &point,
 	string objName = ((GameObject*)fixture->GetBody()->GetUserData())->name;
 	if (objName == "grass" || objName == "OuterBall" || objName == "Player_1" || objName == "Player_2" || objName == "Wall2")
 	{
-		if (!wasGrounded) 
+		if (!wasGrounded)
 		{
 			facingVector = glm::vec2(0, 0);
 		}
