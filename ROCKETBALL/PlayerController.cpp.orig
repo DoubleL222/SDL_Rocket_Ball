@@ -9,23 +9,60 @@
 #include <glm\gtx\vector_angle.hpp>
 
 using namespace std;
-
 PlayerController::PlayerController(GameObject *gameObject) : Component(gameObject)
 {
+<<<<<<< HEAD
+	//SETUP POWERUP COUNTER MAP
+	powerupTimers;
+
+	for (int iter = ENUM_POWERUPS::SpeedIncrease; iter != ENUM_POWERUPS::SpeedIncrease; iter++)
+	{
+		ENUM_POWERUPS curr = static_cast<ENUM_POWERUPS>(iter);
+		powerupTimers.insert(std::pair<ENUM_POWERUPS, float>(curr, 0.0f));
+	}
+
+=======
+#pragma region PlayerUI
+>>>>>>> origin/NewMartinBranch
 	boostBox = RocketBall::gameInstance->mySpriteAtlas->get("boostMain.png");
 	boostDisplay = RocketBall::gameInstance->createGameObject();
-
 	boostBorderBox = RocketBall::gameInstance->mySpriteAtlas->get("boostBorderBackground.png");
 	boostBorder = RocketBall::gameInstance->createGameObject();
 
 	auto boostSpriteComp = boostDisplay->addComponent<SpriteComponent>();
 	auto boostBorderSpriteComp = boostBorder->addComponent<SpriteComponent>();
 
+	gravityObj = RocketBall::gameInstance->createGameObject();
+	speedObj = RocketBall::gameInstance->createGameObject();
+	dashBoostObj = RocketBall::gameInstance->createGameObject();
+	dashExtraObj = RocketBall::gameInstance->createGameObject();
+	dashInfiniteObj = RocketBall::gameInstance->createGameObject();
+
+	gravityIcon = RocketBall::gameInstance->mySpriteAtlas->get("lowGravity.png");
+	speedIcon = RocketBall::gameInstance->mySpriteAtlas->get("speedBoostV2.png");
+	dashBoostIcon = RocketBall::gameInstance->mySpriteAtlas->get("dashBoost.png");
+	dashExtraIcon = RocketBall::gameInstance->mySpriteAtlas->get("ExtraJump.png");
+	dashInfiniteIcon = RocketBall::gameInstance->mySpriteAtlas->get("infiniteBoost.png");
+
+	glm::vec2 iconScale({ 0.4,0.4 });
+	gravityIcon.setScale(iconScale);
+	speedIcon.setScale(iconScale);
+	dashBoostIcon.setScale(iconScale);
+	dashExtraIcon.setScale(iconScale);
+	dashInfiniteIcon.setScale(iconScale);
+
+	auto gravitySpriteComp = gravityObj->addComponent<SpriteComponent>();
+	auto speedSpriteComp = speedObj->addComponent<SpriteComponent>();
+	auto dashBoostSpriteComp = dashBoostObj->addComponent<SpriteComponent>();
+	auto dashExtraSpriteComp = dashExtraObj->addComponent<SpriteComponent>();
+	auto dashInfiniteSpriteComp = dashInfiniteObj->addComponent<SpriteComponent>();
+
 	if (this->getGameObject()->name == "Player_2") {
 
 		boostDisplay->name = this->getGameObject()->name + "_BoostDisplay";
 		boostBox.setScale({ 1,0.4 });
-		boostBox.setOrderInBatch(1);
+		boostBox.setColor(RocketBall::gameInstance->player1Color);
+		boostBox.setOrderInBatch(11);
 		boostSpriteComp->setSprite(boostBox);
 		boostDisplay->setPosition({
 			-RocketBall::gameInstance->windowSize.x * 0.5f + 22.5f,
@@ -34,10 +71,16 @@ PlayerController::PlayerController(GameObject *gameObject) : Component(gameObjec
 
 		boostBorder->name = "boostboxborder";
 		boostBorderBox.setScale({ 1,0.4 });
-		boostBorderBox.setOrderInBatch(0);
+		boostBorderBox.setOrderInBatch(10);
 		boostBorderSpriteComp->setSprite(boostBorderBox);
 		boostBorder->setPosition({ (-RocketBall::gameInstance->windowSize.x * 0.5f) + (boostBorderBox.getSpriteSize().x*0.5) + 20.0f,
 			(-RocketBall::gameInstance->windowSize.y * 0.5f) + ((RocketBall::gameInstance->mySpriteAtlas->get("Grass.png").getSpriteSize().y * 0.5f) * 0.5f) - 20.0f });
+
+		gravityObj->setPosition({ (boostBorder->getPosition().x + (boostBorderBox.getSpriteSize().x*boostBorderBox.getScale().x)*0.5) + ((gravityIcon.getSpriteSize().x*gravityIcon.getScale().x)*0.5), boostBorder->getPosition().y });
+		speedObj->setPosition({ (gravityObj->getPosition().x + ((gravityIcon.getSpriteSize().x*gravityIcon.getScale().x))), boostBorder->getPosition().y });
+		dashBoostObj->setPosition({ (speedObj->getPosition().x + ((gravityIcon.getSpriteSize().x*gravityIcon.getScale().x))), boostBorder->getPosition().y });
+		dashExtraObj->setPosition({ (dashBoostObj->getPosition().x + ((gravityIcon.getSpriteSize().x*gravityIcon.getScale().x))), boostBorder->getPosition().y });
+		dashInfiniteObj->setPosition({ (dashExtraObj->getPosition().x + ((gravityIcon.getSpriteSize().x*gravityIcon.getScale().x))), boostBorder->getPosition().y });
 
 	}
 	else {
@@ -45,6 +88,7 @@ PlayerController::PlayerController(GameObject *gameObject) : Component(gameObjec
 		boostDisplay->name = this->getGameObject()->name + "_BoostDisplay";
 		boostBox.setScale({ 1,0.4 });
 		boostBox.setOrderInBatch(1);
+		boostBox.setColor(RocketBall::gameInstance->player2Color);
 		boostSpriteComp->setSprite(boostBox);
 		boostDisplay->setPosition({
 			RocketBall::gameInstance->windowSize.x * 0.5f - 22.5f,
@@ -58,7 +102,21 @@ PlayerController::PlayerController(GameObject *gameObject) : Component(gameObjec
 		boostBorder->setPosition({ (RocketBall::gameInstance->windowSize.x * 0.5f) - (boostBorderBox.getSpriteSize().x*0.5) - 20.0f,
 			(-RocketBall::gameInstance->windowSize.y * 0.5f) + ((RocketBall::gameInstance->mySpriteAtlas->get("Grass.png").getSpriteSize().y * 0.5f) * 0.5f) - 20.0f });
 
+		gravityObj->setPosition({ (boostBorder->getPosition().x - (boostBorderBox.getSpriteSize().x*boostBorderBox.getScale().x)*0.5) - ((gravityIcon.getSpriteSize().x*gravityIcon.getScale().x)*0.5), boostBorder->getPosition().y });
+		speedObj->setPosition({ (gravityObj->getPosition().x - ((gravityIcon.getSpriteSize().x*gravityIcon.getScale().x))), boostBorder->getPosition().y });
+		dashBoostObj->setPosition({ (speedObj->getPosition().x - ((gravityIcon.getSpriteSize().x*gravityIcon.getScale().x))), boostBorder->getPosition().y });
+		dashExtraObj->setPosition({ (dashBoostObj->getPosition().x - ((gravityIcon.getSpriteSize().x*gravityIcon.getScale().x))), boostBorder->getPosition().y });
+		dashInfiniteObj->setPosition({ (dashExtraObj->getPosition().x - ((gravityIcon.getSpriteSize().x*gravityIcon.getScale().x))), boostBorder->getPosition().y });
+
 	}
+
+	gravitySpriteComp->setSprite(gravityIcon);
+	speedSpriteComp->setSprite(speedIcon);
+	dashBoostSpriteComp->setSprite(dashBoostIcon);
+	dashExtraSpriteComp->setSprite(dashExtraIcon);
+	dashInfiniteSpriteComp->setSprite(dashInfiniteIcon);
+#pragma endregion
+
 }
 
 bool PlayerController::onJoyInput(SDL_Event &event)
@@ -102,11 +160,19 @@ bool PlayerController::onJoyInput(SDL_Event &event)
 			if (axisIndex == 5)
 			{
 				float newVal = Remap(event.jaxis.value, -32768, 32767, 0, 1);
-
 				//SETTING PROPER DIRECTION
 				if (!facingRight)
 				{
 					newVal = -newVal;
+				}
+				cout << "Joystix indx: 1; Val: " << newVal << " curr movement vector: " << movementVector.x << std::endl;
+				if ((newVal <= 0 && movementVector.x > 0) || (newVal >= 0 && movementVector.x < 0))
+				{
+					if (abs(newVal) < abs(movementVector.x))
+					{
+						cout << "Returning" << std::endl;
+						return false;
+					}
 				}
 				movementVector.x = newVal;
 			}
@@ -115,11 +181,20 @@ bool PlayerController::onJoyInput(SDL_Event &event)
 				float newVal = Remap(event.jaxis.value, -32768, 32767, 0, 1);
 
 				//SETTING PROPER DIRECTION
-				if (!facingRight)
+				if (facingRight)
 				{
 					newVal = -newVal;
 				}
-				movementVector.x = -newVal;
+				cout << "Joystix indx: 2; Val: " << newVal << " curr movement vector: " << movementVector.x << std::endl;
+				if ((newVal <= 0 && movementVector.x > 0) || (newVal >= 0 && movementVector.x < 0))
+				{
+					if (abs(newVal) < abs(movementVector.x))
+					{
+						cout << "Returning" << std::endl;
+						return false;
+					}
+				}
+				movementVector.x = newVal;
 			}
 		}
 		if (event.type == SDL_JOYBUTTONDOWN)
@@ -156,56 +231,106 @@ bool PlayerController::onKey(SDL_Event &event) {
 	if (RocketBall::gameInstance->getGameState() == GameState::Running) {
 		if (event.type == SDL_KEYDOWN)
 		{
-			if (event.key.keysym.sym == SDLK_RIGHT)
-			{
-				movementVector.x = 1;
+			if (facingRight) {
+				if (event.key.keysym.sym == SDLK_RIGHT)
+				{
+					movementVector.x = 1;
+				}
+				else if (event.key.keysym.sym == SDLK_LEFT)
+				{
+					movementVector.x = -1;
+				}
+				if (event.key.keysym.sym == SDLK_RCTRL)
+				{
+					jump();
+				}
+				if (event.key.keysym.sym == SDLK_DOWN)
+				{
+					rotatingDown = true;
+				}
+				else if (event.key.keysym.sym == SDLK_UP)
+				{
+					rotatingUp = true;
+				}
+				if (event.key.keysym.sym == SDLK_RSHIFT)
+				{
+					isBoosting = true;
+				}
 			}
-			else if (event.key.keysym.sym == SDLK_LEFT)
+			else
 			{
-				movementVector.x = -1;
-			}
-			if (event.key.keysym.sym == SDLK_SPACE)
-			{
-				jump();
-			}
-			if (event.key.keysym.sym == SDLK_DOWN)
-			{
-				rotatingDown = true;
-			}
-			else if (event.key.keysym.sym == SDLK_UP)
-			{
-				rotatingUp = true;
-			}
-			if (event.key.keysym.sym == SDLK_RSHIFT)
-			{
-				isBoosting = true;
-			}
-			if (event.key.keysym.sym == SDLK_r)
-			{
-				playerPhysics->body->SetAwake(true);
+				if (event.key.keysym.sym == SDLK_a)
+				{
+					movementVector.x = 1;
+				}
+				else if (event.key.keysym.sym == SDLK_d)
+				{
+					movementVector.x = -1;
+				}
+				if (event.key.keysym.sym == SDLK_LCTRL)
+				{
+					jump();
+				}
+				if (event.key.keysym.sym == SDLK_s)
+				{
+					rotatingDown = true;
+				}
+				else if (event.key.keysym.sym == SDLK_w)
+				{
+					rotatingUp = true;
+				}
+				if (event.key.keysym.sym == SDLK_LSHIFT)
+				{
+					isBoosting = true;
+				}
 			}
 		}
 		else if (event.type == SDL_KEYUP)
 		{
-			if (event.key.keysym.sym == SDLK_RIGHT && movementVector.x > 0)
-			{
-				movementVector.x = 0;
+			if (facingRight) {
+				if (event.key.keysym.sym == SDLK_RIGHT && movementVector.x > 0)
+				{
+					movementVector.x = 0;
+				}
+				if (event.key.keysym.sym == SDLK_LEFT && movementVector.x < 0)
+				{
+					movementVector.x = 0;
+				}
+				if (event.key.keysym.sym == SDLK_DOWN)
+				{
+					rotatingDown = false;
+				}
+				else if (event.key.keysym.sym == SDLK_UP)
+				{
+					rotatingUp = false;
+				}
+				if (event.key.keysym.sym == SDLK_RSHIFT)
+				{
+					isBoosting = false;
+				}
 			}
-			if (event.key.keysym.sym == SDLK_LEFT && movementVector.x < 0)
+			else
 			{
-				movementVector.x = 0;
-			}
-			if (event.key.keysym.sym == SDLK_DOWN)
-			{
-				rotatingDown = false;
-			}
-			else if (event.key.keysym.sym == SDLK_UP)
-			{
-				rotatingUp = false;
-			}
-			if (event.key.keysym.sym == SDLK_RSHIFT)
-			{
-				isBoosting = false;
+				if (event.key.keysym.sym == SDLK_a && movementVector.x > 0)
+				{
+					movementVector.x = 0;
+				}
+				if (event.key.keysym.sym == SDLK_d && movementVector.x < 0)
+				{
+					movementVector.x = 0;
+				}
+				if (event.key.keysym.sym == SDLK_s)
+				{
+					rotatingDown = false;
+				}
+				else if (event.key.keysym.sym == SDLK_w)
+				{
+					rotatingUp = false;
+				}
+				if (event.key.keysym.sym == SDLK_LSHIFT)
+				{
+					isBoosting = false;
+				}
 			}
 		}
 	}
@@ -239,6 +364,14 @@ void PlayerController::update(float deltaTime)
 	//RAYCASTS
 	b2Vec2 to{ from.x + currentVelocity.x*0.1f,from.y + currentVelocity.y*0.1f };
 	b2Vec2 toGround{ from.x,from.y - 0.3f };
+	if (isGrounded) 
+	{
+		wasGrounded = true;
+	}
+	else 
+	{
+		wasGrounded = false;
+	}
 	isGrounded = false;
 	if (from != toGround) {
 		RocketBall::gameInstance->world->RayCast(this, from, toGround);
@@ -279,23 +412,28 @@ void PlayerController::update(float deltaTime)
 	//Rotate player
 	float targetRotation = 0.0f;
 	//ROTATE WITH KEYBOARD
-	if (rotatingUp) 
+	if (rotatingUp)
 	{
-		float rotationSpeed = 3.5f;
+		float rotationSpeed = keyboardRotateSpeed;
 		if (facingRight)
 		{
 			rotationSpeed = -rotationSpeed;
 		}
-		facingVector = glm::rotate(glm::vec2(1, 0), glm::radians(rotation - rotationSpeed));
+		facingVector = glm::rotate(glm::vec2(1, 0), glm::radians(rotation - rotationSpeed*deltaTime));
 	}
-	else if (rotatingDown) 
+	else if (rotatingDown)
 	{
-		float rotationSpeed = 3.5f;
+<<<<<<< HEAD
+		float rotationSpeed = keyboardRotateSpeed;
 		if (facingRight) 
+=======
+		float rotationSpeed = 3.5f;
+		if (facingRight)
+>>>>>>> origin/NewMartinBranch
 		{
 			rotationSpeed = -rotationSpeed;
 		}
-		facingVector = glm::rotate(glm::vec2(1, 0), glm::radians(rotation + rotationSpeed));
+		facingVector = glm::rotate(glm::vec2(1, 0), glm::radians(rotation + rotationSpeed * deltaTime));
 	}
 
 	if (!(facingVector.x == 0 && facingVector.y == 0))
@@ -306,7 +444,7 @@ void PlayerController::update(float deltaTime)
 	targetRotation = glm::degrees(targetRotation);
 
 	//cout << "Target: " << targetRotation << std::endl;
-	if (rotation != targetRotation && !isGrounded && !inDash) 
+	if (rotation != targetRotation && !isGrounded && !inDash)
 	{
 		setDelayedRotation(targetRotation);
 		//setRotation(targetRotation);
@@ -317,11 +455,11 @@ void PlayerController::update(float deltaTime)
 	}
 
 	//Moving player
+	//currentVelocity = playerPhysics->getLinearVelocity();
 	if (isGrounded) {
+
 		if (movementVector.x != 0)
 		{
-			float currentX = currentVelocity.x;
-
 			//If player presses the opposite direction set horizontal speed to 0
 			//if ((currentVelocity.x < 0 && movementVector.x>0) || (currentVelocity.x > 0 && movementVector.x < 0))
 			//{
@@ -331,15 +469,19 @@ void PlayerController::update(float deltaTime)
 			//If Speed is more than maxSpeed
 			float currentSpeed = currentVelocity.x;
 			//cout << "0. curr speed: " << currentSpeed << std::endl;
-			if (currentSpeed > maxSpeed && !isBoosting)
+			if (abs(currentSpeed) > maxSpeed && !isBoosting)
 			{
-				playerPhysics->setLinearVelocity((maxSpeed / currentSpeed) * currentVelocity);
+				//IF CURRENT SPEED IS OVER MAX SPEED DON'T BOOST
+				//playerPhysics->setLinearVelocity((maxSpeed / currentSpeed) * currentVelocity);
 			}
 			//IF not, increase speed
 			else
 			{
-				playerPhysics->addForce(glm::vec2(movementVector.x * acceleration * deltaTime, 0));
+				//cout << "IS APPLYING FORCE" << std::endl;
+				playerPhysics->setLinearVelocity(glm::vec2(currentSpeed + movementVector.x * acceleration * deltaTime, currentVelocity.y));
+				//playerPhysics->addForce(glm::vec2(movementVector.x * acceleration * deltaTime, 0));
 			}
+
 		}
 		else
 		{
@@ -348,9 +490,12 @@ void PlayerController::update(float deltaTime)
 	}
 
 	//Boosting player
-	if (isBoosting && currBoost > 0.0f)
+	if (isBoosting && (currBoost > 0.0f ||infiniteBoost))
 	{
-		currBoost -= boostBurnPerSecond*deltaTime;
+		if (!infiniteBoost) 
+		{
+			currBoost -= boostBurnPerSecond*deltaTime;
+		}
 		if (currBoost < 0)
 		{
 			currBoost = 0;
@@ -367,11 +512,11 @@ void PlayerController::update(float deltaTime)
 			//Adjusting for direction
 			if (facingRight)
 			{
-				playerPhysics->addForce(glm::vec2(glm::rotate(glm::vec2(1, 0), glm::radians(rotation)))* bostAccaleration);
+				playerPhysics->addForce(glm::vec2(glm::rotate(glm::vec2(1, 0), glm::radians(rotation)))* bostAccaleration *deltaTime);
 			}
 			else
 			{
-				playerPhysics->addForce(glm::vec2(glm::rotate(glm::vec2(-1, 0), glm::radians(rotation)))* bostAccaleration);
+				playerPhysics->addForce(glm::vec2(glm::rotate(glm::vec2(-1, 0), glm::radians(rotation)))* bostAccaleration*deltaTime);
 			}
 		}
 	}
@@ -380,15 +525,17 @@ void PlayerController::update(float deltaTime)
 	if (inDash)
 	{
 		dashCounter += deltaTime;
-		if (facingRight) 
+		float rotationChange = rotationPerSecond*deltaTime;
+		if (facingRight)
 		{
-			setRotation(rotation - rotationPerSecond*deltaTime);
+			rotationChange = -rotationChange;
+
 		}
-		else 
+		if (!dashingForward)
 		{
-			setRotation(rotation + rotationPerSecond*deltaTime);
+			rotationChange = -rotationChange;
 		}
-		
+		setRotation(rotation + rotationChange);
 		//Fcout << "inDash; " << dashCounter << " "<<deltaTime<<std::endl;
 		if (dashCounter > dashDuration)
 		{
@@ -398,8 +545,43 @@ void PlayerController::update(float deltaTime)
 	}
 	//boost sprite
 	boostSprite.setScale({ currBoost, 0.4 });
-	boostSprite.setColor({ currBoost, 0.0f, 0.0f,1.0f });
+	//boostSprite.setColor({ currBoost, 0.0f, 0.0f,1.0f });
 	boostDisplay->getComponent<SpriteComponent>()->setSprite(boostSprite);
+
+
+	//////////////////// CHECK FOR POWERUPS
+	for (std::map<ENUM_POWERUPS, float>::iterator it = powerupTimers.begin(); it != powerupTimers.end(); ++it) 
+	{
+		if (it->second > 0) 
+		{
+			it->second += deltaTime;
+		}
+
+		if (it->second >= powerupDuration) 
+		{
+			it->second = 0;
+			switch (it->first)
+			{
+			case ENUM_POWERUPS::DashCountIncrease:
+				dashCountPowerUp(false);
+			break;
+			case ENUM_POWERUPS::SpeedIncrease:
+				dashCountPowerUp(false);
+				break;
+			case ENUM_POWERUPS::DashSpeedIncrease:
+				dashPowerUp(false);
+				break;
+			case ENUM_POWERUPS::InfiniteBoost:
+				infiniteBoostPowerUp(false);
+				break;
+			case ENUM_POWERUPS::GravityMod:
+				gravityPowerUp(false);
+				break;
+			default:
+				break;
+			}
+		}
+	}
 }
 
 float PlayerController::angleBetweenVectors(glm::vec2 vec1, glm::vec2 vec2)
@@ -476,7 +658,7 @@ float PlayerController::lerp(float a, float b, float f)
 	return a + f * (b - a);
 }
 
-float PlayerController::clerp(float start, float end, float value) 
+float PlayerController::clerp(float start, float end, float value)
 {
 	float min = 0.0f;
 	float max = 360.0f;
@@ -514,6 +696,14 @@ void PlayerController::jump()
 			airDashCounter++;
 			inDash = true;
 			dashCounter = 0;
+			if (facingVector.x > 0)
+			{
+				dashingForward = true;
+			}
+			else if (facingVector.x < 0)
+			{
+				dashingForward = false;
+			}
 		}
 	}
 	else
@@ -555,10 +745,12 @@ void PlayerController::resetInputs()
 	movementVector = glm::vec2(0.0f, 0.0f);
 	facingVector = glm::vec2(0.0f, 0.0f);
 	rotation = 0.0f;
-	currBoost = maxBoost;
+	currBoost = maxBoost/4;
 	isBoosting = false;
 	rotatingDown = false;
 	rotatingUp = false;
+	if(!RocketBall::gameInstance->gameModeClassic)
+		DisableAllPowerups();
 }
 
 void PlayerController::endDash()
@@ -583,26 +775,139 @@ void PlayerController::rechargeBoost(float _val)
 	}
 }
 
-void PlayerController::gravityPowerUp()
+void PlayerController::DisableAllPowerups() 
 {
+	if(powerupTimers[ENUM_POWERUPS::GravityMod] > 0 && powerupTimers[ENUM_POWERUPS::GravityMod] <powerupDuration)
+	{
+		gravityPowerUp(false);
+	}
+
+	if (powerupTimers[ENUM_POWERUPS::SpeedIncrease] > 0 && powerupTimers[ENUM_POWERUPS::SpeedIncrease] <powerupDuration)
+	{
+		speedPowerUp(false);
+	}
+
+	if (powerupTimers[ENUM_POWERUPS::DashSpeedIncrease] > 0 && powerupTimers[ENUM_POWERUPS::DashSpeedIncrease] <powerupDuration)
+	{
+		dashPowerUp(false);
+	}
+	if (powerupTimers[ENUM_POWERUPS::DashCountIncrease] > 0 && powerupTimers[ENUM_POWERUPS::DashCountIncrease] <powerupDuration)
+	{
+		dashCountPowerUp(false);
+	}
+	if (powerupTimers[ENUM_POWERUPS::InfiniteBoost] > 0 && powerupTimers[ENUM_POWERUPS::InfiniteBoost] <powerupDuration)
+	{
+		infiniteBoostPowerUp(false);
+	}
+
 }
 
-void PlayerController::speedPowerUp()
+void PlayerController::gravityPowerUp(bool _enable)
 {
+	if (_enable)
+	{
+		if (powerupTimers[ENUM_POWERUPS::GravityMod] != 0) 
+		{
+			return;
+		}
+		playerPhysics->body->SetGravityScale(playerPhysics->body->GetGravityScale()*0.5f);
+		powerupTimers[ENUM_POWERUPS::GravityMod] = 0.01f;
+	}
+	else
+	{
+		powerupTimers[ENUM_POWERUPS::GravityMod] = 0;
+		playerPhysics->body->SetGravityScale(playerPhysics->body->GetGravityScale()/0.5f);
+	}
+
 }
 
-void PlayerController::dashPowerUp()
+void PlayerController::speedPowerUp(bool _enable)
 {
+	if (_enable)
+	{
+		if (powerupTimers[ENUM_POWERUPS::SpeedIncrease] != 0)
+		{
+			return;
+		}
+		maxSpeed*=1.5f;
+		acceleration *= 1.5f;
+		bostAccaleration *= 1.5f;
+		maxSpeedWhenBoosting *= 1.5f;
+		powerupTimers[ENUM_POWERUPS::SpeedIncrease] = 0.01f;
+	}
+	else
+	{
+		maxSpeed /= 1.5f;
+		acceleration /= 1.5f;
+		bostAccaleration /= 1.5f;
+		maxSpeedWhenBoosting /= 1.5f;
+		powerupTimers[ENUM_POWERUPS::SpeedIncrease] = 0;
+	}
+
 }
 
-void PlayerController::dashCountPowerUp()
+void PlayerController::dashPowerUp(bool _enable)
 {
+	if (_enable)
+	{
+		if (powerupTimers[ENUM_POWERUPS::DashSpeedIncrease] != 0)
+		{
+			return;
+		}
+		dashSpeed *= 2;
+		dashDuration *= 2;
+		powerupTimers[ENUM_POWERUPS::DashSpeedIncrease] = 0.01f;
+	}
+	else
+	{
+		dashSpeed /= 2;
+		dashDuration /= 2;
+		powerupTimers[ENUM_POWERUPS::DashSpeedIncrease] = 0;
+	}
+}
+
+void PlayerController::dashCountPowerUp(bool _enable)
+{
+	if (_enable) 
+	{
+		if (powerupTimers[ENUM_POWERUPS::DashCountIncrease] != 0)
+		{
+			return;
+		}
+		airDashesAvailable = 2;
+		powerupTimers[ENUM_POWERUPS::DashCountIncrease] = 0.01f;
+	}
+	else
+	{
+		airDashesAvailable = 1;
+		powerupTimers[ENUM_POWERUPS::DashCountIncrease] = 0;
+	}
+
+}
+
+void PlayerController::infiniteBoostPowerUp(bool _enable)
+{
+	if (_enable)
+	{
+		infiniteBoost = true;
+		rechargeBoost(1);
+		powerupTimers[ENUM_POWERUPS::InfiniteBoost] = 0.01f;
+	}
+	else
+	{
+		infiniteBoost = false;
+		powerupTimers[ENUM_POWERUPS::InfiniteBoost] = 0;
+	}
 }
 
 float32 PlayerController::ReportFixture(b2Fixture *fixture, const b2Vec2 &point, const b2Vec2 &normal, float32 fraction) {
 	string objName = ((GameObject*)fixture->GetBody()->GetUserData())->name;
-	if (objName == "grass" || objName == "OuterBall" || objName == "Player_1" || objName == "Player_2")
+	if (objName == "grass" || objName == "OuterBall" || objName == "Player_1" || objName == "Player_2" || objName == "Wall2")
 	{
+		if (!wasGrounded) 
+		{
+			facingVector = glm::vec2(0, 0);
+		}
 		resetJumps();
 		//cout << "GROUNDED" << std::endl;
 		//facingVector = glm::vec2(0, 0);
