@@ -76,6 +76,7 @@ void AbilityComponent::SelectAbilityType() {
 		color = glm::vec4{ 1.0f, 0.2f, 0.2f, 1.0f };
 		abilitySprite.setColor(color);
 		abilitySprite.setScale(originalScale);
+		abilitySprite.setOrderInBatch(9);
 		this->gameObject->getComponent<SpriteComponent>()->setSprite(abilitySprite);
 		break;
 	case 1:
@@ -84,6 +85,7 @@ void AbilityComponent::SelectAbilityType() {
 		color = glm::vec4{ 1.0f, 0.1f, 0.1f, 1.0f };
 		abilitySprite.setColor(color);
 		abilitySprite.setScale(originalScale);
+		abilitySprite.setOrderInBatch(9);
 		this->gameObject->getComponent<SpriteComponent>()->setSprite(abilitySprite);
 		break;
 	case 2:
@@ -92,6 +94,7 @@ void AbilityComponent::SelectAbilityType() {
 		color = glm::vec4{ 0.2f, 0.2f, 1.0f, 1.0f };
 		abilitySprite.setColor(color);
 		abilitySprite.setScale(originalScale);
+		abilitySprite.setOrderInBatch(9);
 		this->gameObject->getComponent<SpriteComponent>()->setSprite(abilitySprite);
 		break;
 	case 3:
@@ -100,6 +103,7 @@ void AbilityComponent::SelectAbilityType() {
 		color = glm::vec4{ 1.0f, 0.2f, 1.0f, 1.0f };
 		abilitySprite.setColor(color);
 		abilitySprite.setScale(originalScale);
+		abilitySprite.setOrderInBatch(9);
 		this->gameObject->getComponent<SpriteComponent>()->setSprite(abilitySprite);
 		break;
 	case 4:
@@ -108,6 +112,7 @@ void AbilityComponent::SelectAbilityType() {
 		color = glm::vec4{ 1.0f, 1.0f, 0.0f, 1.0f };
 		abilitySprite.setColor(color);
 		abilitySprite.setScale(originalScale);
+		abilitySprite.setOrderInBatch(9);
 		this->gameObject->getComponent<SpriteComponent>()->setSprite(abilitySprite);
 		break;
 	case 5:
@@ -116,6 +121,7 @@ void AbilityComponent::SelectAbilityType() {
 		color = glm::vec4{ 0.2f, 1.0f, 1.0f, 1.0f };
 		abilitySprite.setColor(color);
 		abilitySprite.setScale(originalScale);
+		abilitySprite.setOrderInBatch(9);
 		this->gameObject->getComponent<SpriteComponent>()->setSprite(abilitySprite);
 		break;
 	case 6:
@@ -124,6 +130,7 @@ void AbilityComponent::SelectAbilityType() {
 		color = glm::vec4{ 0.2f, 1.0f, 0.2f, 1.0f };
 		abilitySprite.setColor(color);
 		abilitySprite.setScale(originalScale);
+		abilitySprite.setOrderInBatch(9);
 		this->gameObject->getComponent<SpriteComponent>()->setSprite(abilitySprite);
 		break;
 	}

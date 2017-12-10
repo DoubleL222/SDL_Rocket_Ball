@@ -73,70 +73,110 @@ void SetPlayfield::createPlayField(std::shared_ptr<sre::SpriteAtlas> _mySpriteAt
 		0xFFFF
 	);
 
-	createAbilityBox(
-		/*Name*/"AbiBox_0",
-		/*Sprite*/_mySpriteAtlas->get("gray.png"), _mySpriteAtlas->get("PowerUpPlatformGreen.png"),
-		/*GameObject*/RocketBall::gameInstance->AbiBox_0,
-		/*Position*/{ 0, ((_mySpriteAtlas->get("gray.png").getSpriteSize().y)) - grassColBuffer },
-		/*Scale*/{ 0.5, 0.5 },
-		/*Col Buffer*/{ 0,0 },
-		/*PhysScale*/RocketBall::gameInstance->getPhysicsScale(),
-		/*Is large boost?*/true,
-		/*Cooldown*/10.0f
-	);
+	if (useFiveAbilityBoxes) {
+		createAbilityBox(
+			/*Name*/"AbiBox_0",
+			/*Sprite*/_mySpriteAtlas->get("gray.png"), _mySpriteAtlas->get("PowerUpPlatformGreen.png"),
+			/*GameObject*/RocketBall::gameInstance->AbiBox_0,
+			/*Position*/{ 0, ((_mySpriteAtlas->get("gray.png").getSpriteSize().y)) - grassColBuffer },
+			/*Scale*/{ 0.5, 0.5 },
+			/*Col Buffer*/{ 0,0 },
+			/*PhysScale*/RocketBall::gameInstance->getPhysicsScale(),
+			/*Is large boost?*/true,
+			/*Cooldown*/10.0f
+		);
 
-	//Left box 1
-	createAbilityBox(
-		/*Name*/"AbiBox_1",
-		/*Sprite*/_mySpriteAtlas->get("gray.png"), _mySpriteAtlas->get("PowerUpPlatformGreen.png"),
-		/*GameObject*/RocketBall::gameInstance->AbiBox_1,
-		/*Position*/{ -RocketBall::gameInstance->windowSize.x * 0.15f, ((_mySpriteAtlas->get("gray.png").getSpriteSize().y)) - grassColBuffer },
-		/*Scale*/{ 0.5, 0.5 },
-		/*Col Buffer*/{ 0,0 },
-		/*PhysScale*/RocketBall::gameInstance->getPhysicsScale(),
-		/*Is large boost?*/false,
-		/*Cooldown*/5.0f
-	);
+		//Left box 1
+		createAbilityBox(
+			/*Name*/"AbiBox_1",
+			/*Sprite*/_mySpriteAtlas->get("gray.png"), _mySpriteAtlas->get("PowerUpPlatformGreen.png"),
+			/*GameObject*/RocketBall::gameInstance->AbiBox_1,
+			/*Position*/{ -RocketBall::gameInstance->windowSize.x * 0.15f, ((_mySpriteAtlas->get("gray.png").getSpriteSize().y)) - grassColBuffer },
+			/*Scale*/{ 0.5, 0.5 },
+			/*Col Buffer*/{ 0,0 },
+			/*PhysScale*/RocketBall::gameInstance->getPhysicsScale(),
+			/*Is large boost?*/false,
+			/*Cooldown*/5.0f
+		);
 
-	//Left box 2
-	createAbilityBox(
-		/*Name*/"AbiBox_2",
-		/*Sprite*/_mySpriteAtlas->get("gray.png"), _mySpriteAtlas->get("PowerUpPlatformGreen.png"),
-		/*GameObject*/RocketBall::gameInstance->AbiBox_2,
-		/*Position*/{ -RocketBall::gameInstance->windowSize.x * 0.30f, ((_mySpriteAtlas->get("gray.png").getSpriteSize().y)) - grassColBuffer },
-		/*Scale*/{ 0.5, 0.5 },
-		/*Col Buffer*/{ 0,0 },
-		/*PhysScale*/RocketBall::gameInstance->getPhysicsScale(),
-		/*Is large boost?*/false,
-		/*Cooldown*/5.0f
-	);
+		//Left box 2
+		createAbilityBox(
+			/*Name*/"AbiBox_2",
+			/*Sprite*/_mySpriteAtlas->get("gray.png"), _mySpriteAtlas->get("PowerUpPlatformGreen.png"),
+			/*GameObject*/RocketBall::gameInstance->AbiBox_2,
+			/*Position*/{ -RocketBall::gameInstance->windowSize.x * 0.30f, ((_mySpriteAtlas->get("gray.png").getSpriteSize().y)) - grassColBuffer },
+			/*Scale*/{ 0.5, 0.5 },
+			/*Col Buffer*/{ 0,0 },
+			/*PhysScale*/RocketBall::gameInstance->getPhysicsScale(),
+			/*Is large boost?*/false,
+			/*Cooldown*/5.0f
+		);
 
-	//Right box 1
-	createAbilityBox(
-		/*Name*/"AbiBox_3",
-		/*Sprite*/_mySpriteAtlas->get("gray.png"), _mySpriteAtlas->get("PowerUpPlatformGreen.png"),
-		/*GameObject*/RocketBall::gameInstance->AbiBox_3,
-		/*Position*/{ RocketBall::gameInstance->windowSize.x * 0.15f, ((_mySpriteAtlas->get("gray.png").getSpriteSize().y)) - grassColBuffer },
-		/*Scale*/{ 0.5, 0.5 },
-		/*Col Buffer*/{ 0,0 },
-		/*PhysScale*/RocketBall::gameInstance->getPhysicsScale(),
-		/*Is large boost?*/false,
-		/*Cooldown*/5.0f
-	);
+		//Right box 1
+		createAbilityBox(
+			/*Name*/"AbiBox_3",
+			/*Sprite*/_mySpriteAtlas->get("gray.png"), _mySpriteAtlas->get("PowerUpPlatformGreen.png"),
+			/*GameObject*/RocketBall::gameInstance->AbiBox_3,
+			/*Position*/{ RocketBall::gameInstance->windowSize.x * 0.15f, ((_mySpriteAtlas->get("gray.png").getSpriteSize().y)) - grassColBuffer },
+			/*Scale*/{ 0.5, 0.5 },
+			/*Col Buffer*/{ 0,0 },
+			/*PhysScale*/RocketBall::gameInstance->getPhysicsScale(),
+			/*Is large boost?*/false,
+			/*Cooldown*/5.0f
+		);
 
-	//Right box 2
-	createAbilityBox(
-		/*Name*/"AbiBox_4",
-		/*Sprite*/_mySpriteAtlas->get("gray.png"), _mySpriteAtlas->get("PowerUpPlatformGreen.png"),
-		/*GameObject*/RocketBall::gameInstance->AbiBox_4,
-		/*Position*/{ RocketBall::gameInstance->windowSize.x * 0.30f, ((_mySpriteAtlas->get("gray.png").getSpriteSize().y)) - grassColBuffer },
-		/*Scale*/{ 0.5, 0.5 },
-		/*Col Buffer*/{ 0,0 },
-		/*PhysScale*/RocketBall::gameInstance->getPhysicsScale(),
-		/*Is large boost?*/false,
-		/*Cooldown*/5.0f
-	);
+		//Right box 2
+		createAbilityBox(
+			/*Name*/"AbiBox_4",
+			/*Sprite*/_mySpriteAtlas->get("gray.png"), _mySpriteAtlas->get("PowerUpPlatformGreen.png"),
+			/*GameObject*/RocketBall::gameInstance->AbiBox_4,
+			/*Position*/{ RocketBall::gameInstance->windowSize.x * 0.30f, ((_mySpriteAtlas->get("gray.png").getSpriteSize().y)) - grassColBuffer },
+			/*Scale*/{ 0.5, 0.5 },
+			/*Col Buffer*/{ 0,0 },
+			/*PhysScale*/RocketBall::gameInstance->getPhysicsScale(),
+			/*Is large boost?*/false,
+			/*Cooldown*/5.0f
+		);
+	}
+	else {
+		createAbilityBox(
+			/*Name*/"AbiBox_0",
+			/*Sprite*/_mySpriteAtlas->get("gray.png"), _mySpriteAtlas->get("PowerUpPlatformGreen.png"),
+			/*GameObject*/RocketBall::gameInstance->AbiBox_0,
+			/*Position*/{ 0, ((_mySpriteAtlas->get("gray.png").getSpriteSize().y)) - grassColBuffer },
+			/*Scale*/{ 0.5, 0.5 },
+			/*Col Buffer*/{ 0,0 },
+			/*PhysScale*/RocketBall::gameInstance->getPhysicsScale(),
+			/*Is large boost?*/true,
+			/*Cooldown*/10.0f
+		);
 
+		//Left box 1
+		createAbilityBox(
+			/*Name*/"AbiBox_1",
+			/*Sprite*/_mySpriteAtlas->get("gray.png"), _mySpriteAtlas->get("PowerUpPlatformGreen.png"),
+			/*GameObject*/RocketBall::gameInstance->AbiBox_1,
+			/*Position*/{ -RocketBall::gameInstance->windowSize.x * 0.25f, ((_mySpriteAtlas->get("gray.png").getSpriteSize().y)) - grassColBuffer },
+			/*Scale*/{ 0.5, 0.5 },
+			/*Col Buffer*/{ 0,0 },
+			/*PhysScale*/RocketBall::gameInstance->getPhysicsScale(),
+			/*Is large boost?*/false,
+			/*Cooldown*/5.0f
+		);
+
+		//Right box 1
+		createAbilityBox(
+			/*Name*/"AbiBox_3",
+			/*Sprite*/_mySpriteAtlas->get("gray.png"), _mySpriteAtlas->get("PowerUpPlatformGreen.png"),
+			/*GameObject*/RocketBall::gameInstance->AbiBox_2,
+			/*Position*/{ RocketBall::gameInstance->windowSize.x * 0.25f, ((_mySpriteAtlas->get("gray.png").getSpriteSize().y)) - grassColBuffer },
+			/*Scale*/{ 0.5, 0.5 },
+			/*Col Buffer*/{ 0,0 },
+			/*PhysScale*/RocketBall::gameInstance->getPhysicsScale(),
+			/*Is large boost?*/false,
+			/*Cooldown*/5.0f
+		);
+	}
 
 	//Left Corner Box
 	createStaticBox(
@@ -213,6 +253,7 @@ void SetPlayfield::createWallAndGoals(std::string name, sre::Sprite Goalsprite, 
 	staticBox_1.setScale({ wallScaleX, wallScaleY });
 	staticBox_2.setScale({ wallScaleX, botYScale });
 
+	goalBox.setOrderInBatch(20);
 	goalBoxSpriteComp->setSprite(goalBox);
 	staticBoxSpriteComp_1->setSprite(staticBox_1);
 	staticBoxSpriteComp_2->setSprite(staticBox_2);
@@ -285,14 +326,15 @@ void SetPlayfield::createAbilityBox(std::string name, sre::Sprite sprite, sre::S
 	else
 		abilityBox.setScale({ scale });
 
-	spritePlatform.setScale({ scale.x*1.5 , scale.y *1.5});
+	spritePlatform.setScale({ scale.x*1.5 , scale.y *1.5 });
 
 
-	abilityBox_obj->setPosition({ pos.x, pos.y + (-(RocketBall::gameInstance->windowSize.y * 0.5f) + (sprite.getSpriteSize().x * 0.5f)*scale.y) });
-	abiBoxPlatform->setPosition({ pos.x, abilityBox_obj->getPosition().y - (abilityBox.getSpriteSize().y*scale.y)*0.5 });
-	abilityBoxSpriteComp->setSprite(abilityBox);
 	spritePlatform.setOrderInBatch(5);
 	abilityPlatformSpriteComp->setSprite(spritePlatform);
+	abilityBox_obj->setPosition({ pos.x, pos.y + (-(RocketBall::gameInstance->windowSize.y * 0.5f) + (sprite.getSpriteSize().x * 0.5f)*scale.y) });
+	abiBoxPlatform->setPosition({ pos.x, abilityBox_obj->getPosition().y - (abilityBox.getSpriteSize().y*scale.y)*0.5 });
+	abilityBox.setOrderInBatch(9);
+	abilityBoxSpriteComp->setSprite(abilityBox);
 
 
 	glm::vec2 scaleCol_Goal{
@@ -311,10 +353,16 @@ void SetPlayfield::createAbilityBox(std::string name, sre::Sprite sprite, sre::S
 }
 
 void SetPlayfield::readyAbilityBoxes(bool readyTheBox) {
-	RocketBall::gameInstance->AbiBox_0->getComponent<AbilityComponent>()->readyBox(readyTheBox);
-	RocketBall::gameInstance->AbiBox_1->getComponent<AbilityComponent>()->readyBox(readyTheBox);
-	RocketBall::gameInstance->AbiBox_2->getComponent<AbilityComponent>()->readyBox(readyTheBox);
-	RocketBall::gameInstance->AbiBox_3->getComponent<AbilityComponent>()->readyBox(readyTheBox);
-	RocketBall::gameInstance->AbiBox_4->getComponent<AbilityComponent>()->readyBox(readyTheBox);
-
+	if (useFiveAbilityBoxes) {
+		RocketBall::gameInstance->AbiBox_0->getComponent<AbilityComponent>()->readyBox(readyTheBox);
+		RocketBall::gameInstance->AbiBox_1->getComponent<AbilityComponent>()->readyBox(readyTheBox);
+		RocketBall::gameInstance->AbiBox_2->getComponent<AbilityComponent>()->readyBox(readyTheBox);
+		RocketBall::gameInstance->AbiBox_3->getComponent<AbilityComponent>()->readyBox(readyTheBox);
+		RocketBall::gameInstance->AbiBox_4->getComponent<AbilityComponent>()->readyBox(readyTheBox);
+	}
+	else {
+		RocketBall::gameInstance->AbiBox_0->getComponent<AbilityComponent>()->readyBox(readyTheBox);
+		RocketBall::gameInstance->AbiBox_1->getComponent<AbilityComponent>()->readyBox(readyTheBox);
+		RocketBall::gameInstance->AbiBox_2->getComponent<AbilityComponent>()->readyBox(readyTheBox);
+	}
 }

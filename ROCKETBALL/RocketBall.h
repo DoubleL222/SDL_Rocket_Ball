@@ -64,7 +64,7 @@ public:
 	void nextRound();
 
 	glm::vec2 goalSizes{ 0.8, 2 };
-	float botYBoxSize = 0.5;
+	float botYBoxSize = 1.5;
 
 	virtual void BeginContact(b2Contact *contact) override;
 	virtual void EndContact(b2Contact *contact) override;
@@ -75,15 +75,14 @@ public:
 
 	static RocketBall* gameInstance;
 
-	std::shared_ptr<GameObject> AbiBox_0, AbiBox_1, AbiBox_2, AbiBox_3, AbiBox_4;
-
+	std::shared_ptr<GameObject> AbiBox_0 = nullptr, AbiBox_1 = nullptr, AbiBox_2 = nullptr, AbiBox_3 = nullptr, AbiBox_4 = nullptr;
 	void setTextAndPlaySound(int switchIndex);
 
 	void setGameState(GameState newState);
 	GameState getGameState();
 
 	void playPickUp();
-	
+
 	b2World * world = nullptr;
 
 private:

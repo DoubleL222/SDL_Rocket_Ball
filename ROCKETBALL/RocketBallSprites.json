@@ -56,7 +56,7 @@
 },
 {
 	"filename": "go.png",
-	"frame": {"x":547,"y":665,"w":250,"h":95},
+	"frame": {"x":279,"y":511,"w":250,"h":95},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":125,"y":85,"w":250,"h":95},
@@ -74,29 +74,11 @@
 },
 {
 	"filename": "goalMain.png",
-	"frame": {"x":279,"y":779,"w":128,"h":128},
+	"frame": {"x":279,"y":618,"w":128,"h":128},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
 	"sourceSize": {"w":128,"h":128},
-	"pivot": {"x":0.5,"y":0.5}
-},
-{
-	"filename": "goalMainV2.png",
-	"frame": {"x":419,"y":779,"w":128,"h":128},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
-	"sourceSize": {"w":128,"h":128},
-	"pivot": {"x":0.5,"y":0.5}
-},
-{
-	"filename": "goalMainV3.png",
-	"frame": {"x":279,"y":511,"w":256,"h":256},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
-	"sourceSize": {"w":256,"h":256},
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
@@ -110,7 +92,7 @@
 },
 {
 	"filename": "gray.png",
-	"frame": {"x":547,"y":525,"w":128,"h":128},
+	"frame": {"x":279,"y":758,"w":128,"h":128},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
@@ -119,7 +101,7 @@
 },
 {
 	"filename": "infiniteBoost.png",
-	"frame": {"x":687,"y":525,"w":128,"h":128},
+	"frame": {"x":419,"y":618,"w":128,"h":128},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
@@ -128,7 +110,7 @@
 },
 {
 	"filename": "largeBoost.png",
-	"frame": {"x":827,"y":525,"w":128,"h":128},
+	"frame": {"x":419,"y":758,"w":128,"h":128},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
@@ -137,7 +119,7 @@
 },
 {
 	"filename": "lowGravity.png",
-	"frame": {"x":809,"y":665,"w":128,"h":128},
+	"frame": {"x":559,"y":525,"w":128,"h":128},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
@@ -145,26 +127,8 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "PowerUpPlatformBlue.png",
-	"frame": {"x":891,"y":11,"w":73,"h":33},
-	"rotated": false,
-	"trimmed": true,
-	"spriteSourceSize": {"x":27,"y":52,"w":73,"h":33},
-	"sourceSize": {"w":128,"h":128},
-	"pivot": {"x":0.5,"y":0.5}
-},
-{
 	"filename": "PowerUpPlatformGreen.png",
-	"frame": {"x":891,"y":56,"w":73,"h":33},
-	"rotated": false,
-	"trimmed": true,
-	"spriteSourceSize": {"x":27,"y":52,"w":73,"h":33},
-	"sourceSize": {"w":128,"h":128},
-	"pivot": {"x":0.5,"y":0.5}
-},
-{
-	"filename": "PowerUpPlatformRed.png",
-	"frame": {"x":891,"y":101,"w":73,"h":33},
+	"frame": {"x":891,"y":11,"w":73,"h":33},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":27,"y":52,"w":73,"h":33},
@@ -182,7 +146,7 @@
 },
 {
 	"filename": "smallBoost.png",
-	"frame": {"x":559,"y":805,"w":128,"h":128},
+	"frame": {"x":699,"y":525,"w":128,"h":128},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
@@ -200,7 +164,7 @@
 },
 {
 	"filename": "speedBoostV2.png",
-	"frame": {"x":699,"y":805,"w":128,"h":128},
+	"frame": {"x":839,"y":525,"w":128,"h":128},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
@@ -232,6 +196,6 @@
 	"format": "RGBA8888",
 	"size": {"w":1024,"h":1024},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:32a1ba4f3d8cd5875750367760d6f841:a5bd608fb0c1bcb21c5942248a82f2b4:abc763de9f831949696569c25140e526$"
+	"smartupdate": "$TexturePacker:SmartUpdate:11c4ad9b086ff2308dad1351eca8e62d:833be635cdd5b9ca8f1fb8f4a9d6699d:abc763de9f831949696569c25140e526$"
 }
 }
