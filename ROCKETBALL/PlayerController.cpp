@@ -515,6 +515,7 @@ void PlayerController::update(float deltaTime)
 	//CHECK FOR DASH
 	if (inDash)
 	{
+		cout << "in dash: " << deltaTime << std::endl;
 		dashCounter += deltaTime;
 		float rotationChange = rotationPerSecond*deltaTime;
 		if (facingRight)
@@ -685,6 +686,7 @@ void PlayerController::jump()
 		else
 		{
 			airDashCounter++;
+			dashCounter = 0;
 			inDash = true;
 			if (facingVector.x > 0)
 			{
@@ -820,19 +822,19 @@ void PlayerController::speedPowerUp(bool _enable)
 		{
 			return;
 		}
-		maxSpeed*=1.2f;
-		acceleration *= 1.2f;
-		bostAccaleration *= 1.1f;
-		maxSpeedWhenBoosting *= 1.1f;
+		maxSpeed*=1.3f;
+		acceleration *= 1.3f;
+		bostAccaleration *= 1.3f;
+		maxSpeedWhenBoosting *= 1.3f;
 		powerupTimers[ENUM_POWERUPS::SpeedIncrease] = 0.01f;
 	}
 	else
 	{
 		powerupTimers[ENUM_POWERUPS::SpeedIncrease] = 0;
-		maxSpeed /= 1.2f;
-		acceleration /= 1.2f;
-		bostAccaleration /= 1.1f;
-		maxSpeedWhenBoosting /= 1.1f;
+		maxSpeed /= 1.3f;
+		acceleration /= 1.3f;
+		bostAccaleration /= 1.3f;
+		maxSpeedWhenBoosting /= 1.3f;
 
 	}
 
