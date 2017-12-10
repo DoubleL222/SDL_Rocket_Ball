@@ -11,6 +11,7 @@
 using namespace std;
 PlayerController::PlayerController(GameObject *gameObject) : Component(gameObject)
 {
+	//check which player and assign color
 	if (this->getGameObject()->name == "Player_1") {
 		_color = RocketBall::gameInstance->player2Color;
 	}
@@ -27,26 +28,29 @@ PlayerController::PlayerController(GameObject *gameObject) : Component(gameObjec
 		powerupTimers.insert(std::pair<ENUM_POWERUPS, float>(curr, 0.0f));
 	}
 
+	//Create gameobject for the boosting display and its border/background
 	boostBox = RocketBall::gameInstance->mySpriteAtlas->get("boostMain.png");
 	boostDisplay = RocketBall::gameInstance->createGameObject();
 	boostBorderBox = RocketBall::gameInstance->mySpriteAtlas->get("boostBorderBackground.png");
 	boostBorder = RocketBall::gameInstance->createGameObject();
-
 	auto boostSpriteComp = boostDisplay->addComponent<SpriteComponent>();
 	auto boostBorderSpriteComp = boostBorder->addComponent<SpriteComponent>();
 
+	//create gameobjects to hold the icons
 	gravityObj = RocketBall::gameInstance->createGameObject();
 	speedObj = RocketBall::gameInstance->createGameObject();
 	dashBoostObj = RocketBall::gameInstance->createGameObject();
 	dashExtraObj = RocketBall::gameInstance->createGameObject();
 	dashInfiniteObj = RocketBall::gameInstance->createGameObject();
 
+	//assign the icons
 	gravityIcon = RocketBall::gameInstance->mySpriteAtlas->get("lowGravity.png");
 	speedIcon = RocketBall::gameInstance->mySpriteAtlas->get("speedBoostV2.png");
 	dashBoostIcon = RocketBall::gameInstance->mySpriteAtlas->get("dashBoost.png");
 	dashExtraIcon = RocketBall::gameInstance->mySpriteAtlas->get("ExtraJump.png");
 	dashInfiniteIcon = RocketBall::gameInstance->mySpriteAtlas->get("infiniteBoost.png");
 
+	//Size of the icons
 	glm::vec2 iconScale({ 0.4,0.4 });
 	gravityIcon.setScale(iconScale);
 	speedIcon.setScale(iconScale);
@@ -54,12 +58,14 @@ PlayerController::PlayerController(GameObject *gameObject) : Component(gameObjec
 	dashExtraIcon.setScale(iconScale);
 	dashInfiniteIcon.setScale(iconScale);
 
+	//Icon sprite components
 	auto gravitySpriteComp = gravityObj->addComponent<SpriteComponent>();
 	auto speedSpriteComp = speedObj->addComponent<SpriteComponent>();
 	auto dashBoostSpriteComp = dashBoostObj->addComponent<SpriteComponent>();
 	auto dashExtraSpriteComp = dashExtraObj->addComponent<SpriteComponent>();
 	auto dashInfiniteSpriteComp = dashInfiniteObj->addComponent<SpriteComponent>();
 
+	//Assign icon's position based on which player is holding the PlayerController
 	if (this->getGameObject()->name == "Player_2") {
 
 		boostDisplay->name = this->getGameObject()->name + "_BoostDisplay";
@@ -113,6 +119,7 @@ PlayerController::PlayerController(GameObject *gameObject) : Component(gameObjec
 
 	}
 
+	//Set the sprites
 	gravitySpriteComp->setSprite(gravityIcon);
 	speedSpriteComp->setSprite(speedIcon);
 	dashBoostSpriteComp->setSprite(dashBoostIcon);
@@ -541,9 +548,11 @@ void PlayerController::update(float deltaTime)
 			endDash();
 		}
 	}
-	//boost sprite
+
+	//boost sprite, set scale according to current boost (between 0 and 1)
+	//The boost sprite has a custom pivot position in the JSON (x = 0) to
+	//ensure the sprite scales from x = 0
 	boostSprite.setScale({ currBoost, 0.4 });
-	//boostSprite.setColor({ currBoost, 0.0f, 0.0f,1.0f });
 	boostDisplay->getComponent<SpriteComponent>()->setSprite(boostSprite);
 
 
