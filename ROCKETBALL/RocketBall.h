@@ -63,7 +63,7 @@ public:
 
 	void nextRound();
 
-	glm::vec2 goalSizes{ 0.8, 2};
+	glm::vec2 goalSizes{ 0.8, 2 };
 	float botYBoxSize = 0.5;
 
 	virtual void BeginContact(b2Contact *contact) override;
@@ -82,6 +82,8 @@ public:
 	void setGameState(GameState newState);
 	GameState getGameState();
 
+	void playPickUp();
+	
 	b2World * world = nullptr;
 
 private:
@@ -89,12 +91,13 @@ private:
 	std::shared_ptr<GameObject> soccerBall, soccerBallInner;
 	std::shared_ptr<GameObject> player1, player2;
 	std::shared_ptr<GameObject> textHolder;
-	sre::Sprite goalText, readyText, winnerText, goText;
 	std::shared_ptr<PhysicsComponent> OuterBallPhyiscs, InnerBallPhysics;
 	b2Vec2 b2P1Origin, b2P2Origin, b2sbOuterOrigin, b2sbInnerOrigin;
 	glm::vec2 P1Origin, P2Origin, sbOuterOrigin, sbInnerOrigin;
 
-	Mix_Chunk *goalSound, *readySound, *goSound, *winnerSound;
+	sre::Sprite goalText, readyText, winnerP1Text, winnerP2Text, goText;
+
+	Mix_Chunk *goalSound, *readySound, *goSound, *winnerSound, *pickUpSound;
 	Mix_Music *music;
 
 	SDL_Joystick * joy1;
