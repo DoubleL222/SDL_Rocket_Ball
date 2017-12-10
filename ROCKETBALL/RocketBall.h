@@ -97,7 +97,7 @@ private:
 
 	sre::Sprite goalText, readyText, winnerP1Text, winnerP2Text, goText;
 
-	Mix_Chunk *goalSound, *readySound, *goSound, *winnerSound, *pickUpSound;
+	Mix_Chunk *goalSound = nullptr, *readySound = nullptr, *goSound = nullptr, *winnerSound = nullptr, *pickUpSound = nullptr;
 	Mix_Music *music;
 
 	SDL_Joystick * joy1;

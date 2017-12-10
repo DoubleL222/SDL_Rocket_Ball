@@ -154,11 +154,11 @@ void AbilityComponent::ProvideAbility(PhysicsComponent *PhysComp) {
 		break;
 	case 5:
 		//Dash Extra
-		PhysComp->getGameObject()->getComponent<PlayerController>()->dashPowerUp(true);
+		PhysComp->getGameObject()->getComponent<PlayerController>()->dashCountPowerUp(true);
 		break;
 	case 6:
 		//Dash Extra
-		//PhysComp->getGameObject()->getComponent<PlayerController>()->infiniteBoostPowerUp();
+		PhysComp->getGameObject()->getComponent<PlayerController>()->infiniteBoostPowerUp(true);
 		break;
 	}
 	readyBox(false);

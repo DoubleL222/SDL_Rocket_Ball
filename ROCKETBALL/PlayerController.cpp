@@ -557,7 +557,7 @@ void PlayerController::update(float deltaTime)
 				dashCountPowerUp(false);
 			break;
 			case ENUM_POWERUPS::SpeedIncrease:
-				dashCountPowerUp(false);
+				speedPowerUp(false);
 				break;
 			case ENUM_POWERUPS::DashSpeedIncrease:
 				dashPowerUp(false);
@@ -686,7 +686,6 @@ void PlayerController::jump()
 		{
 			airDashCounter++;
 			inDash = true;
-			dashCounter = 0;
 			if (facingVector.x > 0)
 			{
 				dashingForward = true;
@@ -699,6 +698,7 @@ void PlayerController::jump()
 	}
 	else
 	{
+		airDashCounter = 0;
 		verticalJump = true;
 		inDash = false;
 	}
@@ -768,25 +768,25 @@ void PlayerController::rechargeBoost(float _val)
 
 void PlayerController::DisableAllPowerups() 
 {
-	if(powerupTimers[ENUM_POWERUPS::GravityMod] > 0 && powerupTimers[ENUM_POWERUPS::GravityMod] <powerupDuration)
+	if(powerupTimers[ENUM_POWERUPS::GravityMod] > 0)
 	{
 		gravityPowerUp(false);
 	}
 
-	if (powerupTimers[ENUM_POWERUPS::SpeedIncrease] > 0 && powerupTimers[ENUM_POWERUPS::SpeedIncrease] <powerupDuration)
+	if (powerupTimers[ENUM_POWERUPS::SpeedIncrease] > 0)
 	{
 		speedPowerUp(false);
 	}
 
-	if (powerupTimers[ENUM_POWERUPS::DashSpeedIncrease] > 0 && powerupTimers[ENUM_POWERUPS::DashSpeedIncrease] <powerupDuration)
+	if (powerupTimers[ENUM_POWERUPS::DashSpeedIncrease] > 0)
 	{
 		dashPowerUp(false);
 	}
-	if (powerupTimers[ENUM_POWERUPS::DashCountIncrease] > 0 && powerupTimers[ENUM_POWERUPS::DashCountIncrease] <powerupDuration)
+	if (powerupTimers[ENUM_POWERUPS::DashCountIncrease] > 0)
 	{
 		dashCountPowerUp(false);
 	}
-	if (powerupTimers[ENUM_POWERUPS::InfiniteBoost] > 0 && powerupTimers[ENUM_POWERUPS::InfiniteBoost] <powerupDuration)
+	if (powerupTimers[ENUM_POWERUPS::InfiniteBoost] > 0)
 	{
 		infiniteBoostPowerUp(false);
 	}
@@ -820,19 +820,20 @@ void PlayerController::speedPowerUp(bool _enable)
 		{
 			return;
 		}
-		maxSpeed*=1.5f;
-		acceleration *= 1.5f;
-		bostAccaleration *= 1.5f;
-		maxSpeedWhenBoosting *= 1.5f;
+		maxSpeed*=1.2f;
+		acceleration *= 1.2f;
+		bostAccaleration *= 1.1f;
+		maxSpeedWhenBoosting *= 1.1f;
 		powerupTimers[ENUM_POWERUPS::SpeedIncrease] = 0.01f;
 	}
 	else
 	{
-		maxSpeed /= 1.5f;
-		acceleration /= 1.5f;
-		bostAccaleration /= 1.5f;
-		maxSpeedWhenBoosting /= 1.5f;
 		powerupTimers[ENUM_POWERUPS::SpeedIncrease] = 0;
+		maxSpeed /= 1.2f;
+		acceleration /= 1.2f;
+		bostAccaleration /= 1.1f;
+		maxSpeedWhenBoosting /= 1.1f;
+
 	}
 
 }
@@ -845,15 +846,15 @@ void PlayerController::dashPowerUp(bool _enable)
 		{
 			return;
 		}
-		dashSpeed *= 2;
-		dashDuration *= 2;
+		dashSpeed *= 1.3f;
+		dashDuration *= 1.3f;
 		powerupTimers[ENUM_POWERUPS::DashSpeedIncrease] = 0.01f;
 	}
 	else
 	{
-		dashSpeed /= 2;
-		dashDuration /= 2;
 		powerupTimers[ENUM_POWERUPS::DashSpeedIncrease] = 0;
+		dashSpeed /= 1.3;
+		dashDuration /= 1.3;
 	}
 }
 
@@ -870,8 +871,8 @@ void PlayerController::dashCountPowerUp(bool _enable)
 	}
 	else
 	{
-		airDashesAvailable = 1;
 		powerupTimers[ENUM_POWERUPS::DashCountIncrease] = 0;
+		airDashesAvailable = 1;
 	}
 
 }
@@ -886,8 +887,8 @@ void PlayerController::infiniteBoostPowerUp(bool _enable)
 	}
 	else
 	{
-		infiniteBoost = false;
 		powerupTimers[ENUM_POWERUPS::InfiniteBoost] = 0;
+		infiniteBoost = false;
 	}
 }
 

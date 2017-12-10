@@ -106,7 +106,7 @@ void RocketBall::initGame() {
 	gameModeClassic = true;
 
 	music = Mix_LoadMUS("music.ogg");
-	winnerSound = Mix_LoadWAV("gameOverSound.ogg");
+//	winnerSound = Mix_LoadWAV("gameOverSound.ogg");
 	goalSound = Mix_LoadWAV("goalSound.ogg");
 	pickUpSound = Mix_LoadWAV("pickUpSound.ogg");
 	readySound = Mix_LoadWAV("readySound.ogg");
