@@ -12,14 +12,39 @@ using namespace std;
 
 PlayerController::PlayerController(GameObject *gameObject) : Component(gameObject)
 {
+#pragma region PlayerUI
 	boostBox = RocketBall::gameInstance->mySpriteAtlas->get("boostMain.png");
 	boostDisplay = RocketBall::gameInstance->createGameObject();
-
 	boostBorderBox = RocketBall::gameInstance->mySpriteAtlas->get("boostBorderBackground.png");
 	boostBorder = RocketBall::gameInstance->createGameObject();
 
 	auto boostSpriteComp = boostDisplay->addComponent<SpriteComponent>();
 	auto boostBorderSpriteComp = boostBorder->addComponent<SpriteComponent>();
+
+	gravityObj = RocketBall::gameInstance->createGameObject();
+	speedObj = RocketBall::gameInstance->createGameObject();
+	dashBoostObj = RocketBall::gameInstance->createGameObject();
+	dashExtraObj = RocketBall::gameInstance->createGameObject();
+	dashInfiniteObj = RocketBall::gameInstance->createGameObject();
+
+	gravityIcon = RocketBall::gameInstance->mySpriteAtlas->get("lowGravity.png");
+	speedIcon = RocketBall::gameInstance->mySpriteAtlas->get("speedBoostV2.png");
+	dashBoostIcon = RocketBall::gameInstance->mySpriteAtlas->get("dashBoost.png");
+	dashExtraIcon = RocketBall::gameInstance->mySpriteAtlas->get("ExtraJump.png");
+	dashInfiniteIcon = RocketBall::gameInstance->mySpriteAtlas->get("infiniteBoost.png");
+
+	glm::vec2 iconScale({ 0.4,0.4 });
+	gravityIcon.setScale(iconScale);
+	speedIcon.setScale(iconScale);
+	dashBoostIcon.setScale(iconScale);
+	dashExtraIcon.setScale(iconScale);
+	dashInfiniteIcon.setScale(iconScale);
+
+	auto gravitySpriteComp = gravityObj->addComponent<SpriteComponent>();
+	auto speedSpriteComp = speedObj->addComponent<SpriteComponent>();
+	auto dashBoostSpriteComp = dashBoostObj->addComponent<SpriteComponent>();
+	auto dashExtraSpriteComp = dashExtraObj->addComponent<SpriteComponent>();
+	auto dashInfiniteSpriteComp = dashInfiniteObj->addComponent<SpriteComponent>();
 
 	if (this->getGameObject()->name == "Player_2") {
 
@@ -39,6 +64,12 @@ PlayerController::PlayerController(GameObject *gameObject) : Component(gameObjec
 		boostBorderSpriteComp->setSprite(boostBorderBox);
 		boostBorder->setPosition({ (-RocketBall::gameInstance->windowSize.x * 0.5f) + (boostBorderBox.getSpriteSize().x*0.5) + 20.0f,
 			(-RocketBall::gameInstance->windowSize.y * 0.5f) + ((RocketBall::gameInstance->mySpriteAtlas->get("Grass.png").getSpriteSize().y * 0.5f) * 0.5f) - 20.0f });
+
+		gravityObj->setPosition({ (boostBorder->getPosition().x + (boostBorderBox.getSpriteSize().x*boostBorderBox.getScale().x)*0.5) + ((gravityIcon.getSpriteSize().x*gravityIcon.getScale().x)*0.5), boostBorder->getPosition().y });
+		speedObj->setPosition({ (gravityObj->getPosition().x + ((gravityIcon.getSpriteSize().x*gravityIcon.getScale().x))), boostBorder->getPosition().y });
+		dashBoostObj->setPosition({ (speedObj->getPosition().x + ((gravityIcon.getSpriteSize().x*gravityIcon.getScale().x))), boostBorder->getPosition().y });
+		dashExtraObj->setPosition({ (dashBoostObj->getPosition().x + ((gravityIcon.getSpriteSize().x*gravityIcon.getScale().x))), boostBorder->getPosition().y });
+		dashInfiniteObj->setPosition({ (dashExtraObj->getPosition().x + ((gravityIcon.getSpriteSize().x*gravityIcon.getScale().x))), boostBorder->getPosition().y });
 
 	}
 	else {
@@ -60,7 +91,21 @@ PlayerController::PlayerController(GameObject *gameObject) : Component(gameObjec
 		boostBorder->setPosition({ (RocketBall::gameInstance->windowSize.x * 0.5f) - (boostBorderBox.getSpriteSize().x*0.5) - 20.0f,
 			(-RocketBall::gameInstance->windowSize.y * 0.5f) + ((RocketBall::gameInstance->mySpriteAtlas->get("Grass.png").getSpriteSize().y * 0.5f) * 0.5f) - 20.0f });
 
+		gravityObj->setPosition({ (boostBorder->getPosition().x - (boostBorderBox.getSpriteSize().x*boostBorderBox.getScale().x)*0.5) - ((gravityIcon.getSpriteSize().x*gravityIcon.getScale().x)*0.5), boostBorder->getPosition().y });
+		speedObj->setPosition({ (gravityObj->getPosition().x - ((gravityIcon.getSpriteSize().x*gravityIcon.getScale().x))), boostBorder->getPosition().y });
+		dashBoostObj->setPosition({ (speedObj->getPosition().x - ((gravityIcon.getSpriteSize().x*gravityIcon.getScale().x))), boostBorder->getPosition().y });
+		dashExtraObj->setPosition({ (dashBoostObj->getPosition().x - ((gravityIcon.getSpriteSize().x*gravityIcon.getScale().x))), boostBorder->getPosition().y });
+		dashInfiniteObj->setPosition({ (dashExtraObj->getPosition().x - ((gravityIcon.getSpriteSize().x*gravityIcon.getScale().x))), boostBorder->getPosition().y });
+
 	}
+
+	gravitySpriteComp->setSprite(gravityIcon);
+	speedSpriteComp->setSprite(speedIcon);
+	dashBoostSpriteComp->setSprite(dashBoostIcon);
+	dashExtraSpriteComp->setSprite(dashExtraIcon);
+	dashInfiniteSpriteComp->setSprite(dashInfiniteIcon);
+#pragma endregion
+
 }
 
 bool PlayerController::onJoyInput(SDL_Event &event)
@@ -109,8 +154,8 @@ bool PlayerController::onJoyInput(SDL_Event &event)
 				{
 					newVal = -newVal;
 				}
-				cout << "Joystix indx: 1; Val: " << newVal << " curr movement vector: "<< movementVector.x << std::endl;
-				if ((newVal <= 0 && movementVector.x >0) || (newVal >= 0 && movementVector.x <0))
+				cout << "Joystix indx: 1; Val: " << newVal << " curr movement vector: " << movementVector.x << std::endl;
+				if ((newVal <= 0 && movementVector.x > 0) || (newVal >= 0 && movementVector.x < 0))
 				{
 					if (abs(newVal) < abs(movementVector.x))
 					{
@@ -130,9 +175,9 @@ bool PlayerController::onJoyInput(SDL_Event &event)
 					newVal = -newVal;
 				}
 				cout << "Joystix indx: 2; Val: " << newVal << " curr movement vector: " << movementVector.x << std::endl;
-				if ((newVal <= 0 && movementVector.x >0) || (newVal >= 0 && movementVector.x <0))
+				if ((newVal <= 0 && movementVector.x > 0) || (newVal >= 0 && movementVector.x < 0))
 				{
-					if (abs(newVal) < abs(movementVector.x)) 
+					if (abs(newVal) < abs(movementVector.x))
 					{
 						cout << "Returning" << std::endl;
 						return false;
@@ -201,7 +246,7 @@ bool PlayerController::onKey(SDL_Event &event) {
 					isBoosting = true;
 				}
 			}
-			else 
+			else
 			{
 				if (event.key.keysym.sym == SDLK_a)
 				{
@@ -253,7 +298,7 @@ bool PlayerController::onKey(SDL_Event &event) {
 					isBoosting = false;
 				}
 			}
-			else 
+			else
 			{
 				if (event.key.keysym.sym == SDLK_a && movementVector.x > 0)
 				{
@@ -348,7 +393,7 @@ void PlayerController::update(float deltaTime)
 	//Rotate player
 	float targetRotation = 0.0f;
 	//ROTATE WITH KEYBOARD
-	if (rotatingUp) 
+	if (rotatingUp)
 	{
 		float rotationSpeed = 3.5f;
 		if (facingRight)
@@ -357,10 +402,10 @@ void PlayerController::update(float deltaTime)
 		}
 		facingVector = glm::rotate(glm::vec2(1, 0), glm::radians(rotation - rotationSpeed));
 	}
-	else if (rotatingDown) 
+	else if (rotatingDown)
 	{
 		float rotationSpeed = 3.5f;
-		if (facingRight) 
+		if (facingRight)
 		{
 			rotationSpeed = -rotationSpeed;
 		}
@@ -375,7 +420,7 @@ void PlayerController::update(float deltaTime)
 	targetRotation = glm::degrees(targetRotation);
 
 	//cout << "Target: " << targetRotation << std::endl;
-	if (rotation != targetRotation && !isGrounded && !inDash) 
+	if (rotation != targetRotation && !isGrounded && !inDash)
 	{
 		setDelayedRotation(targetRotation);
 		//setRotation(targetRotation);
@@ -388,7 +433,7 @@ void PlayerController::update(float deltaTime)
 	//Moving player
 	//currentVelocity = playerPhysics->getLinearVelocity();
 	if (isGrounded) {
-		
+
 		if (movementVector.x != 0)
 		{
 			//If player presses the opposite direction set horizontal speed to 0
@@ -411,7 +456,7 @@ void PlayerController::update(float deltaTime)
 				playerPhysics->setLinearVelocity(glm::vec2(currentSpeed + movementVector.x * acceleration * deltaTime, currentVelocity.y));
 				//playerPhysics->addForce(glm::vec2(movementVector.x * acceleration * deltaTime, 0));
 			}
-			
+
 		}
 		else
 		{
@@ -453,12 +498,12 @@ void PlayerController::update(float deltaTime)
 	{
 		dashCounter += deltaTime;
 		float rotationChange = rotationPerSecond*deltaTime;
-		if (facingRight) 
+		if (facingRight)
 		{
 			rotationChange = -rotationChange;
-			
+
 		}
-		if (!dashingForward) 
+		if (!dashingForward)
 		{
 			rotationChange = -rotationChange;
 		}
@@ -550,7 +595,7 @@ float PlayerController::lerp(float a, float b, float f)
 	return a + f * (b - a);
 }
 
-float PlayerController::clerp(float start, float end, float value) 
+float PlayerController::clerp(float start, float end, float value)
 {
 	float min = 0.0f;
 	float max = 360.0f;
@@ -588,11 +633,11 @@ void PlayerController::jump()
 			airDashCounter++;
 			inDash = true;
 			dashCounter = 0;
-			if (facingVector.x > 0) 
+			if (facingVector.x > 0)
 			{
 				dashingForward = true;
 			}
-			else if(facingVector.x<0)
+			else if (facingVector.x < 0)
 			{
 				dashingForward = false;
 			}

@@ -106,10 +106,13 @@ void RocketBall::initGame() {
 	gameModeClassic = true;
 
 	music = Mix_LoadMUS("music.ogg");
-	winnerSound = Mix_LoadWAV("gameOverSound.ogg"); //needs sound change
+	winnerSound = Mix_LoadWAV("gameOverSound.ogg");
 	goalSound = Mix_LoadWAV("goalSound.ogg");
+	pickUpSound = Mix_LoadWAV("pickUpSound.ogg");
 	readySound = Mix_LoadWAV("readySound.ogg");
 	goSound = Mix_LoadWAV("goSound.ogg");
+
+	pickUpSound->volume = 20;
 
 	if (music != nullptr)
 		Mix_PlayMusic(music, -1);
@@ -119,9 +122,10 @@ void RocketBall::initGame() {
 	textHolder->name = "Text_Holder";
 	auto textHolderSpriteComp = textHolder->addComponent<SpriteComponent>();
 	goalText = mySpriteAtlas->get("goal.png");
-	winnerText = mySpriteAtlas->get("gameOver.png"); //needs text change
+	winnerP1Text = mySpriteAtlas->get("WinnerP1.png");
+	winnerP2Text = mySpriteAtlas->get("WinnerP2.png");
 	readyText = mySpriteAtlas->get("ready.png");
-	goText = mySpriteAtlas->get("getReady.png");
+	goText = mySpriteAtlas->get("go.png");
 	goalText.setColor({ 0.2f, 0.8f, 0.2f, 0.0f });
 	goalText.setScale({ 1,1 });
 	textHolderSpriteComp->setSprite(goalText);
@@ -130,7 +134,7 @@ void RocketBall::initGame() {
 	gameOverBool = false;
 
 	//Set gamemode before initilizing the playingfield
-	gameModeClassic = true;
+	gameModeClassic = false;
 	if (!setPlayField.playFieldInit) {
 		//Set size for the goals
 		setPlayField.setGoalSizes(goalSizes);
@@ -244,12 +248,13 @@ void RocketBall::setTextAndPlaySound(int switchIndex) {
 
 		if (player1Goals > player2Goals) {
 
-			winnerText.setColor(player1Color);
+			winnerP1Text.setColor(player1Color);
+			textHolder->getComponent<SpriteComponent>()->setSprite(winnerP1Text);
 		}
 		else {
-			winnerText.setColor(player2Color);
+			winnerP2Text.setColor(player2Color);
+			textHolder->getComponent<SpriteComponent>()->setSprite(winnerP2Text);
 		}
-		textHolder->getComponent<SpriteComponent>()->setSprite(winnerText);
 		break;
 	case 4:
 		//Go!
@@ -262,6 +267,15 @@ void RocketBall::setTextAndPlaySound(int switchIndex) {
 		textHolder->getComponent<SpriteComponent>()->setSprite(goText);
 		beginGame = true;
 		break;
+	}
+}
+
+void RocketBall::playPickUp() {
+
+	if (pickUpSound != nullptr)
+		Mix_PlayChannel(-1, pickUpSound, 0);
+	else {
+		cout << "couldnt find sound" << endl;
 	}
 }
 

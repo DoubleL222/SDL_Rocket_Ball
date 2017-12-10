@@ -75,7 +75,7 @@ void SetPlayfield::createPlayField(std::shared_ptr<sre::SpriteAtlas> _mySpriteAt
 
 	createAbilityBox(
 		/*Name*/"AbiBox_0",
-		/*Sprite*/_mySpriteAtlas->get("gray.png"),
+		/*Sprite*/_mySpriteAtlas->get("gray.png"), _mySpriteAtlas->get("PowerUpPlatformGreen.png"),
 		/*GameObject*/RocketBall::gameInstance->AbiBox_0,
 		/*Position*/{ 0, ((_mySpriteAtlas->get("gray.png").getSpriteSize().y)) - grassColBuffer },
 		/*Scale*/{ 0.5, 0.5 },
@@ -88,7 +88,7 @@ void SetPlayfield::createPlayField(std::shared_ptr<sre::SpriteAtlas> _mySpriteAt
 	//Left box 1
 	createAbilityBox(
 		/*Name*/"AbiBox_1",
-		/*Sprite*/_mySpriteAtlas->get("gray.png"),
+		/*Sprite*/_mySpriteAtlas->get("gray.png"), _mySpriteAtlas->get("PowerUpPlatformGreen.png"),
 		/*GameObject*/RocketBall::gameInstance->AbiBox_1,
 		/*Position*/{ -RocketBall::gameInstance->windowSize.x * 0.15f, ((_mySpriteAtlas->get("gray.png").getSpriteSize().y)) - grassColBuffer },
 		/*Scale*/{ 0.5, 0.5 },
@@ -101,7 +101,7 @@ void SetPlayfield::createPlayField(std::shared_ptr<sre::SpriteAtlas> _mySpriteAt
 	//Left box 2
 	createAbilityBox(
 		/*Name*/"AbiBox_2",
-		/*Sprite*/_mySpriteAtlas->get("gray.png"),
+		/*Sprite*/_mySpriteAtlas->get("gray.png"), _mySpriteAtlas->get("PowerUpPlatformGreen.png"),
 		/*GameObject*/RocketBall::gameInstance->AbiBox_2,
 		/*Position*/{ -RocketBall::gameInstance->windowSize.x * 0.30f, ((_mySpriteAtlas->get("gray.png").getSpriteSize().y)) - grassColBuffer },
 		/*Scale*/{ 0.5, 0.5 },
@@ -114,7 +114,7 @@ void SetPlayfield::createPlayField(std::shared_ptr<sre::SpriteAtlas> _mySpriteAt
 	//Right box 1
 	createAbilityBox(
 		/*Name*/"AbiBox_3",
-		/*Sprite*/_mySpriteAtlas->get("gray.png"),
+		/*Sprite*/_mySpriteAtlas->get("gray.png"), _mySpriteAtlas->get("PowerUpPlatformGreen.png"),
 		/*GameObject*/RocketBall::gameInstance->AbiBox_3,
 		/*Position*/{ RocketBall::gameInstance->windowSize.x * 0.15f, ((_mySpriteAtlas->get("gray.png").getSpriteSize().y)) - grassColBuffer },
 		/*Scale*/{ 0.5, 0.5 },
@@ -124,10 +124,10 @@ void SetPlayfield::createPlayField(std::shared_ptr<sre::SpriteAtlas> _mySpriteAt
 		/*Cooldown*/5.0f
 	);
 
-	//Right box 1
+	//Right box 2
 	createAbilityBox(
 		/*Name*/"AbiBox_4",
-		/*Sprite*/_mySpriteAtlas->get("gray.png"),
+		/*Sprite*/_mySpriteAtlas->get("gray.png"), _mySpriteAtlas->get("PowerUpPlatformGreen.png"),
 		/*GameObject*/RocketBall::gameInstance->AbiBox_4,
 		/*Position*/{ RocketBall::gameInstance->windowSize.x * 0.30f, ((_mySpriteAtlas->get("gray.png").getSpriteSize().y)) - grassColBuffer },
 		/*Scale*/{ 0.5, 0.5 },
@@ -270,19 +270,30 @@ void SetPlayfield::createWallAndGoals(std::string name, sre::Sprite Goalsprite, 
 }
 
 
-void SetPlayfield::createAbilityBox(std::string name, sre::Sprite sprite, std::shared_ptr<GameObject> &abilityBox_obj, glm::vec2 pos, glm::vec2 scale, glm::vec2 colBuffer, const float phyScale, bool isLargeBoost, float _cooldown) {
+void SetPlayfield::createAbilityBox(std::string name, sre::Sprite sprite, sre::Sprite spritePlatform, std::shared_ptr<GameObject> &abilityBox_obj, glm::vec2 pos, glm::vec2 scale, glm::vec2 colBuffer, const float phyScale, bool isLargeBoost, float _cooldown) {
 	auto abilityBox = sprite;
 	abilityBox_obj = RocketBall::gameInstance->createGameObject();
 	abilityBox_obj->name = name;
+	auto abiBoxPlatform = RocketBall::gameInstance->createGameObject();
+	abiBoxPlatform->name = name + "_abiPlatform";
+
 	auto abilityBoxSpriteComp = abilityBox_obj->addComponent<SpriteComponent>();
+	auto abilityPlatformSpriteComp = abiBoxPlatform->addComponent<SpriteComponent>();
 
 	if (isLargeBoost && RocketBall::gameInstance->gameModeClassic)
 		abilityBox.setScale({ scale.x * 1.25, scale.y * 1.25 });
 	else
 		abilityBox.setScale({ scale });
 
+	spritePlatform.setScale({ scale.x*1.5 , scale.y *1.5});
+
+
 	abilityBox_obj->setPosition({ pos.x, pos.y + (-(RocketBall::gameInstance->windowSize.y * 0.5f) + (sprite.getSpriteSize().x * 0.5f)*scale.y) });
+	abiBoxPlatform->setPosition({ pos.x, abilityBox_obj->getPosition().y - (abilityBox.getSpriteSize().y*scale.y)*0.5 });
 	abilityBoxSpriteComp->setSprite(abilityBox);
+	spritePlatform.setOrderInBatch(5);
+	abilityPlatformSpriteComp->setSprite(spritePlatform);
+
 
 	glm::vec2 scaleCol_Goal{
 		(abilityBox.getSpriteSize().x * abilityBox.getScale().x / 2) + colBuffer.x,

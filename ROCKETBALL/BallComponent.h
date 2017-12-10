@@ -2,14 +2,12 @@
 
 #include "Component.hpp"
 
-
 class BallComponent : public Component {
 private:
 
 	std::shared_ptr<PhysicsComponent> ballPhysics;
 	glm::vec2 initialPosition;
 	float blowBackForce;
-
 
 	void update(float deltaTime) override;
 

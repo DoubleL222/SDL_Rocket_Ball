@@ -11,7 +11,6 @@
 using namespace std;
 
 AbilityComponent::AbilityComponent(GameObject *gameObject) : Component(gameObject) {
-	//SelectAbilityType();
 	color = glm::vec4{ 0,0,0,0 };
 	destroy = false;
 }
@@ -35,6 +34,7 @@ void AbilityComponent::onCollisionStart(PhysicsComponent *PhysComp) {
 		PhysComp->getGameObject()->name == "Player_2" &&
 		!hasProvidedAbility) {
 		ProvideAbility(PhysComp);
+		RocketBall::gameInstance->playPickUp();
 		//destroy = true;
 	}
 }
@@ -72,7 +72,7 @@ void AbilityComponent::SelectAbilityType() {
 	{
 	case 0:
 		//Boost Power
-		abilitySprite = RocketBall::gameInstance->mySpriteAtlas->get("gray.png");
+		abilitySprite = RocketBall::gameInstance->mySpriteAtlas->get("smallBoost.png");
 		color = glm::vec4{ 1.0f, 0.2f, 0.2f, 1.0f };
 		abilitySprite.setColor(color);
 		abilitySprite.setScale(originalScale);
@@ -80,15 +80,15 @@ void AbilityComponent::SelectAbilityType() {
 		break;
 	case 1:
 		//Large Boost
-		abilitySprite = RocketBall::gameInstance->mySpriteAtlas->get("gray.png");
-		color = glm::vec4{ 0.2f, 1.0f, 0.2f, 1.0f };
+		abilitySprite = RocketBall::gameInstance->mySpriteAtlas->get("largeBoost.png");
+		color = glm::vec4{ 1.0f, 0.1f, 0.1f, 1.0f };
 		abilitySprite.setColor(color);
 		abilitySprite.setScale(originalScale);
 		this->gameObject->getComponent<SpriteComponent>()->setSprite(abilitySprite);
 		break;
 	case 2:
 		//Gravity
-		abilitySprite = RocketBall::gameInstance->mySpriteAtlas->get("gray.png");
+		abilitySprite = RocketBall::gameInstance->mySpriteAtlas->get("lowGravity.png");
 		color = glm::vec4{ 0.2f, 0.2f, 1.0f, 1.0f };
 		abilitySprite.setColor(color);
 		abilitySprite.setScale(originalScale);
@@ -96,7 +96,7 @@ void AbilityComponent::SelectAbilityType() {
 		break;
 	case 3:
 		//Speed
-		abilitySprite = RocketBall::gameInstance->mySpriteAtlas->get("gray.png");
+		abilitySprite = RocketBall::gameInstance->mySpriteAtlas->get("speedBoostV2.png");
 		color = glm::vec4{ 1.0f, 0.2f, 1.0f, 1.0f };
 		abilitySprite.setColor(color);
 		abilitySprite.setScale(originalScale);
@@ -104,7 +104,7 @@ void AbilityComponent::SelectAbilityType() {
 		break;
 	case 4:
 		//Dash Boost
-		abilitySprite = RocketBall::gameInstance->mySpriteAtlas->get("gray.png");
+		abilitySprite = RocketBall::gameInstance->mySpriteAtlas->get("dashBoost.png");
 		color = glm::vec4{ 1.0f, 1.0f, 0.0f, 1.0f };
 		abilitySprite.setColor(color);
 		abilitySprite.setScale(originalScale);
@@ -112,7 +112,7 @@ void AbilityComponent::SelectAbilityType() {
 		break;
 	case 5:
 		//Dash Extra
-		abilitySprite = RocketBall::gameInstance->mySpriteAtlas->get("gray.png");
+		abilitySprite = RocketBall::gameInstance->mySpriteAtlas->get("ExtraJump.png");
 		color = glm::vec4{ 0.2f, 1.0f, 1.0f, 1.0f };
 		abilitySprite.setColor(color);
 		abilitySprite.setScale(originalScale);
@@ -120,8 +120,8 @@ void AbilityComponent::SelectAbilityType() {
 		break;
 	case 6:
 		//Infinite Boost
-		abilitySprite = RocketBall::gameInstance->mySpriteAtlas->get("gray.png");
-		color = glm::vec4{ 0.2f, 0.2f, 0.2f, 1.0f };
+		abilitySprite = RocketBall::gameInstance->mySpriteAtlas->get("infiniteBoost.png");
+		color = glm::vec4{ 0.2f, 1.0f, 0.2f, 1.0f };
 		abilitySprite.setColor(color);
 		abilitySprite.setScale(originalScale);
 		this->gameObject->getComponent<SpriteComponent>()->setSprite(abilitySprite);
@@ -177,8 +177,6 @@ void AbilityComponent::readyBox(bool ready) {
 	else {
 		hasProvidedAbility = false;
 		SelectAbilityType();
-		_sprite.setColor({ color.x, color.y, color.z, 1 });
-		this->getGameObject()->getComponent<SpriteComponent>()->setSprite(_sprite);
 	}
 }
 

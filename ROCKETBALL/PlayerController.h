@@ -78,17 +78,17 @@ private:
 	std::shared_ptr<SpriteComponent> playerSprite;
 	std::shared_ptr<PhysicsComponent> playerPhysics;
 
-	std::shared_ptr<GameObject> boostDisplay, boostBorder;
-	sre::Sprite boostBox, boostBorderBox;
+	std::shared_ptr<GameObject> boostDisplay, boostBorder, gravityObj, speedObj, dashBoostObj, dashExtraObj, dashInfiniteObj;
+	sre::Sprite boostBox, boostBorderBox, gravityIcon, speedIcon, dashBoostIcon, dashExtraIcon, dashInfiniteIcon;
 	sre::Sprite& boostSprite = boostBox;
-	
-	
+
+
 	//Player car Settings
 	const float maxSpeed = 5.0f;
 	const float acceleration = 10.0f;
 	const float dashSpeed = 0.4f;
 	const float dashDuration = 0.5f;
-	const float rotationPerSecond = 360.0f*(1.0f/dashDuration);
+	const float rotationPerSecond = 360.0f*(1.0f / dashDuration);
 
 	//BoostSetting
 	const float maxSpeedWhenBoosting = 10.0f;
