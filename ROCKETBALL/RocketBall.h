@@ -89,18 +89,19 @@ private:
 	std::shared_ptr<GameObject> soccerBall, soccerBallInner;
 	std::shared_ptr<GameObject> player1, player2;
 	std::shared_ptr<GameObject> textHolder;
-	sre::Sprite goalText, readyText, gameOverText, goText;
+	sre::Sprite goalText, readyText, winnerText, goText;
 	std::shared_ptr<PhysicsComponent> OuterBallPhyiscs, InnerBallPhysics;
 	b2Vec2 b2P1Origin, b2P2Origin, b2sbOuterOrigin, b2sbInnerOrigin;
 	glm::vec2 P1Origin, P2Origin, sbOuterOrigin, sbInnerOrigin;
 
-	Mix_Chunk *goalSound = nullptr, *readySound=nullptr, *goSound=nullptr, *gameOverSound=nullptr;
+	Mix_Chunk *goalSound, *readySound, *goSound, *winnerSound;
 	Mix_Music *music;
 
 	SDL_Joystick * joy1;
 	SDL_Joystick * joy2;
 
 	bool beginGame;
+	bool gameOverBool;
 	float beginGameTime = 0;
 
 	//GAME SETTINGS
