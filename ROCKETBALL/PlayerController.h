@@ -21,12 +21,6 @@ public:
 
 	void update(float deltaTime) override;
 
-	void applyMovement();
-
-	void stopFalling();
-
-	void stopHorizontalMovement();
-
 	void setRotation(float _rot);
 
 	void setDelayedRotation(float _rot);
@@ -102,8 +96,8 @@ private:
 	const float rotationPerSecond = 360.0f*(1.0f / dashDuration);
 
 	//BoostSetting
-	float maxSpeedWhenBoosting = 10.0f;
-	float bostAccaleration = 150.0f;
+	float maxSpeedWhenBoosting = 9.0f;
+	float bostAccaleration = 100.0f;
 	const float boostBurnPerSecond = 0.5;
 	const float maxBoost = 1.0f;
 
@@ -118,19 +112,13 @@ private:
 	float powerupDuration = 5.0f;
 	bool infiniteBoost = false;
 
-	//UPDATE THINGS
-	float nextFixedUpdate = 0.0f;
-	float updateFrequency = 1.0f / 20.0f;
-
+	//DASH THINGS
 	int airDashesAvailable = 1;
 	int airDashCounter = 0;
-
 	float dashCounter = 0;
-
 	bool dashingForward = true;
 	bool inDash = false;
 
-	bool isNextToWall = false;
 	bool isGrounded = false;
 	bool wasGrounded = false;
 	float timePassed = 0.0f;
@@ -138,8 +126,6 @@ private:
 	float size;
 
 	//INPUT VARIABLES
-	bool isHoldingGas = false;
-	bool isHoldingRevers = false;
 	bool isBoosting = false;
 
 	bool movingForward = false;

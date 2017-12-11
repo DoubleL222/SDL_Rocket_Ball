@@ -152,7 +152,7 @@ void RocketBall::initGame() {
 	gameModeClassic = true;
 
 	goalSizes = glm::vec2{ 0.8f , 2.0f }; //Determines the size of the goal
-	botYBoxSize = 0.5f; //Determines the position of the goal from the grass and up.
+	botYBoxSize = 0.0f; //Determines the position of the goal from the grass and up.
 
 	//If the playfield has not been initilized (fail-safe)
 	if (!setPlayField.playFieldInit) {
@@ -646,6 +646,7 @@ void RocketBall::updatePhysics(float deltaTime)
 	}
 }
 
+//USED FOR PHYSICS TINKERING
 void RocketBall::UpdateWithNewPhysics()
 {
 	auto soccerBallPhysics = soccerBall->getComponent<PhysicsComponent>();
