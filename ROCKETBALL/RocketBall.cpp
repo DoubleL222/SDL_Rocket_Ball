@@ -151,8 +151,8 @@ void RocketBall::initGame() {
 	//Set gamemode before initilizing the playingfield
 	gameModeClassic = true;
 
-	goalSizes = glm::vec2{ 0.8, 2 }; //Determines the size of the goal
-	botYBoxSize = 1.0f; //Determines the position of the goal from the grass and up.
+	goalSizes = glm::vec2{ 0.8f , 2.0f }; //Determines the size of the goal
+	botYBoxSize = 0.5f; //Determines the position of the goal from the grass and up.
 
 	//If the playfield has not been initilized (fail-safe)
 	if (!setPlayField.playFieldInit) {
@@ -542,7 +542,7 @@ void RocketBall::onKey(SDL_Event &event) {
 	}
 	if (event.type == SDL_KEYDOWN) {
 		switch (event.key.keysym.sym) {
-		case SDLK_d:
+		case SDLK_h:
 			// press 'd' for physics debug
 			doDebugDraw = !doDebugDraw;
 			if (doDebugDraw) {

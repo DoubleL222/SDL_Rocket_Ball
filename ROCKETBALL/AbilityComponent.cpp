@@ -38,7 +38,6 @@ void AbilityComponent::onCollisionStart(PhysicsComponent *PhysComp) {
 		PhysComp->getGameObject()->name == "Player_2" &&
 		!hasProvidedAbility) {
 		ProvideAbility(PhysComp); //Call function on the object collided with
-		RocketBall::gameInstance->playPickUp(); //Play sound for picking up pellet
 		//destroy = true;
 	}
 }
@@ -182,6 +181,7 @@ void AbilityComponent::ProvideAbility(PhysicsComponent *PhysComp) {
 		PhysComp->getGameObject()->getComponent<PlayerController>()->infiniteBoostPowerUp(true);
 		break;
 	}
+	RocketBall::gameInstance->playPickUp(); //Play sound for picking up pellet
 	//Box has been taken; make it inaccessible.
 	readyBox(false);
 }
