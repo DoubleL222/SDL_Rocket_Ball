@@ -17,9 +17,12 @@
 using namespace std;
 using namespace sre;
 
+//Detects system
 #ifdef _WIN32
+//Assign values if a windows machine
 const glm::vec2 RocketBall::windowSize(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
 #else
+//Otherwise use 1600x900
 const glm::vec2 RocketBall::windowSize(1600, 900);
 #   error "Unknown compiler"
 #endif
@@ -29,16 +32,20 @@ RocketBall* RocketBall::gameInstance = nullptr;
 RocketBall::RocketBall()
 	:debugDraw(physicsScale)
 {
+	//create a singleton instance
 	gameInstance = this;
+	
 	r.setWindowSize(windowSize);
 
 	r.init(SDL_INIT_EVERYTHING, SDL_WINDOW_OPENGL);
 
+	//Check to create audio; if failed, just return
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 4, 4096) == 1) {
 		cout << "Error in creating audio" << endl;
 		return;
 	}
 
+	//Initilize the whole game
 	initGame();
 
 	// setup callback functions
@@ -61,9 +68,6 @@ RocketBall::RocketBall()
 }
 
 void RocketBall::initGame() {
-
-	displayGameParameters = true;
-
 	//Joystick init
 	//cout << "number of joysticks " << SDL_NumJoysticks();
 
@@ -103,61 +107,88 @@ void RocketBall::initGame() {
 		background_Layer_1.init("skybackdrop.png", -windowSize.x*0.5f, -windowSize.y*0.5f, true);
 	}
 
-	gameModeClassic = true;
+	//Displays window for game parameters
+	displayGameParameters = true;
 
+	//Assign pointers to the sound files
 	music = Mix_LoadMUS("music.ogg");
-<<<<<<< HEAD
-	//gameOverSound = Mix_LoadWAV("gameOverSound.ogg");
-=======
-	winnerSound = Mix_LoadWAV("gameOverSound.ogg"); //needs sound change
->>>>>>> origin/NewMartinBranch
+//	winnerSound = Mix_LoadWAV("gameOverSound.ogg");
 	goalSound = Mix_LoadWAV("goalSound.ogg");
+	pickUpSound = Mix_LoadWAV("pickUpSound.ogg");
 	readySound = Mix_LoadWAV("readySound.ogg");
 	goSound = Mix_LoadWAV("goSound.ogg");
+
+	//Set volume of this one; values between 0 and 128
+	pickUpSound->volume = 20;
 
 	if (music != nullptr)
 		Mix_PlayMusic(music, -1);
 	Mix_VolumeMusic(64); //0 to 128 ( MIX_MAX_VOLUME ) 
 
+	//Create a gameobject to hold the text
 	textHolder = createGameObject();
 	textHolder->name = "Text_Holder";
+	//Add a sprite component
 	auto textHolderSpriteComp = textHolder->addComponent<SpriteComponent>();
+	//Assign sprites using the spriteatlas
 	goalText = mySpriteAtlas->get("goal.png");
-	winnerText = mySpriteAtlas->get("gameOver.png"); //needs text change
+	winnerP1Text = mySpriteAtlas->get("WinnerP1.png");
+	winnerP2Text = mySpriteAtlas->get("WinnerP2.png");
 	readyText = mySpriteAtlas->get("ready.png");
-	goText = mySpriteAtlas->get("getReady.png");
+	goText = mySpriteAtlas->get("go.png");
+	//Alpha = 0; invis
 	goalText.setColor({ 0.2f, 0.8f, 0.2f, 0.0f });
 	goalText.setScale({ 1,1 });
+	//Assign sprite to component
 	textHolderSpriteComp->setSprite(goalText);
+	//Set position based on screen resolution
 	textHolder->setPosition({ 0, windowSize.y * 0.25f });
+
+	//Bools to control game
 	beginGame = false;
 	gameOverBool = false;
 
 	//Set gamemode before initilizing the playingfield
 	gameModeClassic = true;
+
+<<<<<<< HEAD
+	goalSizes = glm::vec2{ 0.8, 2 }; //Determines the size of the goal
+=======
+	goalSizes = glm::vec2{ 0.8f , 2.0f }; //Determines the size of the goal
+>>>>>>> origin/NewMartinBranch
+	botYBoxSize = 0.5f; //Determines the position of the goal from the grass and up.
+
+	//If the playfield has not been initilized (fail-safe)
 	if (!setPlayField.playFieldInit) {
+		//Use 3 or 5 boxes
+		setPlayField.useFiveAbilityBoxes = false;
 		//Set size for the goals
 		setPlayField.setGoalSizes(goalSizes);
 		//Init playing field
 		setPlayField.createPlayField(mySpriteAtlas);
-		setPlayField.readyAbilityBoxes(false);
+		setPlayField.readyAbilityBoxes(false); //make boxes invis
 	}
-#pragma region Dynamic Elements
+#pragma region Dynamic GameObjects
 	//Spawn Player1
-	player1 = createGameObject();
-	player1->name = "Player_1";
-	std::shared_ptr<PlayerController> pc = player1->addComponent<PlayerController>();
-	pc->setFacingDirection(false);
+	player1 = createGameObject(); //Create a new gameobject
+	player1->name = "Player_1"; //assign name
+	//Add player controller component
+	std::shared_ptr<PlayerController> pc = player1->addComponent<PlayerController>(); 
+	pc->setFacingDirection(false); //facing direction
+	//Add sprite component
 	auto spriteComp = player1->addComponent<SpriteComponent>();
-	auto player1Sprite = mySpriteAtlas->get("car1.png");
-	player1Sprite.setScale(glm::vec2(0.3f, 0.3f));
-	spriteComp->setSprite(player1Sprite);
+	auto player1Sprite = mySpriteAtlas->get("car1.png"); //set player 1 sprite
+	player1Sprite.setScale(glm::vec2(0.3f, 0.3f)); //set scale
+	player1Sprite.setOrderInBatch(15); //Order in batch; determines rendering
+	spriteComp->setSprite(player1Sprite); //Assign the sprite to sprite component
+	//Set the position of the player; origin used to reset after each round
 	P1Origin = glm::vec2(windowSize.x * 0.375, -windowSize.y * 0.2 + (player1Sprite.getSpriteSize().y * 0.5f));
 	player1->setPosition(P1Origin);
+	//Add a physics component and create a carCollider
 	auto physComp = player1->addComponent<PhysicsComponent>();
 	physComp->initCarCollider(glm::vec2(0.35f, 0.1f), player1->getPosition() / physicsScale, playerFriction, playerDensity, playerLinearDamping, playerAngularDamping);
 
-	//Spawn Player2
+	//Spawn Player2; same as player 1
 	player2 = createGameObject();
 	player2->name = "Player_2";
 	pc = player2->addComponent<PlayerController>();
@@ -166,6 +197,7 @@ void RocketBall::initGame() {
 	auto player2Sprite = mySpriteAtlas->get("car2.png");
 	player2Sprite.setFlip(glm::vec2(-1, 0));
 	player2Sprite.setScale(glm::vec2(0.3f, 0.3f));
+	player2Sprite.setOrderInBatch(15);
 	spriteComp->setSprite(player2Sprite);
 	P2Origin = glm::vec2(-windowSize.x * 0.375, -windowSize.y * 0.2 + (player2Sprite.getSpriteSize().y * 0.5f));
 	player2->setPosition(P2Origin);
@@ -173,6 +205,7 @@ void RocketBall::initGame() {
 	physComp->initCarCollider(glm::vec2(0.35f, 0.1f), player2->getPosition() / physicsScale, playerFriction, playerDensity, playerLinearDamping, playerAngularDamping);
 
 	//Spawn (outer) Soccer Ball w/e sprite
+	//Same as with the players
 	soccerBall = createGameObject();
 	soccerBall->name = "OuterBall";
 	spriteComp = soccerBall->addComponent<SpriteComponent>();
@@ -189,6 +222,7 @@ void RocketBall::initGame() {
 	//Create an inner circle collider in the soccerball to score goals only 
 	//when the ball is roughly 50% inside the goal (i.e. a very smaller cirlce collider inside the big)
 	//The position of the inner collider is set in the update().
+	//Inner ball is assigned the BallComponent which determines the ball's behaviour
 	soccerBallInner = createGameObject();
 	soccerBallInner->name = "InnerBall";
 	soccerBallInner->setPosition(soccerBall->getPosition());
@@ -202,28 +236,28 @@ void RocketBall::initGame() {
 
 #pragma endregion
 
-	//SET GAME STATE
-	//gameState = GameState::Ready;
+	//SET INITIAL GAME STATE
 	gameState = GameState::InitializeGame;
 }
 
+////////// Function to set the text and play the associated sound
 void RocketBall::setTextAndPlaySound(int switchIndex) {
 	switch (switchIndex) {
 	case 0:
-		//Invis
+		//Set invisible.
 		readyText.setColor({ 0.2f, 0.8f, 0.2f, 0.0f });
 		textHolder->getComponent<SpriteComponent>()->setSprite(readyText);
 		break;
 	case 1:
 		//ready
-		if (readySound != nullptr)
-			Mix_PlayChannel(-1, readySound, 0);
+		if (readySound != nullptr) //Chekc if nullptr
+			Mix_PlayChannel(-1, readySound, 0); //if not, play sound
 		else {
 			cout << "couldnt find sound" << endl;
 		}
 
-		readyText.setColor({ 0.2f, 0.8f, 0.2f, 1.0f });
-		textHolder->getComponent<SpriteComponent>()->setSprite(readyText);
+		readyText.setColor({ 0.2f, 0.8f, 0.2f, 1.0f }); //Set color 
+		textHolder->getComponent<SpriteComponent>()->setSprite(readyText); //assign "updated" sprite
 		break;
 	case 2:
 		//Goal
@@ -244,16 +278,18 @@ void RocketBall::setTextAndPlaySound(int switchIndex) {
 			cout << "couldnt find sound" << endl;
 		}
 
-		Mix_VolumeMusic(32); //half original volume
+		Mix_VolumeMusic(32); //half original volume for the music
 
+		//Check who has won, and assign correct sprite and color
 		if (player1Goals > player2Goals) {
 
-			winnerText.setColor(player1Color);
+			winnerP1Text.setColor(player1Color);
+			textHolder->getComponent<SpriteComponent>()->setSprite(winnerP1Text);
 		}
 		else {
-			winnerText.setColor(player2Color);
+			winnerP2Text.setColor(player2Color);
+			textHolder->getComponent<SpriteComponent>()->setSprite(winnerP2Text);
 		}
-		textHolder->getComponent<SpriteComponent>()->setSprite(winnerText);
 		break;
 	case 4:
 		//Go!
@@ -269,6 +305,16 @@ void RocketBall::setTextAndPlaySound(int switchIndex) {
 	}
 }
 
+//Public function to play sound when ability boxes are picked up
+void RocketBall::playPickUp() {
+	if (pickUpSound != nullptr)
+		Mix_PlayChannel(-1, pickUpSound, 0);
+	else {
+		cout << "couldnt find sound" << endl;
+	}
+}
+
+//Function to initilize a new round; resets the position, velocity, inputs etc. of dynamic objects
 void RocketBall::nextRound() {
 	player1->setPosition(P1Origin);
 	glm::vec2 bodPos = P1Origin / physicsScale;
@@ -291,9 +337,7 @@ void RocketBall::nextRound() {
 	soccerBallInner->getComponent<PhysicsComponent>()->body->SetTransform(b2sbInnerOrigin, 0);
 	soccerBallInner->getComponent<PhysicsComponent>()->setLinearVelocity({ 0,0 });
 	soccerBallInner->getComponent<PhysicsComponent>()->body->SetAngularVelocity(0);
-	soccerBallInner->getComponent<BallComponent>()->engageSlowmotion = false;
-
-	//setPlayField.readyAbilityBoxes(true);
+	soccerBallInner->getComponent<BallComponent>()->engageSlowmotion = false; //Step out of slowmotion
 }
 
 void RocketBall::initPhysics()
@@ -308,43 +352,51 @@ void RocketBall::initPhysics()
 	}
 }
 
-
+//Get the phyiscsScale from other classes; public function
 const float RocketBall::getPhysicsScale() {
 	return physicsScale;
 }
 
 /// Core Update
 void RocketBall::update(float time) {
+	//If game is running, roundcomplete or gameover, update the phyiscs.
 	if (gameState == GameState::Running || gameState == GameState::RoundComplete || gameState == GameState::GameOver) {
 		updatePhysics(time);
 	}
+
+	//Call update using the time on all objects
 	for (int i = 0; i < sceneObjects.size(); i++) {
 		sceneObjects[i]->update(time);
 	}
+	
+	//Set the innerball's position in the center of the outer ball on every update call
 	InnerBallPhysics->body->SetTransform(OuterBallPhyiscs->body->GetPosition(), OuterBallPhyiscs->body->GetAngle());
 	soccerBallInner->setPosition(soccerBall->getPosition());
 
+	//Check if one of the players have reached the required amount of goals
 	if ((player1Goals == goalsToScore || player2Goals == goalsToScore) && !gameOverBool) {
 		gameState = GameState::GameOver;
 		setTextAndPlaySound(3);
 	}
 
+	//An update check to remove the "Go" Text after 2 seconds
 	if (beginGame && gameState != GameState::Ready && gameState != GameState::GameOver) {
 		beginGameTime += time;
-		if (beginGameTime > 2.0f) {
+		if (beginGameTime > 2.0f) { //Afer 2 seconds...
 			beginGame = false;
-			beginGameTime = 0;
-			setTextAndPlaySound(0);
+			beginGameTime = 0; //reset time
+			setTextAndPlaySound(0); //play sound and set text "go"
 		}
 	}
 
 }
 
+//Get gamestate
 GameState RocketBall::getGameState() {
 	return gameState;
 }
 
-/// Region for Render engine
+/// Render Update
 #pragma region Render
 void RocketBall::render() {
 	auto rp = RenderPass::create()
@@ -356,8 +408,6 @@ void RocketBall::render() {
 	//Render the background Layer_1
 	background_Layer_1.renderBackground(rp, +pos.x*0.8f);
 
-
-
 	auto spriteBatchBuilder = SpriteBatch::create();
 	for (auto & go : sceneObjects) {
 		go->renderSprite(spriteBatchBuilder);
@@ -366,6 +416,7 @@ void RocketBall::render() {
 	auto sb = spriteBatchBuilder.build();
 	rp.draw(sb);
 
+	//Small window to display the player's score. 
 	ImGui::SetNextWindowPos(ImVec2(Renderer::instance->getWindowSize().x / 2 - 50, .0f), ImGuiSetCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(150, 75), ImGuiSetCond_Always);
 	ImGui::Begin("", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
@@ -375,6 +426,7 @@ void RocketBall::render() {
 	ImGui::PushFont;
 	ImGui::End();
 
+	//Debugging parameters
 	if (doDebugDraw) {
 		static Profiler profiler;
 		profiler.update();
@@ -383,11 +435,14 @@ void RocketBall::render() {
 		rp.drawLines(debugDraw.getLines());
 		debugDraw.clear();
 	}
+	//Game Settings
 	if (displayGameParameters) {
 		RenderSliders();
 	}
 }
 #pragma endregion
+
+//Function to handle contacts.
 void RocketBall::handleContact(b2Contact *contact, bool begin) {
 	auto fixA = contact->GetFixtureA();
 	auto fixB = contact->GetFixtureB();
@@ -397,9 +452,7 @@ void RocketBall::handleContact(b2Contact *contact, bool begin) {
 	auto physB = physBIter == physicsComponentLookup.end() ? nullptr : (*physBIter).second;
 
 	if (physAIter != physicsComponentLookup.end()) {
-
 		auto & aComponents = physA->getGameObject()->getComponents();
-		//std::cout << "fixA" << std::endl;
 		for (auto & c : aComponents) {
 			if (begin) {
 				c->onCollisionStart(physB);
@@ -493,8 +546,12 @@ void RocketBall::onKey(SDL_Event &event) {
 	}
 	if (event.type == SDL_KEYDOWN) {
 		switch (event.key.keysym.sym) {
-		case SDLK_d:
+		case SDLK_h:
+<<<<<<< HEAD
+			// press 'h' for physics debug
+=======
 			// press 'd' for physics debug
+>>>>>>> origin/NewMartinBranch
 			doDebugDraw = !doDebugDraw;
 			if (doDebugDraw) {
 				world->SetDebugDraw(&debugDraw);
@@ -504,34 +561,49 @@ void RocketBall::onKey(SDL_Event &event) {
 			}
 			break;
 		case SDLK_g:
+			//press g to display game parameters
 			displayGameParameters = !displayGameParameters;
 			break;
+<<<<<<< HEAD
+		case SDLK_RSHIFT:
+		case SDLK_LSHIFT:
+		case SDLK_RCTRL:
+		case SDLK_LCTRL:
+=======
+		//During different gameStates, space will do different things...
+>>>>>>> origin/NewMartinBranch
 		case SDLK_SPACE:
+			//GameOver achieved upon reaching required goals
 			if (gameState == GameState::GameOver) {
+				//If game over, reset the game
 				nextRound();
 				soccerBallInner->getComponent<BallComponent>()->goalAchieved = false;
 				player1Goals = 0;
 				player2Goals = 0;
 				displayGameParameters = true;
-				setTextAndPlaySound(0);
-				gameState = GameState::InitializeGame;
+				setTextAndPlaySound(0); //make text invis
+				gameState = GameState::InitializeGame; //Enter state to display parameters
 			}
 			else if (gameState == GameState::Ready) {
+				//If ready to play, enter running state: game is now playing
 				gameState = GameState::Running;
+				//Set dynamic bodies awake to make the engage with phyiscs update
 				player1->getComponent<PhysicsComponent>()->body->SetAwake(true);
 				player2->getComponent<PhysicsComponent>()->body->SetAwake(true);
 				soccerBall->getComponent<PhysicsComponent>()->body->SetAwake(true);
-				setPlayField.readyAbilityBoxes(true);
-				beginGame = true;
-				setTextAndPlaySound(4);
+				setPlayField.readyAbilityBoxes(true); //Set the ability boxes ready
+				beginGame = true; //being the game bool
+				setTextAndPlaySound(4); //Set "Go" text
 			}
 			else if (gameState == GameState::RoundComplete) {
+				//Enters after a goal has been achieved and player pressed Space
 				soccerBallInner->getComponent<BallComponent>()->goalAchieved = false;
-				nextRound();
-				gameState = GameState::Ready;
-				setTextAndPlaySound(1);
+				nextRound(); //Reset game
+				gameState = GameState::Ready; //get readyyyyy!
+				setTextAndPlaySound(1); //show ready
 			}
 			else if (gameState == GameState::InitializeGame) {
+				//When game begins or after a game has been concluded;
 				gameState = GameState::Ready;
 				displayGameParameters = false;
 				gameOverBool = false;
@@ -549,7 +621,6 @@ std::shared_ptr<GameObject> RocketBall::createGameObject() {
 	sceneObjects.push_back(obj);
 	return obj;
 }
-
 
 #pragma region Physics
 ///Phyiscs
@@ -632,11 +703,6 @@ void RocketBall::RenderSliders()
 
 	ImGui::End();
 	UpdateWithNewPhysics();
-}
-
-void RocketBall::applyForcesToPlayersAfterGoal()
-{
-
 }
 
 #pragma endregion

@@ -11,6 +11,7 @@
 using namespace std;
 PlayerController::PlayerController(GameObject *gameObject) : Component(gameObject)
 {
+	//check which player and assign color
 	if (this->getGameObject()->name == "Player_1") {
 		_color = RocketBall::gameInstance->player2Color;
 	}
@@ -27,26 +28,29 @@ PlayerController::PlayerController(GameObject *gameObject) : Component(gameObjec
 		powerupTimers.insert(std::pair<ENUM_POWERUPS, float>(curr, 0.0f));
 	}
 
+	//Create gameobject for the boosting display and its border/background
 	boostBox = RocketBall::gameInstance->mySpriteAtlas->get("boostMain.png");
 	boostDisplay = RocketBall::gameInstance->createGameObject();
 	boostBorderBox = RocketBall::gameInstance->mySpriteAtlas->get("boostBorderBackground.png");
 	boostBorder = RocketBall::gameInstance->createGameObject();
-
 	auto boostSpriteComp = boostDisplay->addComponent<SpriteComponent>();
 	auto boostBorderSpriteComp = boostBorder->addComponent<SpriteComponent>();
 
+	//create gameobjects to hold the icons
 	gravityObj = RocketBall::gameInstance->createGameObject();
 	speedObj = RocketBall::gameInstance->createGameObject();
 	dashBoostObj = RocketBall::gameInstance->createGameObject();
 	dashExtraObj = RocketBall::gameInstance->createGameObject();
 	dashInfiniteObj = RocketBall::gameInstance->createGameObject();
 
+	//assign the icons
 	gravityIcon = RocketBall::gameInstance->mySpriteAtlas->get("lowGravity.png");
 	speedIcon = RocketBall::gameInstance->mySpriteAtlas->get("speedBoostV2.png");
 	dashBoostIcon = RocketBall::gameInstance->mySpriteAtlas->get("dashBoost.png");
 	dashExtraIcon = RocketBall::gameInstance->mySpriteAtlas->get("ExtraJump.png");
 	dashInfiniteIcon = RocketBall::gameInstance->mySpriteAtlas->get("infiniteBoost.png");
 
+	//Size of the icons
 	glm::vec2 iconScale({ 0.4,0.4 });
 	gravityIcon.setScale(iconScale);
 	speedIcon.setScale(iconScale);
@@ -54,12 +58,14 @@ PlayerController::PlayerController(GameObject *gameObject) : Component(gameObjec
 	dashExtraIcon.setScale(iconScale);
 	dashInfiniteIcon.setScale(iconScale);
 
+	//Icon sprite components
 	auto gravitySpriteComp = gravityObj->addComponent<SpriteComponent>();
 	auto speedSpriteComp = speedObj->addComponent<SpriteComponent>();
 	auto dashBoostSpriteComp = dashBoostObj->addComponent<SpriteComponent>();
 	auto dashExtraSpriteComp = dashExtraObj->addComponent<SpriteComponent>();
 	auto dashInfiniteSpriteComp = dashInfiniteObj->addComponent<SpriteComponent>();
 
+	//Assign icon's position based on which player is holding the PlayerController
 	if (this->getGameObject()->name == "Player_2") {
 
 		boostDisplay->name = this->getGameObject()->name + "_BoostDisplay";
@@ -113,6 +119,7 @@ PlayerController::PlayerController(GameObject *gameObject) : Component(gameObjec
 
 	}
 
+	//Set the sprites
 	gravitySpriteComp->setSprite(gravityIcon);
 	speedSpriteComp->setSprite(speedIcon);
 	dashBoostSpriteComp->setSprite(dashBoostIcon);
@@ -355,15 +362,10 @@ void PlayerController::update(float deltaTime)
 	{
 		playerSprite = gameObject->getComponent<SpriteComponent>();
 	}
-	//playerPhysics->body->SetTransform(playerPhysics->body->GetPosition(), timePassed / 10);
 
 	auto from = playerPhysics->body->GetWorldCenter();
-	//radius = playerPhysics->radius;
-
-	//cout << "0: UPDATE" <<std::endl;
 
 	glm::vec2 currentVelocity = playerPhysics->getLinearVelocity();
-
 	//RAYCASTS
 	b2Vec2 to{ from.x + currentVelocity.x*0.1f,from.y + currentVelocity.y*0.1f };
 	b2Vec2 toGround{ from.x,from.y - 0.3f };
@@ -379,38 +381,6 @@ void PlayerController::update(float deltaTime)
 	if (from != toGround) {
 		RocketBall::gameInstance->world->RayCast(this, from, toGround);
 	}
-
-	//RAYCAST INTO VELOCITY
-	//if (from != to)
-	//{
-	//	//RocketBall::gameInstance->world->RayCast(this, from, to);
-	//}
-
-
-	//FIXED UPDATE
-
-	//if (timePassed > nextFixedUpdate) {
-	//	nextFixedUpdate += updateFrequency;
-	//	//cout << "1: FIXED UPDATE" << std::endl;
-	//	if (!isGrounded)
-	//	{
-			//APPLY GRAVITY
-	//		//cout << "2: APPLYING GRAVITY" << std::endl;
-	//		if (currentVelocity.y > -1.0f) 
-	//		{
-
-	//			//playerPhysics->setLinearVelocity(glm::vec2(currentVelocity.x, currentVelocity.y - 5));
-	//		}
-	//	}
-	//	else 
-	//	{
-			//STOP FALLING
-	//		if (currentVelocity.y < 0) 
-	//		{
-	//			playerPhysics->setLinearVelocity(glm::vec2(currentVelocity.x, 0));
-	//		}
-	//	}
-	//}
 
 	//Rotate player
 	float targetRotation = 0.0f;
@@ -434,6 +404,7 @@ void PlayerController::update(float deltaTime)
 		facingVector = glm::rotate(glm::vec2(1, 0), glm::radians(rotation + rotationSpeed * deltaTime));
 	}
 
+	//ROTATE WITH JOYSTICKK
 	if (!(facingVector.x == 0 && facingVector.y == 0))
 	{
 		targetRotation = angleBetweenVectors(glm::vec2(1, 0), facingVector);
@@ -441,11 +412,9 @@ void PlayerController::update(float deltaTime)
 
 	targetRotation = glm::degrees(targetRotation);
 
-	//cout << "Target: " << targetRotation << std::endl;
 	if (rotation != targetRotation && !isGrounded && !inDash)
 	{
 		setDelayedRotation(targetRotation);
-		//setRotation(targetRotation);
 	}
 	if (isGrounded)
 	{
@@ -453,7 +422,6 @@ void PlayerController::update(float deltaTime)
 	}
 
 	//Moving player
-	//currentVelocity = playerPhysics->getLinearVelocity();
 	if (isGrounded) {
 		if (movementVector.x != 0)
 		{
@@ -525,9 +493,11 @@ void PlayerController::update(float deltaTime)
 			endDash();
 		}
 	}
-	//boost sprite
+
+	//boost sprite, set scale according to current boost (between 0 and 1)
+	//The boost sprite has a custom pivot position in the JSON (x = 0) to
+	//ensure the sprite scales from x = 0
 	boostSprite.setScale({ currBoost, 0.4 });
-	//boostSprite.setColor({ currBoost, 0.0f, 0.0f,1.0f });
 	boostDisplay->getComponent<SpriteComponent>()->setSprite(boostSprite);
 
 
@@ -583,35 +553,6 @@ float PlayerController::angleBetweenVectors(glm::vec2 vec1, glm::vec2 vec2)
 void PlayerController::setFacingDirection(bool _facingRight)
 {
 	facingRight = _facingRight;
-}
-
-void PlayerController::applyMovement()
-{
-
-}
-
-void PlayerController::stopFalling()
-{
-	if (playerPhysics == nullptr)
-	{
-		playerPhysics = gameObject->getComponent<PhysicsComponent>();
-	}
-	glm::vec2 currentVelocity = playerPhysics->getLinearVelocity();
-	if (currentVelocity.y < 0)
-	{
-		playerPhysics->setLinearVelocity(glm::vec2(currentVelocity.x, 0));
-	}
-}
-
-void PlayerController::stopHorizontalMovement()
-{
-	if (playerPhysics == nullptr)
-	{
-		playerPhysics = gameObject->getComponent<PhysicsComponent>();
-	}
-	glm::vec2 currentVelocity = playerPhysics->getLinearVelocity();
-
-	playerPhysics->setLinearVelocity(glm::vec2(0, currentVelocity.y));
 }
 
 void PlayerController::setRotation(float _rot)
