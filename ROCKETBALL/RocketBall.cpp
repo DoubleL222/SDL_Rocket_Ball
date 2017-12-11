@@ -104,7 +104,7 @@ void RocketBall::initGame() {
 	}
 
 	music = Mix_LoadMUS("music.ogg");
-	winnerSound = Mix_LoadWAV("gameOverSound.ogg");
+//	winnerSound = Mix_LoadWAV("gameOverSound.ogg");
 	goalSound = Mix_LoadWAV("goalSound.ogg");
 	pickUpSound = Mix_LoadWAV("pickUpSound.ogg");
 	readySound = Mix_LoadWAV("readySound.ogg");
@@ -135,7 +135,7 @@ void RocketBall::initGame() {
 	gameModeClassic = true;
 
 	goalSizes = glm::vec2{ 0.8, 2 }; //Determines the size of the goal
-	botYBoxSize = 1.0f; //Determines the position of the goal from the grass and up.
+	botYBoxSize = 0.5f; //Determines the position of the goal from the grass and up.
 
 	if (!setPlayField.playFieldInit) {
 		setPlayField.useFiveAbilityBoxes = false;
@@ -507,8 +507,8 @@ void RocketBall::onKey(SDL_Event &event) {
 	}
 	if (event.type == SDL_KEYDOWN) {
 		switch (event.key.keysym.sym) {
-		case SDLK_d:
-			// press 'd' for physics debug
+		case SDLK_h:
+			// press 'h' for physics debug
 			doDebugDraw = !doDebugDraw;
 			if (doDebugDraw) {
 				world->SetDebugDraw(&debugDraw);
@@ -520,6 +520,10 @@ void RocketBall::onKey(SDL_Event &event) {
 		case SDLK_g:
 			displayGameParameters = !displayGameParameters;
 			break;
+		case SDLK_RSHIFT:
+		case SDLK_LSHIFT:
+		case SDLK_RCTRL:
+		case SDLK_LCTRL:
 		case SDLK_SPACE:
 			if (gameState == GameState::GameOver) {
 				nextRound();

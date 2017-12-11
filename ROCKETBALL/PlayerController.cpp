@@ -262,11 +262,11 @@ bool PlayerController::onKey(SDL_Event &event) {
 			}
 			else
 			{
-				if (event.key.keysym.sym == SDLK_a)
+				if (event.key.keysym.sym == SDLK_d)
 				{
 					movementVector.x = 1;
 				}
-				else if (event.key.keysym.sym == SDLK_d)
+				else if (event.key.keysym.sym == SDLK_a)
 				{
 					movementVector.x = -1;
 				}
@@ -314,11 +314,11 @@ bool PlayerController::onKey(SDL_Event &event) {
 			}
 			else
 			{
-				if (event.key.keysym.sym == SDLK_a && movementVector.x > 0)
+				if (event.key.keysym.sym == SDLK_d && movementVector.x > 0)
 				{
 					movementVector.x = 0;
 				}
-				if (event.key.keysym.sym == SDLK_d && movementVector.x < 0)
+				if (event.key.keysym.sym == SDLK_a && movementVector.x < 0)
 				{
 					movementVector.x = 0;
 				}
@@ -455,35 +455,18 @@ void PlayerController::update(float deltaTime)
 	//Moving player
 	//currentVelocity = playerPhysics->getLinearVelocity();
 	if (isGrounded) {
-
 		if (movementVector.x != 0)
 		{
-			//If player presses the opposite direction set horizontal speed to 0
-			//if ((currentVelocity.x < 0 && movementVector.x>0) || (currentVelocity.x > 0 && movementVector.x < 0))
-			//{
-			//	currentX = 0;
-			//	playerPhysics->setLinearVelocity(glm::vec2(currentX, currentVelocity.y));
-			//}
 			//If Speed is more than maxSpeed
 			float currentSpeed = currentVelocity.x;
-			//cout << "0. curr speed: " << currentSpeed << std::endl;
 			if (abs(currentSpeed) > maxSpeed && !isBoosting)
 			{
-				//IF CURRENT SPEED IS OVER MAX SPEED DON'T BOOST
-				//playerPhysics->setLinearVelocity((maxSpeed / currentSpeed) * currentVelocity);
 			}
 			//IF not, increase speed
 			else
 			{
-				//cout << "IS APPLYING FORCE" << std::endl;
 				playerPhysics->setLinearVelocity(glm::vec2(currentSpeed + movementVector.x * acceleration * deltaTime, currentVelocity.y));
-				//playerPhysics->addForce(glm::vec2(movementVector.x * acceleration * deltaTime, 0));
 			}
-
-		}
-		else
-		{
-			//playerPhysics->setLinearVelocity(glm::vec2(0, currentVelocity.y));
 		}
 	}
 
@@ -568,28 +551,18 @@ void PlayerController::update(float deltaTime)
 			switch (it->first)
 			{
 			case ENUM_POWERUPS::DashCountIncrease:
-				dashExtraIcon.setColor({ 1,1,1,1 });
-				dashExtraObj->getComponent<SpriteComponent>()->setSprite(dashExtraIcon);
 				dashCountPowerUp(false);
 				break;
 			case ENUM_POWERUPS::SpeedIncrease:
-				speedIcon.setColor({ 1,1,1,1 });
-				speedObj->getComponent<SpriteComponent>()->setSprite(speedIcon);
 				speedPowerUp(false);
 				break;
 			case ENUM_POWERUPS::DashSpeedIncrease:
-				dashBoostIcon.setColor({ 1,1,1,1 });
-				dashBoostObj->getComponent<SpriteComponent>()->setSprite(dashBoostIcon);
 				dashPowerUp(false);
 				break;
 			case ENUM_POWERUPS::InfiniteBoost:
-				dashInfiniteIcon.setColor({ 1,1,1,1 });
-				dashInfiniteObj->getComponent<SpriteComponent>()->setSprite(dashInfiniteIcon);
 				infiniteBoostPowerUp(false);
 				break;
 			case ENUM_POWERUPS::GravityMod:
-				gravityIcon.setColor({ 1,1,1,1 });
-				gravityObj->getComponent<SpriteComponent>()->setSprite(gravityIcon);
 				gravityPowerUp(false);
 				break;
 			default:
@@ -662,9 +635,9 @@ void PlayerController::setDelayedRotation(float _rot)
 		_rot += 360;
 	}
 
-	//cout << "Rotation: " << _rot << std::endl;
+	//CLERP->Circular lerp smooth transition between 0 and 360
 	rotation = clerp(rotation, _rot, 0.2f);
-	//gameObject->setRotation(rotation);
+	//ROTATE car
 	playerPhysics->body->SetTransform(playerPhysics->body->GetPosition(), glm::radians(rotation));
 }
 
@@ -751,7 +724,7 @@ void PlayerController::jump()
 	{
 		playerPhysics->setLinearVelocity(glm::vec2(playerPhysics->getLinearVelocity().x, 0));
 	}
-
+	//JUMP
 	playerPhysics->addImpulse(moveNormalized*dashSpeed);
 
 }
@@ -823,7 +796,6 @@ void PlayerController::gravityPowerUp(bool _enable)
 	if (_enable)
 	{
 		gravityIcon.setColor(_color);
-		gravityObj->getComponent<SpriteComponent>()->setSprite(gravityIcon);
 		if (powerupTimers[ENUM_POWERUPS::GravityMod] != 0)
 		{
 			return;
@@ -833,10 +805,11 @@ void PlayerController::gravityPowerUp(bool _enable)
 	}
 	else
 	{
+		gravityIcon.setColor({ 1,1,1,1 });
 		powerupTimers[ENUM_POWERUPS::GravityMod] = 0;
 		playerPhysics->body->SetGravityScale(playerPhysics->body->GetGravityScale() / 0.5f);
 	}
-
+	gravityObj->getComponent<SpriteComponent>()->setSprite(gravityIcon);
 }
 
 void PlayerController::speedPowerUp(bool _enable)
@@ -844,7 +817,6 @@ void PlayerController::speedPowerUp(bool _enable)
 	if (_enable)
 	{
 		speedIcon.setColor(_color);
-		speedObj->getComponent<SpriteComponent>()->setSprite(speedIcon);
 		if (powerupTimers[ENUM_POWERUPS::SpeedIncrease] != 0)
 		{
 			return;
@@ -857,13 +829,14 @@ void PlayerController::speedPowerUp(bool _enable)
 	}
 	else
 	{
+		speedIcon.setColor({ 1,1,1,1 });
 		powerupTimers[ENUM_POWERUPS::SpeedIncrease] = 0;
 		maxSpeed /= 1.3f;
 		acceleration /= 1.3f;
 		bostAccaleration /= 1.3f;
 		maxSpeedWhenBoosting /= 1.3f;
-
 	}
+	speedObj->getComponent<SpriteComponent>()->setSprite(speedIcon);
 
 }
 
@@ -872,7 +845,6 @@ void PlayerController::dashPowerUp(bool _enable)
 	if (_enable)
 	{
 		dashBoostIcon.setColor(_color);
-		dashBoostObj->getComponent<SpriteComponent>()->setSprite(dashBoostIcon);
 		if (powerupTimers[ENUM_POWERUPS::DashSpeedIncrease] != 0)
 		{
 			return;
@@ -883,10 +855,12 @@ void PlayerController::dashPowerUp(bool _enable)
 	}
 	else
 	{
+		dashBoostIcon.setColor({ 1,1,1,1 });
 		powerupTimers[ENUM_POWERUPS::DashSpeedIncrease] = 0;
 		dashSpeed /= 1.3;
 		dashDuration /= 1.3;
 	}
+	dashBoostObj->getComponent<SpriteComponent>()->setSprite(dashBoostIcon);
 }
 
 void PlayerController::dashCountPowerUp(bool _enable)
@@ -894,7 +868,6 @@ void PlayerController::dashCountPowerUp(bool _enable)
 	if (_enable)
 	{
 		dashExtraIcon.setColor(_color);
-		dashExtraObj->getComponent<SpriteComponent>()->setSprite(dashExtraIcon);
 		if (powerupTimers[ENUM_POWERUPS::DashCountIncrease] != 0)
 		{
 			return;
@@ -904,9 +877,11 @@ void PlayerController::dashCountPowerUp(bool _enable)
 	}
 	else
 	{
+		dashExtraIcon.setColor({ 1,1,1,1 });
 		powerupTimers[ENUM_POWERUPS::DashCountIncrease] = 0;
 		airDashesAvailable = 1;
 	}
+	dashExtraObj->getComponent<SpriteComponent>()->setSprite(dashExtraIcon);
 }
 
 void PlayerController::infiniteBoostPowerUp(bool _enable)
@@ -914,20 +889,22 @@ void PlayerController::infiniteBoostPowerUp(bool _enable)
 	if (_enable)
 	{
 		dashInfiniteIcon.setColor(_color);
-		dashInfiniteObj->getComponent<SpriteComponent>()->setSprite(dashInfiniteIcon);
 		infiniteBoost = true;
 		rechargeBoost(1);
 		powerupTimers[ENUM_POWERUPS::InfiniteBoost] = 0.01f;
 	}
 	else
 	{
+		dashInfiniteIcon.setColor({ 1,1,1,1 });
 		powerupTimers[ENUM_POWERUPS::InfiniteBoost] = 0;
 		infiniteBoost = false;
 	}
+	dashInfiniteObj->getComponent<SpriteComponent>()->setSprite(dashInfiniteIcon);
 }
 
 float32 PlayerController::ReportFixture(b2Fixture *fixture, const b2Vec2 &point, const b2Vec2 &normal, float32 fraction) {
 	string objName = ((GameObject*)fixture->GetBody()->GetUserData())->name;
+	//CHECK IF ON FLOOR OR BALL OR OTHER PLAYER
 	if (objName == "grass" || objName == "OuterBall" || objName == "Player_1" || objName == "Player_2" || objName == "Wall2")
 	{
 		if (!wasGrounded)
