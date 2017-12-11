@@ -109,6 +109,4 @@ IF (WIN32)
 ENDIF(WIN32)
 
 # build targets using sre
-# add_subdirectory(examples)
- add_subdirectory(project)
  add_subdirectory(ROCKETBALL)
