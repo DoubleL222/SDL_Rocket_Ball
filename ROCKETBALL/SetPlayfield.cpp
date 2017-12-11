@@ -317,16 +317,11 @@ void SetPlayfield::createWallAndGoals(std::string name, sre::Sprite Goalsprite, 
 	staticBoxPhysicsComp_2->initBox(b2BodyType::b2_staticBody, scaleCol_staticBox_2 / phyScale, staticBox_obj_2->getPosition() / phyScale, 0.0f, categoryBits, maskBits);
 
 	//Bounding Colliders: Ensures the players cannot pass out of the game area through the goals (as they are triggers)
-	auto boundingColliderRight_obj = RocketBall::gameInstance->createGameObject();
-	auto boundingColliderLeft_obj = RocketBall::gameInstance->createGameObject();
-	boundingColliderRight_obj->name = "BoundingColliderRight";
-	boundingColliderLeft_obj->name = "BoundingColliderLeft";
-	boundingColliderRight_obj->setPosition({ RocketBall::gameInstance->windowSize.x * 0.5f, 0.0f });
-	boundingColliderLeft_obj->setPosition({ -RocketBall::gameInstance->windowSize.x * 0.5f, 0.0f });
-	auto boundingColRight_Physics = boundingColliderRight_obj->addComponent<PhysicsComponent>();
-	auto boundingColLeft_Physics = boundingColliderLeft_obj->addComponent<PhysicsComponent>();
-	boundingColRight_Physics->initBox(b2BodyType::b2_staticBody, { 0,RocketBall::gameInstance->windowSize.y / phyScale }, boundingColliderRight_obj->getPosition() / phyScale, 0.0f, categoryBits, maskBits);
-	boundingColLeft_Physics->initBox(b2BodyType::b2_staticBody, { 0,RocketBall::gameInstance->windowSize.y / phyScale }, boundingColliderLeft_obj->getPosition() / phyScale, 0.0f, categoryBits, maskBits);
+	auto boundingCollider_obj = RocketBall::gameInstance->createGameObject();
+	boundingCollider_obj->name = "BoundingCollider";
+	boundingCollider_obj->setPosition({ pos.x * RocketBall::gameInstance->windowSize.x * 0.5f, 0.0f });
+	auto boundingColRight_Physics = boundingCollider_obj->addComponent<PhysicsComponent>();
+	boundingColRight_Physics->initBox(b2BodyType::b2_staticBody, { 0,RocketBall::gameInstance->windowSize.y / phyScale }, boundingCollider_obj->getPosition() / phyScale, 0.0f, categoryBits, maskBits);
 }
 
 ////////////// FUNCTION TO CREATE AN ABILITYBOX
